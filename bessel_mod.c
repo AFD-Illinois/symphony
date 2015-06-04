@@ -101,9 +101,9 @@ double my_Bessel_J( double n, double x )
 
 //#if FLAG_N_JN == JN_C_LIB
   /* At least for GNU C Library, jn(n,x) requires n to be integer. */
- // if( n < N_JN ) { 
-//    return( jn((int)n,x) );
-//  }
+ if( n < N_JN ) { 
+    return( jn((int)n,x) );
+  }
 //#elif FLAG_N_JN == JN_C_LIB_interpolate
 //  double dn;
 //  int ni;
@@ -119,9 +119,9 @@ double my_Bessel_J( double n, double x )
 //    return( (1.-dn)*jn(ni,x) + dn*jn(ni+1,x) );
 //  }
 //#elif FLAG_N_JN == JN_GSL
-  if( n < N_JN ) { 
-    return( gsl_sf_bessel_Jnu(n,x) );
-  }
+//  if( n < N_JN ) { 
+//    return( gsl_sf_bessel_Jnu(n,x) );
+//  }
 //#elif FLAG_N_JN == JN_Chishtie
 //#else
 //  #error "FLAG_N_JN is not set correctly"
