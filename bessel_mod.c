@@ -99,33 +99,33 @@ double my_Bessel_J( double n, double x )
   double BesselJ_Asympt1(        double n, double x);
   double BesselJ_bigx(           double n , double x );
 
-#if FLAG_N_JN == JN_C_LIB
+//#if FLAG_N_JN == JN_C_LIB
   /* At least for GNU C Library, jn(n,x) requires n to be integer. */
-  if( n < N_JN ) { 
-    return( jn((int)n,x) );
-  }
-#elif FLAG_N_JN == JN_C_LIB_interpolate
-  double dn;
-  int ni;
+ // if( n < N_JN ) { 
+//    return( jn((int)n,x) );
+//  }
+//#elif FLAG_N_JN == JN_C_LIB_interpolate
+//  double dn;
+//  int ni;
 
   /* At least for GNU C Library, jn(n,x) requires n to be integer. Therefore linear 
    *  interpolation is used to calculate J_n. */
   /* If we just return jn(n,x), the bessel function at small n is a step function with 
    *  jumps at every integer. The integrand of n integration becomes spiky for n < N_JN */
-  if( n < N_JN ) { 
-    ni = (int)n;
-    dn = n - ni;
+//  if( n < N_JN ) { 
+//    ni = (int)n;
+//    dn = n - ni;
 
-    return( (1.-dn)*jn(ni,x) + dn*jn(ni+1,x) );
-  }
-#elif FLAG_N_JN == JN_GSL
+//    return( (1.-dn)*jn(ni,x) + dn*jn(ni+1,x) );
+//  }
+//#elif FLAG_N_JN == JN_GSL
   if( n < N_JN ) { 
     return( gsl_sf_bessel_Jnu(n,x) );
   }
-#elif FLAG_N_JN == JN_Chishtie
-#else
-  #error "FLAG_N_JN is not set correctly"
-#endif
+//#elif FLAG_N_JN == JN_Chishtie
+//#else
+//  #error "FLAG_N_JN is not set correctly"
+//#endif
 
   fn = n;
   logn = log10(fn);
