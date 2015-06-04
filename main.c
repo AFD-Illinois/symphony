@@ -19,9 +19,7 @@ double theta_e = 10.;
 double e = 4.80320680e-10;
 double B = 30.;
 double n_e = 1.;
-//double nu_c = (e * B)/(2. * M_PI * m * c);
 double theta = (M_PI  / 3.);
-//double nu_s = (2./9.) * nu_c * theta_e*theta_e * sin(theta);
 int C = 10;
 
 
@@ -29,7 +27,9 @@ double n_peak(double nu);
 double K_s(double gamma, int n, double nu);
 double my_Bessel_J(double n, double x);
 double my_Bessel_dJ(double n, double x);
+double MJ_f(double gamma);
 double I(double gamma, double n, double nu);
+
 int main(int argc, char *argv[])
 {
 	//define parameters of calculation
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	double nu = 1. * nu_c;
 	double * jn;
 	//printf("\n%f\n", K_s(10, 10, nu));
-	printf("\n%f\n", gsl_sf_bessel_Kn(2, 1./theta_e));
+	printf("\n%f\n", I(5, 4., nu)*1e18 );
 	//printf("\n%f\n", my_Bessel_dJ(2000., 3000.));
 	return 0;
 }
