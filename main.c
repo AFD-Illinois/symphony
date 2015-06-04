@@ -29,6 +29,8 @@ double my_Bessel_J(double n, double x);
 double my_Bessel_dJ(double n, double x);
 double MJ_f(double gamma);
 double I(double gamma, double n, double nu);
+double trapez(double min, double max);
+double gamma_integrand(double gamma, double n, double nu);
 
 int main(int argc, char *argv[])
 {
@@ -38,7 +40,7 @@ int main(int argc, char *argv[])
 	double nu = 1. * nu_c;
 	double * jn;
 	//printf("\n%f\n", K_s(10, 10, nu));
-	printf("\n%f\n", I(5, 4., nu)*1e18 );
+	printf("\n%f\n", gamma_integrand(1.5, 1., nu)*1e26);
 	//printf("\n%f\n", my_Bessel_dJ(2000., 3000.));
 	return 0;
 }
@@ -88,4 +90,32 @@ double I(double gamma, double n, double nu)
 	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
 	double ans = (2. * M_PI * e*e * nu*nu)/c * (pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta * 2. * M_PI) * MJ_f(gamma) * K_s(gamma, n, nu);
 	return ans;
+}
+
+double gamma_integrand(double gamma, double n, double nu)
+{
+	double nu_c = (e * B)/(2. * M_PI * m * c);
+	double beta = sqrt(1. - 1./(gamma*gamma));
+	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
+	double ans = 1./(nu * beta * fabs(cos(theta))) * I(gamma, n, nu);
+	return ans;
+}
+
+double trapez (double min, double max)
+{
+	int n;
+	float interval, sum=0., x;
+	int divisions = 100;
+
+	interval = ((max-min) / (divisions-1));
+
+	for (n=2; n<divisions; n++)           	/* sum the midpoints */
+   	{
+      		x    = interval * (n-1);
+      		//sum += f(x)*interval;
+   	}
+   
+	//sum += 0.5 *(f(min) + f(max)) * interval; /* add the endpoints */
+	sum = 0;
+   	return (sum);
 }
