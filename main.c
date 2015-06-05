@@ -23,7 +23,6 @@ double theta = (M_PI  / 3.);
 int C = 10;
 double n_max = 30.;
 
-
 double n_peak(double nu);
 double K_s(double gamma, double n, double nu);
 double my_Bessel_J(double n, double x);
@@ -32,18 +31,33 @@ double MJ_f(double gamma);
 double I(double gamma, double n, double nu);
 double trapez_gamma(double min, double max, double n, double nu);
 double trapez_n(double min, double max, double nu);
-double gamma_integrand(double gamma, double n, double nu);
-double gamma_integration_result(double n, double nu);
+//double gamma_integrand(double gamma, double n, double nu);
+double gamma_integrand(double gamma, void * params);
+//double gamma_integration_result(double n, double nu);
+double gamma_integration_result(double n, void * params);
 double n_summation(double nu);
 double n_integration(double n_minus, double nu);
-//double integrand(double gamma);
+double integrate(double min, double max, double n, double nu);
+double gsl_integrate(double min, double max, double n, double nu);
+
+struct parameters
+{
+	double n;
+	double nu;
+};
 
 int main(int argc, char *argv[])
 {
 	//define parameters of calculation
 	double nu_c = (e * B)/(2. * M_PI * m * c);
-	double nu = 100. * nu_c;
-	n_summation(nu);
+	int index = 0;
+	double nu = 1. * nu_c;
+	for(index; index < 7; index++)
+	{
+		double nu = pow(10., index) * nu_c;
+		n_summation(nu);
+	}
+	//printf("\n%e\n", gamma_integration_result(10, &nu));
 	return 0;
 }
 
@@ -93,8 +107,17 @@ double I(double gamma, double n, double nu)
 	return ans;
 }
 
-double gamma_integrand(double gamma, double n, double nu)
+//double gamma_integrand(double gamma, double n, double nu)
+double gamma_integrand(double gamma, void * params)
 {
+	struct parameters n_and_nu = *(struct parameters*) params;
+	double n = n_and_nu.n;
+	double nu = n_and_nu.nu;
+	//printf("\n%e\n", 5.0);
+	//double nu = 1;
+	//double n = 1;
+	//printf("\n\n\n%e\n\n", p);
+	//double nu = *(double *) params;
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	double beta = sqrt(1. - 1./(gamma*gamma));
 	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
@@ -103,49 +126,17 @@ double gamma_integrand(double gamma, double n, double nu)
 	return ans;
 }
 
-double gamma_integration_result(double n, double nu)
+//double gamma_integration_result(double n, double nu)
+double gamma_integration_result(double n, void * params)
 {
+	double nu = *(double *) params;
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	double gamma_minus = ((n*nu_c)/nu - fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
 	double gamma_plus  = ((n*nu_c)/nu + fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
-	double result = trapez_gamma(gamma_minus, gamma_plus, n, nu);
+	//double result = trapez_gamma(gamma_minus, gamma_plus, n, nu);
+	double result = gsl_integrate(gamma_minus, gamma_plus, n, nu);
+
 	return result;
-}
-
-double trapez_gamma (double min, double max, double n, double nu)
-{
-	int i;
-	float interval, sum=0., x;
-	int divisions = 1000;
-
-	interval = ((max-min) / (divisions-1));
-
-	for (i=2; i<divisions; i++)
-   	{
-      		x    = min + interval * (i-1);
-      		sum += gamma_integrand(x, n, nu)*interval;
-   	}
-
-	//sum += 0.5 *(gamma_integrand(min, n, nu) + gamma_integrand(max, n, nu)) * interval;
-   	return (sum);
-}
-
-double trapez_n(double min, double max, double nu)
-{
-	int i;
-	float interval, sum=0., x;
-	int divisions = 1000;
-
-	interval = ((max-min) / (divisions-1));
-
-	for (i=2; i<divisions; i++)
-   	{
-      		x    = min + interval * (i-1);
-      		sum += gamma_integration_result(x, nu)*interval;
-   	}
-
-	//sum += 0.5 *(gamma_integration_result(min, nu) + gamma_integration_result(max, nu)) * interval;
-   	return (sum);
 }
 
 double n_integration(double n_minus, double nu)
@@ -155,7 +146,8 @@ double n_integration(double n_minus, double nu)
 		n_max = n_minus;
 	}
 
-	double ans = trapez_n(n_max, C * n_peak(nu), nu);
+	//double ans = trapez_n(n_max, C * n_peak(nu), nu);
+	double ans = gsl_integrate(n_max, C * n_peak(nu), -1, nu);
 	return ans;
 }
 
@@ -167,10 +159,10 @@ double n_summation(double nu)
 	int x = (int)(n_minus+1.);
 	for(x; x <= n_max + (int)n_minus ; x++)
 	{
-		j_nu += gamma_integration_result(x, nu);
+		j_nu += gamma_integration_result(x, &nu);
 	}
 
-	printf("\n%e\n", j_nu);
+	//printf("\n%e\n", j_nu);
 	j_nu = j_nu + n_integration(n_minus, nu);
 	printf("\n%e\n", j_nu);
 	return j_nu;
