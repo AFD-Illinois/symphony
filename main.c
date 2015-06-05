@@ -23,6 +23,14 @@ double theta = (M_PI  / 3.);
 int C = 10;
 double n_max = 30.;
 
+//power law parameters
+double p = 3.;
+double gamma_min = 1.;
+double gamma_max = 1000.;
+double n_e_NT = 1.;
+double gamma_cutoff = 1000.;
+
+//function declarations
 double n_peak(double nu);
 double K_s(double gamma, double n, double nu);
 double my_Bessel_J(double n, double x);
@@ -31,15 +39,17 @@ double MJ_f(double gamma);
 double I(double gamma, double n, double nu);
 double trapez_gamma(double min, double max, double n, double nu);
 double trapez_n(double min, double max, double nu);
-//double gamma_integrand(double gamma, double n, double nu);
 double gamma_integrand(double gamma, void * params);
-//double gamma_integration_result(double n, double nu);
 double gamma_integration_result(double n, void * params);
 double n_summation(double nu);
 double n_integration(double n_minus, double nu);
 double integrate(double min, double max, double n, double nu);
 double gsl_integrate(double min, double max, double n, double nu);
+double normalize_f();
+double power_law_to_be_normalized(double gamma, void * params);
+double power_law_f(double gamma);
 
+//struct to pass parameters to integrand
 struct parameters
 {
 	double n;
@@ -52,12 +62,12 @@ int main(int argc, char *argv[])
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	int index = 0;
 	double nu = 1. * nu_c;
-	for(index; index < 7; index++)
-	{
-		double nu = pow(10., index) * nu_c;
-		n_summation(nu);
-	}
-	//printf("\n%e\n", gamma_integration_result(10, &nu));
+	//for(index; index < 7; index++)
+	//{
+	//	double nu = pow(10., index) * nu_c;
+	//	n_summation(nu);
+	//}
+	printf("\n%f\n", normalize_f());
 	return 0;
 }
 
@@ -95,6 +105,25 @@ double MJ_f(double gamma)
 	double beta = sqrt(1. - 1./(gamma*gamma));
 	double d = (n_e * gamma * sqrt(gamma*gamma-1.) * exp(-gamma/theta_e))/(4. * M_PI * theta_e * gsl_sf_bessel_Kn(2, 1./theta_e));
 	double ans = 1./(pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta) * d;
+	return ans;
+}
+
+//power law distribution function
+double power_law_to_be_normalized(double gamma, void * params)
+{
+	double norm_term = 4. * M_PI;
+	double prefactor = n_e_NT * (p - 1.) / (pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
+	double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
+	double pl_no_norm = norm_term * prefactor * body;
+	//double ans = pl_no_norm 
+	return pl_no_norm;
+}
+
+double power_law_f(double gamma)
+{
+	double prefactor = n_e_NT * (p - 1.) / (pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
+	double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
+	double ans = 1./normalize_f() * prefactor * body;
 	return ans;
 }
 
