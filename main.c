@@ -48,6 +48,8 @@ double gsl_integrate(double min, double max, double n, double nu);
 double normalize_f();
 double power_law_to_be_normalized(double gamma, void * params);
 double power_law_f(double gamma);
+double n_integration_adaptive(double n_max, double n_minus);
+double derivative(double n_start, double nu);
 
 //struct to pass parameters to integrand
 struct parameters
@@ -62,12 +64,14 @@ int main(int argc, char *argv[])
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	int index = 0;
 	double nu = 1. * nu_c;
-	//for(index; index < 7; index++)
-	//{
-	//	double nu = pow(10., index) * nu_c;
-	//	n_summation(nu);
-	//}
-	printf("\n%e\n", power_law_f(105));
+	for(index; index < 7; index++)
+	{
+		double nu = pow(10., index) * nu_c;
+		n_summation(nu);
+		printf("%e\n\n", nu/nu_c);
+	}
+	//n_summation(nu);
+	//printf("\n%e\n", power_law_f(10));
 	return 0;
 }
 
@@ -132,7 +136,8 @@ double I(double gamma, double n, double nu)
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	double beta = sqrt(1. - 1./(gamma*gamma));
 	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
-	double ans = (2. * M_PI * e*e * nu*nu)/c * (pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta * 2. * M_PI) * MJ_f(gamma) * K_s(gamma, n, nu);
+	//distribution function goes in here
+	double ans = (2. * M_PI * e*e * nu*nu)/c * (pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta * 2. * M_PI) * power_law_f(gamma) * K_s(gamma, n, nu);
 	return ans;
 }
 
@@ -166,10 +171,43 @@ double n_integration(double n_minus, double nu)
 {
 	if(n_max < n_minus)
 	{
-		n_max = n_minus;
+		n_max = (int) (n_minus+1);
 	}
 	
 	double ans = gsl_integrate(n_max, C * n_peak(nu), -1, nu);
+	return ans;
+}
+
+double n_integration_adaptive(double n_minus, double nu)
+{
+	//if(n_max < n_minus)
+	//{
+	//	n_max = (int)(n_minus + 1.)
+	//}
+	double n_start = (int)(n_max + n_minus + 1.);
+	double ans = 0.;
+	double contrib = 0.;
+	int i = 0;
+	double delta_n = 1.e5;
+	double deriv_tol = 1.e-10;
+	double tolerance = 1.e13;
+
+	while(contrib >= ans/tolerance)
+	{
+		double deriv = derivative(n_start, nu);
+		if(fabs(deriv) < deriv_tol)
+		{
+			delta_n = 100. * delta_n;
+			//delta_n = 1. * delta_n;
+		}
+
+		contrib = gsl_integrate(n_start, (n_start + delta_n), -1, nu);
+		ans = ans + contrib;
+		n_start = n_start + delta_n;
+		i++;
+		//printf("\n%d\n", i);
+	}
+
 	return ans;
 }
 
@@ -184,7 +222,16 @@ double n_summation(double nu)
 		j_nu += gamma_integration_result(x, &nu);
 	}
 
-	j_nu = j_nu + n_integration(n_minus, nu);
+	j_nu = j_nu + n_integration_adaptive(n_minus, nu);
 	printf("\n%e\n", j_nu);
 	return j_nu;
+}
+
+double derivative(double n_start, double nu)
+{
+	double dx = 0.01;
+	double yhigh = gamma_integration_result(n_start + dx/2., &nu);
+	double ylow  = gamma_integration_result(n_start - dx/2., &nu);
+	double ans = (yhigh - ylow)/dx;
+	return ans;
 }
