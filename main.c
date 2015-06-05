@@ -134,7 +134,7 @@ double gamma_integration_result(double n, void * params)
 	double gamma_minus = ((n*nu_c)/nu - fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
 	double gamma_plus  = ((n*nu_c)/nu + fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
 	//double result = trapez_gamma(gamma_minus, gamma_plus, n, nu);
-	double result = gsl_integrate(gamma_minus, gamma_plus, n, nu);
+	double result = integrate(gamma_minus, gamma_plus, n, nu);
 
 	return result;
 }
@@ -147,7 +147,7 @@ double n_integration(double n_minus, double nu)
 	}
 
 	//double ans = trapez_n(n_max, C * n_peak(nu), nu);
-	double ans = gsl_integrate(n_max, C * n_peak(nu), -1, nu);
+	double ans = integrate(n_max, C * n_peak(nu), -1, nu);
 	return ans;
 }
 
