@@ -24,14 +24,14 @@ int C = 10;
 double n_max = 30.;
 
 //power law parameters
-double p = 3.;
+double p = 2.5;
 double gamma_min = 1.;
 double gamma_max = 1000.;
 double n_e_NT = 1.;
-//double gamma_cutoff = 1000.;
+//double gamma_cutoff = 1000.; also a kappa distribution parameter
 
 //kappa distribution parameters
-double kappa = 150;
+double kappa = 3.5;
 double gamma_cutoff = 1000;
 
 //function declarations
@@ -54,7 +54,6 @@ double kappa_to_be_normalized(double gamma, void * params);
 double kappa_f(double gamma);
 double n_integration_adaptive(double n_max, double n_minus);
 double derivative(double n_start, double nu);
-//from absorptivity
 double K_q(double gamma, double n, double nu);
 double K_u(double gamma, double n, double nu);
 double K_v(double gamma, double n, double nu);
@@ -73,25 +72,24 @@ struct parameters
 #define MJ (0)
 #define POWER_LAW (1)
 #define KAPPA_DIST (2)
-#define DISTRIBUTION_FUNCTION (KAPPA_DIST)
+#define DISTRIBUTION_FUNCTION (MJ)
 
 //choose absorptivity or emissivity
 #define ABSORP (10)
 #define EMISS  (11)
-#define MODE   (ABSORP)
+#define MODE   (EMISS)
 
 int main(int argc, char *argv[])
 {
 	//define parameters of calculation
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	int index = 0;
-	double nu = 1. * nu_c;
-	for(index; index < 7; index++)
+	//double nu = 1. * nu_c;
+	for(index; index < 15; index++)
 	{
-		double nu = pow(10., index) * nu_c;
+		double nu = pow(10., index/2.) * nu_c;
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
 	}
-	//printf("\n%e\n\n", power_law_f(10));
 	printf("\n");
 	return 0;
 }
@@ -308,10 +306,6 @@ double n_integration(double n_minus, double nu)
 
 double n_integration_adaptive(double n_minus, double nu)
 {
-	//if(n_max < n_minus)
-	//{
-	//	n_max = (int)(n_minus + 1.)
-	//}
 	double n_start = (int)(n_max + n_minus + 1.);
 	double ans = 0.;
 	double contrib = 0.;
@@ -387,8 +381,6 @@ double normalize_f()
 #else
 	return 0;
 #endif
-
-	//printf("\n%e\n", kappa);
 	double unused = 0.;
 	F.params = &unused;
 

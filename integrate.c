@@ -21,7 +21,6 @@ double integrate(double min, double max, double n, double nu)
 		int i;
 		float interval, sum=0., x;
 		int divisions = 100;
-		//printf("\n%e\n", test());
 		interval = ((max-min) / (divisions-1));
 
 		for (i=2; i<divisions; i++)
@@ -50,7 +49,6 @@ double integrate(double min, double max, double n, double nu)
    		}
 		//sum += 0.5 *(gamma_integrand(min, n, nu) + gamma_integrand(max, n, nu)) * interval;
    		return (sum);
-		//return 5;
 	}
 }
 
@@ -71,7 +69,6 @@ double gsl_integrate(double min, double max, double n, double nu)
                       3,  w, &result, &error);
 
 		gsl_integration_workspace_free (w);
-		//printf("\n%s\n", "n integration");
 		return result;
 	}
 	else
@@ -82,7 +79,6 @@ double gsl_integrate(double min, double max, double n, double nu)
 		struct parameters n_and_nu;
 		n_and_nu.n = n;
 		n_and_nu.nu = nu;
-		//printf("\n\n%e\n\n\n", n_and_nu.nu);
 
 		gsl_function F;
 		F.function = &gamma_integrand;
@@ -96,29 +92,27 @@ double gsl_integrate(double min, double max, double n, double nu)
 		return result; 
 	}
 }
+//still working on this
 /*
-double normalize_f()
+double s_integrate(double min, double max, double n, double nu)
 {
-	gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
-	double result, error;
+	int i = 10;
+	if(i % 2 != 0)
+	{
+		i = i + 1;
+	}
+	double h = (max - min)/i;
+	double s = gamma_integration_result(min, &nu) + gamma_integration_result(max, &nu);
 
-	gsl_function F;
-#if DISTRIBUTION_FUNCTION == POWER_LAW
-	F.function = &power_law_to_be_normalized;
-#elif DISTRIBUTION_FUNCTION == KAPPA_DIST
-	F.function = &kappa_to_be_normalized;
-#else
-	return 0;
-#endif
+	for(i; i < n; i+=2)
+	{
+		s += 4. * gamma_integration_result(min+i*h);
+	}
+	for(i; i < n-1; i+=2)
+	{
+		s += 2 * gamma_integration_result(min+i*h);
+	}
 
-	//printf("\n%e\n", kappa);
-	double unused = 0.;
-	F.params = &unused;
-
-	gsl_integration_qagiu(&F, 1, 0, 1e-8, 1000,
-	                       w, &result, &error);
-	gsl_integration_workspace_free (w);
-	return result;
-
+	return s * h / 3.;
 }
 */
