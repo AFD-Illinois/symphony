@@ -70,7 +70,7 @@ double gsl_integrate(double min, double max, double n, double nu)
                       3,  w, &result, &error);
 
 		gsl_integration_workspace_free (w);
-		printf("\n%s\n", "n integration");
+		//printf("\n%s\n", "n integration");
 		return result;
 	}
 	else
