@@ -31,7 +31,7 @@ double n_e_NT = 1.;
 //double gamma_cutoff = 1000.;
 
 //kappa distribution parameters
-double kappa = 150.;
+double kappa = 5.;
 double gamma_cutoff = 1000;
 
 //function declarations
@@ -73,13 +73,13 @@ int main(int argc, char *argv[])
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	int index = 0;
 	double nu = 1. * nu_c;
-	for(index; index < 7; index++)
-	{
-		double nu = pow(10., index) * nu_c;
-		printf("\n%e	%e", nu/nu_c, n_summation(nu));
-	}
-	//printf("\n%e\n\n", kappa_f(10.));
-	printf("\n");
+	//for(index; index < 14; index++)
+	//{
+	//	double nu = pow(10., index/2.) * nu_c;
+	//	printf("\n%e	%e", nu/nu_c, n_summation(nu));
+	//}
+	printf("\n%e\n\n", power_law_f(10));
+	//printf("\n");
 	return 0;
 }
 

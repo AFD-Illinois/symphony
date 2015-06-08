@@ -42,9 +42,12 @@ double K_u(double gamma, double n, double nu);
 double K_v(double gamma, double n, double nu);
 double D_thermal(double gamma, double nu);
 double D_pl(double gamma, double nu);
+double D_kappa(double gamma, double nu);
 double my_Bessel_J(double n, double x);
 double my_Bessel_dJ(double n, double x);
 double MJ_f(double gamma);
+double kappa_to_be_normalized(double gamma, void * params);
+double kappa_f(double gamma);
 double I(double gamma, double n, double nu);
 double gamma_integrand(double gamma, void * params);
 double gamma_integration_result(double n, void * params);
@@ -81,8 +84,9 @@ int main(int argc, char *argv[])
 		double nu = pow(10., index) * nu_c;
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
 	}
-	//printf("\n");
-	//printf("\n%e\n", 0.5/normalize_f());
+	printf("\n");
+	//printf("\n%e\n", D_pl(10., nu));
+	//printf("\n%e\n", 1./normalize_f());
 	return 0;
 }
 
@@ -147,7 +151,6 @@ double K_v(double gamma, double n, double nu)
 	return ans;
 }
 
-//this is specific to the thermal (MJ) distribution
 double D_thermal(double gamma, double nu)
 {
 	double prefactor = (M_PI * nu / (m*c*c)) * (n_e/(theta_e * gsl_sf_bessel_Kn(2, 1./theta_e)));
@@ -156,11 +159,11 @@ double D_thermal(double gamma, double nu)
 	return f;
 }
 
-//this is specific to the power-law distribution
 double D_pl(double gamma, double nu)
 {
-	//not sure where we lost the factor of 2.
-	double pl_norm = 1./(2.*normalize_f());
+	//not sure where we lost the factor of 1/2
+	double pl_norm = 1./(normalize_f());
+	//double pl_norm = 1.0019951442;
 	//printf("\n%e\n", pl_norm);
 	double prefactor = (M_PI * nu / (m*c*c)) * (n_e_NT*(p-1.))/((pow(gamma_min, 1.-p) - pow(gamma_max, 1.-p)));
 	double term1 = ((-p-1.)*exp(-gamma/gamma_cutoff)*pow(gamma,-p-2.)/(sqrt(gamma*gamma - 1.)));
@@ -192,12 +195,12 @@ double MJ_f(double gamma)
 double power_law_to_be_normalized(double gamma, void * params)
 {
 	double norm_term = 4. * M_PI;
-	double prefactor = n_e_NT * (p - 1.) / (pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
+	double prefactor = n_e_NT * (p - 1.) / (4. * M_PI * pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
 	double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
-	//double ans = norm_term * prefactor * body;
-	double ans = body;
+	double ans = norm_term * prefactor * body;
 	return ans;
 }
+
 
 double power_law_f(double gamma)
 {
@@ -205,6 +208,24 @@ double power_law_f(double gamma)
 	double prefactor = n_e_NT * (p - 1.) / (pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
 	double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
 	double ans = 1./normalize_f() * prefactor * body * 1./(pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta);
+	return ans;
+}
+
+double kappa_to_be_normalized(double gamma, void * params)
+{
+	double kappa_body = pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-1);
+	double cutoff = exp(-gamma/gamma_cutoff);
+	double norm_term = 4. * M_PI * pow(m, 3.) * pow(c, 3.) * gamma * sqrt(gamma*gamma-1.);
+	double ans = kappa_body * cutoff * norm_term;
+	return ans;
+}
+
+double kappa_f(double gamma)
+{
+	double norm = 1./normalize_f();
+	double kappa_body = pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-1);
+	double cutoff = exp(-gamma/gamma_cutoff);
+	double ans = norm * kappa_body * cutoff;
 	return ans;
 }
 
