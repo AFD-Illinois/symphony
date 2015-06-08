@@ -61,9 +61,9 @@ struct parameters
 	double nu;
 };
 
-//#define MJ (0)
-//#define POWER_LAW
-//#define DISTRIBUTION_FUNCTION (MJ)
+#define MJ (0)
+#define POWER_LAW (1)
+#define DISTRIBUTION_FUNCTION (POWER_LAW)
 
 int main(int argc, char *argv[])
 {
@@ -230,7 +230,13 @@ double gamma_integrand(double gamma, void * params)
 	double beta = sqrt(1. - 1./(gamma*gamma));
 	double prefactor = -c*e*e / (2. * nu);
 	//polarization mode goes in below
+#if DISTRIBUTION_FUNCTION == MJ
 	double ans = prefactor*gamma*gamma*beta*D_thermal(gamma, nu)*K_s(gamma, n, nu)*(1./(nu*beta*fabs(cos(theta))));
+#elif DISTRIBUTION_FUNCTION == POWER_LAW
+	double ans = prefactor*gamma*gamma*beta*D_pl(gamma, nu)*K_s(gamma, n, nu)*(1./(nu*beta*fabs(cos(theta))));
+#else
+	double ans = 0.;
+#endif
 	return ans;
 }
 
@@ -301,7 +307,13 @@ double n_summation(double nu)
 		j_nu += gamma_integration_result(x, &nu);
 	}
 
+#if DISTRIBUTION_FUNCTION == MJ
 	j_nu = j_nu + n_integration(n_minus, nu);
+#elif DISTRIBUTION_FUNCTION == POWER_LAW
+	j_nu = j_nu + n_integration_adaptive(n_minus, nu);
+#else
+	j_nu = 0.;
+#endif
 	//printf("\n%e\n", j_nu);
 	return j_nu;
 }

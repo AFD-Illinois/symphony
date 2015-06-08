@@ -58,6 +58,10 @@ struct parameters
 	double nu;
 };
 
+#define MJ (0)
+#define POWER_LAW (1)
+#define DISTRIBUTION_FUNCTION (POWER_LAW)
+
 int main(int argc, char *argv[])
 {
 	//define parameters of calculation
@@ -138,7 +142,14 @@ double I(double gamma, double n, double nu)
 	double beta = sqrt(1. - 1./(gamma*gamma));
 	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
 	//distribution function goes in here
+#if DISTRIBUTION_FUNCTION == MJ
 	double ans = (2. * M_PI * e*e * nu*nu)/c * (pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta * 2. * M_PI) * MJ_f(gamma) * K_s(gamma, n, nu);
+#elif DISTRIBUTION_FUNCTION == POWER_LAW
+	double ans = (2. * M_PI * e*e * nu*nu)/c * (pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta * 2. * M_PI) * power_law_f(gamma) * K_s(gamma, n, nu);
+#else
+	double ans = 0;
+#endif
+
 	return ans;
 }
 
@@ -223,7 +234,13 @@ double n_summation(double nu)
 		j_nu += gamma_integration_result(x, &nu);
 	}
 
+#if DISTRIBUTION_FUNCTION == MJ
 	j_nu = j_nu + n_integration(n_minus, nu);
+#elif DISTRIBUTION_FUNCTION == POWER_LAW
+	j_nu = j_nu + n_integration_adaptive(n_minus, nu);
+#else
+	j_nu = 0.;
+#endif
 	//printf("\n%e\n", j_nu);
 	return j_nu;
 }
