@@ -28,7 +28,11 @@ double p = 3.;
 double gamma_min = 1.;
 double gamma_max = 1000.;
 double n_e_NT = 1.;
-double gamma_cutoff = 1000.;
+//double gamma_cutoff = 1000.; this is also a kappa_dist parameter
+
+//kappa distribution parameters
+double kappa = 150.;
+double gamma_cutoff = 1000;
 
 //function declarations
 double n_peak(double nu);
@@ -63,6 +67,7 @@ struct parameters
 
 #define MJ (0)
 #define POWER_LAW (1)
+#define KAPPA_DIST (2)
 #define DISTRIBUTION_FUNCTION (POWER_LAW)
 
 int main(int argc, char *argv[])
@@ -74,16 +79,10 @@ int main(int argc, char *argv[])
 	for(index; index < 7; index++)
 	{
 		double nu = pow(10., index) * nu_c;
-		n_summation(nu);
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
 	}
-	printf("\n");
-	//n_summation(nu);
-	//struct parameters p;
-	//p.n = 10.;
-	//p.nu = nu;
-	//printf("\n%e\n", D_pl(10., nu));
-	//printf("\n%e\n", absorptivity_integrand(10., 10., nu));
+	//printf("\n");
+	//printf("\n%e\n", 0.5/normalize_f());
 	return 0;
 }
 
@@ -160,14 +159,24 @@ double D_thermal(double gamma, double nu)
 //this is specific to the power-law distribution
 double D_pl(double gamma, double nu)
 {
-	//double pl_norm = 1./normalize_f();
+	//not sure where we lost the factor of 2.
+	double pl_norm = 1./(2.*normalize_f());
 	//printf("\n%e\n", pl_norm);
 	double prefactor = (M_PI * nu / (m*c*c)) * (n_e_NT*(p-1.))/((pow(gamma_min, 1.-p) - pow(gamma_max, 1.-p)));
 	double term1 = ((-p-1.)*exp(-gamma/gamma_cutoff)*pow(gamma,-p-2.)/(sqrt(gamma*gamma - 1.)));
 	double term2 = (exp(-gamma/gamma_cutoff) * pow(gamma,(-p-1.))/(gamma_cutoff * sqrt(gamma*gamma - 1.)));
 	double term3 = (exp(-gamma/gamma_cutoff) * pow(gamma,-p))/pow((gamma*gamma - 1.), (3./2.));
-	//double f = pl_norm * prefactor * (term1 - term2 - term3);
-	double f= prefactor * (term1 - term2 - term3);
+	double f = pl_norm * prefactor * (term1 - term2 - term3);
+	//double f= prefactor * (term1 - term2 - term3);
+	return f;
+}
+
+double D_kappa(double gamma, double nu)
+{
+	double prefactor = (1./normalize_f()) * 4. * M_PI*M_PI * nu * m*m * c;
+	double term1 = pow(((- kappa - 1.) / (kappa * theta_e)) * (1. + (gamma - 1.)/(kappa * theta_e)), -kappa-2.);
+	double term2 = pow((1. + (gamma - 1.)/(kappa * theta_e)), (- kappa - 1.)) * (- 1./gamma_cutoff);
+	double f = prefactor * (term1 + term2) * exp(-gamma/gamma_cutoff);
 	return f;
 }
 
@@ -185,7 +194,8 @@ double power_law_to_be_normalized(double gamma, void * params)
 	double norm_term = 4. * M_PI;
 	double prefactor = n_e_NT * (p - 1.) / (pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
 	double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
-	double ans = norm_term * prefactor * body;
+	//double ans = norm_term * prefactor * body;
+	double ans = body;
 	return ans;
 }
 
@@ -234,6 +244,8 @@ double gamma_integrand(double gamma, void * params)
 	double ans = prefactor*gamma*gamma*beta*D_thermal(gamma, nu)*K_s(gamma, n, nu)*(1./(nu*beta*fabs(cos(theta))));
 #elif DISTRIBUTION_FUNCTION == POWER_LAW
 	double ans = prefactor*gamma*gamma*beta*D_pl(gamma, nu)*K_s(gamma, n, nu)*(1./(nu*beta*fabs(cos(theta))));
+#elif DISTRIBUTION_FUNCTION == KAPPA_DIST
+	double ans = prefactor*gamma*gamma*beta*D_kappa(gamma, nu)*K_s(gamma, n, nu)*(1./(nu*beta*fabs(cos(theta))));
 #else
 	double ans = 0.;
 #endif
@@ -309,7 +321,7 @@ double n_summation(double nu)
 
 #if DISTRIBUTION_FUNCTION == MJ
 	j_nu = j_nu + n_integration(n_minus, nu);
-#elif DISTRIBUTION_FUNCTION == POWER_LAW
+#elif DISTRIBUTION_FUNCTION != MJ
 	j_nu = j_nu + n_integration_adaptive(n_minus, nu);
 #else
 	j_nu = 0.;
@@ -325,4 +337,35 @@ double derivative(double n_start, double nu)
 	double ylow  = gamma_integration_result(n_start - dx/2., &nu);
 	double ans = (yhigh - ylow)/dx;
 	return ans;
+}
+
+double normalize_f()
+{
+	static double ans = 0;
+	if(ans != 0)
+	{
+		return ans;
+	}
+
+	gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
+	double result, error;
+
+	gsl_function F;
+#if DISTRIBUTION_FUNCTION == POWER_LAW
+	F.function = &power_law_to_be_normalized;
+#elif DISTRIBUTION_FUNCTION == KAPPA_DIST
+	F.function = &kappa_to_be_normalized;
+#else
+	return 0;
+#endif
+
+	//printf("\n%e\n", kappa);
+	double unused = 0.;
+	F.params = &unused;
+
+	gsl_integration_qagiu(&F, 1, 0, 1e-8, 1000,
+	                       w, &result, &error);
+	gsl_integration_workspace_free (w);
+	ans = result;
+	return result;
 }
