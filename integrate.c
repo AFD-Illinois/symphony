@@ -11,6 +11,7 @@ struct parameters
 double gamma_integrand(double gamma, void * params);
 double gamma_integration_result(double n, void * params);
 double power_law_to_be_normalized(double gamma, void * params);
+double kappa_to_be_normalized(double gamma, void * params);
 
 double integrate(double min, double max, double n, double nu)
 {
@@ -95,14 +96,22 @@ double gsl_integrate(double min, double max, double n, double nu)
 		return result; 
 	}
 }
-
+/*
 double normalize_f()
 {
 	gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
 	double result, error;
 
 	gsl_function F;
+#if DISTRIBUTION_FUNCTION == POWER_LAW
 	F.function = &power_law_to_be_normalized;
+#elif DISTRIBUTION_FUNCTION == KAPPA_DIST
+	F.function = &kappa_to_be_normalized;
+#else
+	return 0;
+#endif
+
+	//printf("\n%e\n", kappa);
 	double unused = 0.;
 	F.params = &unused;
 
@@ -112,3 +121,4 @@ double normalize_f()
 	return result;
 
 }
+*/

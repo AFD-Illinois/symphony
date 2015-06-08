@@ -28,7 +28,11 @@ double p = 3.;
 double gamma_min = 1.;
 double gamma_max = 1000.;
 double n_e_NT = 1.;
-double gamma_cutoff = 1000.;
+//double gamma_cutoff = 1000.;
+
+//kappa distribution parameters
+double kappa = 150.;
+double gamma_cutoff = 1000;
 
 //function declarations
 double n_peak(double nu);
@@ -37,8 +41,6 @@ double my_Bessel_J(double n, double x);
 double my_Bessel_dJ(double n, double x);
 double MJ_f(double gamma);
 double I(double gamma, double n, double nu);
-double trapez_gamma(double min, double max, double n, double nu);
-double trapez_n(double min, double max, double nu);
 double gamma_integrand(double gamma, void * params);
 double gamma_integration_result(double n, void * params);
 double n_summation(double nu);
@@ -48,6 +50,8 @@ double gsl_integrate(double min, double max, double n, double nu);
 double normalize_f();
 double power_law_to_be_normalized(double gamma, void * params);
 double power_law_f(double gamma);
+double kappa_to_be_normalized(double gamma, void * params);
+double kappa_f(double gamma);
 double n_integration_adaptive(double n_max, double n_minus);
 double derivative(double n_start, double nu);
 
@@ -60,6 +64,7 @@ struct parameters
 
 #define MJ (0)
 #define POWER_LAW (1)
+#define KAPPA_DIST (2)
 #define DISTRIBUTION_FUNCTION (POWER_LAW)
 
 int main(int argc, char *argv[])
@@ -71,12 +76,10 @@ int main(int argc, char *argv[])
 	for(index; index < 7; index++)
 	{
 		double nu = pow(10., index) * nu_c;
-		//n_summation(nu);
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
 	}
+	//printf("\n%e\n\n", kappa_f(10.));
 	printf("\n");
-	//n_summation(nu);
-	//printf("\n%e\n", power_law_f(10));
 	return 0;
 }
 
@@ -117,7 +120,6 @@ double MJ_f(double gamma)
 	return ans;
 }
 
-//power law distribution function
 double power_law_to_be_normalized(double gamma, void * params)
 {
 	double norm_term = 4. * M_PI;
@@ -136,24 +138,42 @@ double power_law_f(double gamma)
 	return ans;
 }
 
+double kappa_to_be_normalized(double gamma, void * params)
+{
+	double kappa_body = pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-1);
+	double cutoff = exp(-gamma/gamma_cutoff);
+	double norm_term = 4. * M_PI * pow(m, 3.) * pow(c, 3.) * gamma * sqrt(gamma*gamma-1.);
+	double ans = kappa_body * cutoff * norm_term;
+	return ans;
+}
+
+double kappa_f(double gamma)
+{
+	double norm = 1./normalize_f();
+	double kappa_body = pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-1);
+	double cutoff = exp(-gamma/gamma_cutoff);
+	double ans = norm * kappa_body * cutoff;
+	return ans;
+}
+
 double I(double gamma, double n, double nu)
 {
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	double beta = sqrt(1. - 1./(gamma*gamma));
 	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
-	//distribution function goes in here
+//I(gamma, n, nu) depends on the distribution function
 #if DISTRIBUTION_FUNCTION == MJ
 	double ans = (2. * M_PI * e*e * nu*nu)/c * (pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta * 2. * M_PI) * MJ_f(gamma) * K_s(gamma, n, nu);
 #elif DISTRIBUTION_FUNCTION == POWER_LAW
 	double ans = (2. * M_PI * e*e * nu*nu)/c * (pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta * 2. * M_PI) * power_law_f(gamma) * K_s(gamma, n, nu);
+#elif DISTRIBUTION_FUNCTION == KAPPA_DIST
+	double ans = (2. * M_PI * e*e * nu*nu)/c * (pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta * 2. * M_PI) * kappa_f(gamma) * K_s(gamma, n, nu);
 #else
 	double ans = 0;
 #endif
-
 	return ans;
 }
 
-//double gamma_integrand(double gamma, double n, double nu)
 double gamma_integrand(double gamma, void * params)
 {
 	struct parameters n_and_nu = *(struct parameters*) params;
@@ -167,7 +187,6 @@ double gamma_integrand(double gamma, void * params)
 	return ans;
 }
 
-//double gamma_integration_result(double n, double nu)
 double gamma_integration_result(double n, void * params)
 {
 	double nu = *(double *) params;
@@ -175,7 +194,6 @@ double gamma_integration_result(double n, void * params)
 	double gamma_minus = ((n*nu_c)/nu - fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
 	double gamma_plus  = ((n*nu_c)/nu + fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
 	double result = gsl_integrate(gamma_minus, gamma_plus, n, nu);
-
 	return result;
 }
 
@@ -185,7 +203,6 @@ double n_integration(double n_minus, double nu)
 	{
 		n_max = (int) (n_minus+1);
 	}
-	
 	double ans = gsl_integrate(n_max, C * n_peak(nu), -1, nu);
 	return ans;
 }
@@ -217,7 +234,6 @@ double n_integration_adaptive(double n_minus, double nu)
 		ans = ans + contrib;
 		n_start = n_start + delta_n;
 		i++;
-		//printf("\n%d\n", i);
 	}
 
 	return ans;
@@ -234,14 +250,13 @@ double n_summation(double nu)
 		j_nu += gamma_integration_result(x, &nu);
 	}
 
-#if DISTRIBUTION_FUNCTION == MJ
+#if DISTRIBUTION_FUNCTION == MJ //we know where peak is analytically
 	j_nu = j_nu + n_integration(n_minus, nu);
-#elif DISTRIBUTION_FUNCTION == POWER_LAW
+#elif DISTRIBUTION_FUNCTION != MJ //need to use adaptive integration
 	j_nu = j_nu + n_integration_adaptive(n_minus, nu);
 #else
 	j_nu = 0.;
 #endif
-	//printf("\n%e\n", j_nu);
 	return j_nu;
 }
 
@@ -252,4 +267,35 @@ double derivative(double n_start, double nu)
 	double ylow  = gamma_integration_result(n_start - dx/2., &nu);
 	double ans = (yhigh - ylow)/dx;
 	return ans;
+}
+
+double normalize_f()
+{
+	static double ans = 0;
+	if(ans != 0)
+	{
+		return ans;
+	}
+
+	gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
+	double result, error;
+
+	gsl_function F;
+#if DISTRIBUTION_FUNCTION == POWER_LAW
+	F.function = &power_law_to_be_normalized;
+#elif DISTRIBUTION_FUNCTION == KAPPA_DIST
+	F.function = &kappa_to_be_normalized;
+#else
+	return 0;
+#endif
+
+	//printf("\n%e\n", kappa);
+	double unused = 0.;
+	F.params = &unused;
+
+	gsl_integration_qagiu(&F, 1, 0, 1e-8, 1000,
+	                       w, &result, &error);
+	gsl_integration_workspace_free (w);
+	ans = result;
+	return result;
 }
