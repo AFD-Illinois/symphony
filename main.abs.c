@@ -71,22 +71,22 @@ struct parameters
 #define MJ (0)
 #define POWER_LAW (1)
 #define KAPPA_DIST (2)
-#define DISTRIBUTION_FUNCTION (POWER_LAW)
+#define DISTRIBUTION_FUNCTION (KAPPA_DIST)
 
 int main(int argc, char *argv[])
 {
 	//define parameters of calculation
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	int index = 0;
-	double nu = 1. * nu_c;
+	//double nu = 1. * nu_c;
 	for(index; index < 7; index++)
 	{
 		double nu = pow(10., index) * nu_c;
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
 	}
 	printf("\n");
-	//printf("\n%e\n", D_pl(10., nu));
-	//printf("\n%e\n", 1./normalize_f());
+	//printf("\n%e\n", D_kappa(10., nu));
+	//printf("\n%e\n", normalize_f());
 	return 0;
 }
 
@@ -177,7 +177,7 @@ double D_pl(double gamma, double nu)
 double D_kappa(double gamma, double nu)
 {
 	double prefactor = (1./normalize_f()) * 4. * M_PI*M_PI * nu * m*m * c;
-	double term1 = pow(((- kappa - 1.) / (kappa * theta_e)) * (1. + (gamma - 1.)/(kappa * theta_e)), -kappa-2.);
+	double term1 = ((- kappa - 1.) / (kappa * theta_e)) * pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-2.);
 	double term2 = pow((1. + (gamma - 1.)/(kappa * theta_e)), (- kappa - 1.)) * (- 1./gamma_cutoff);
 	double f = prefactor * (term1 + term2) * exp(-gamma/gamma_cutoff);
 	return f;
@@ -215,7 +215,7 @@ double kappa_to_be_normalized(double gamma, void * params)
 {
 	double kappa_body = pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-1);
 	double cutoff = exp(-gamma/gamma_cutoff);
-	double norm_term = 4. * M_PI * pow(m, 3.) * pow(c, 3.) * gamma * sqrt(gamma*gamma-1.);
+	double norm_term = 2. * M_PI * pow(m, 3.) * pow(c, 3.) * gamma * sqrt(gamma*gamma-1.);
 	double ans = kappa_body * cutoff * norm_term;
 	return ans;
 }
