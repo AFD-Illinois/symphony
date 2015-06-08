@@ -33,12 +33,16 @@ double gamma_cutoff = 1000.;
 //function declarations
 double n_peak(double nu);
 double K_s(double gamma, double n, double nu);
+double K_q(double gamma, double n, double nu);
+double K_u(double gamma, double n, double nu);
+double K_v(double gamma, double n, double nu);
+double D_thermal(double gamma, double nu);
+double D_pl(double gamma, double nu);
 double my_Bessel_J(double n, double x);
 double my_Bessel_dJ(double n, double x);
 double MJ_f(double gamma);
 double I(double gamma, double n, double nu);
-double trapez_gamma(double min, double max, double n, double nu);
-double trapez_n(double min, double max, double nu);
+double absorptivity_integrand(double gamma, double n, double nu);
 double gamma_integrand(double gamma, void * params);
 double gamma_integration_result(double n, void * params);
 double n_summation(double nu);
@@ -64,15 +68,19 @@ int main(int argc, char *argv[])
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	int index = 0;
 	double nu = 1. * nu_c;
-	for(index; index < 7; index++)
-	{
-		double nu = pow(10., index) * nu_c;
-		//n_summation(nu);
-		printf("\n%e	%e", nu/nu_c, n_summation(nu));
-	}
-	printf("\n");
+	//for(index; index < 7; index++)
+	//{
+	//	double nu = pow(10., index) * nu_c;
+	//	n_summation(nu);
+	//	printf("\n%e	%e", nu/nu_c, n_summation(nu));
+	//}
+	//printf("\n");
 	//n_summation(nu);
-	//printf("\n%e\n", power_law_f(10));
+	//struct parameters p;
+	//p.n = 10.;
+	//p.nu = nu;
+	printf("\n%e\n", D_pl(10., nu));
+	//printf("\n%e\n", absorptivity_integrand(10., 10., nu));
 	return 0;
 }
 
@@ -103,6 +111,59 @@ double K_s(double gamma, double n, double nu)
 	double K_yy = N*N * pow(my_Bessel_dJ(n, z), 2.);
 	double ans = K_xx + K_yy;
 	return ans;
+}
+
+double K_q(double gamma, double n, double nu)
+{
+	double nu_c = (e * B)/(2. * M_PI * m * c);
+	double beta = sqrt(1. - 1./(gamma*gamma));
+	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
+	double M = (cos(theta) - beta * cos_xi)/sin(theta);
+	double N = beta * sqrt(1 - (cos_xi*cos_xi));
+	double z = (nu * gamma * beta * sin(theta) * sqrt(1. - cos_xi*cos_xi))/nu_c;
+	double K_xx = M*M * pow(my_Bessel_J(n, z), 2.);
+	double K_yy = N*N * pow(my_Bessel_dJ(n, z), 2.);
+	double ans = K_xx - K_yy;
+	return ans;
+}
+
+double K_u(double gamma, double n, double nu)
+{
+	double ans = 0.;
+	return ans;
+}
+
+double K_v(double gamma, double n, double nu)
+{
+	double nu_c = (e * B)/(2. * M_PI * m * c);
+	double beta = sqrt(1. - 1./(gamma*gamma));
+	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
+	double M = (cos(theta) - beta * cos_xi)/sin(theta);
+	double N = beta * sqrt(1 - (cos_xi*cos_xi));
+	double z = (nu * gamma * beta * sin(theta) * sqrt(1. - cos_xi*cos_xi))/nu_c;
+	double ans = -2.*M*N*my_Bessel_J(n, z)*my_Bessel_dJ(n, z);
+	return ans;
+}
+
+//this is specific to the thermal (MJ) distribution
+double D_thermal(double gamma, double nu)
+{
+	double prefactor = (M_PI * nu / (m*c*c)) * (n_e/(theta_e * gsl_sf_bessel_Kn(2, 1./theta_e)));
+	double body = (-1./theta_e) * exp(-gamma/theta_e);
+	double f = prefactor * body;
+	return f;
+}
+
+//this is specific to the power-law distribution
+double D_pl(double gamma, double nu)
+{
+	double pl_norm = 1./normalize_f();
+	double prefactor = (M_PI * nu / (m*c*c)) * (n_e_NT*(p-1.))/((pow(gamma_min, 1.-p) - pow(gamma_max, 1.-p)));
+	double term1 = ((-p-1.)*exp(-gamma/gamma_cutoff)*pow(gamma,-p-2.)/(sqrt(gamma*gamma - 1.)));
+	double term2 = (exp(-gamma/gamma_cutoff) * pow(gamma,(-p-1.))/(gamma_cutoff * sqrt(gamma*gamma - 1.)));
+	double term3 = (exp(-gamma/gamma_cutoff) * pow(gamma,-p))/pow((gamma*gamma - 1.), (3./2.));
+	double f = pl_norm * prefactor * (term1 - term2 - term3);
+	return f;
 }
 
 double MJ_f(double gamma)
@@ -142,7 +203,19 @@ double I(double gamma, double n, double nu)
 	return ans;
 }
 
-//double gamma_integrand(double gamma, double n, double nu)
+double absorptivity_integrand(double gamma, double n, double nu)
+{
+	double nu_c = (e * B)/(2. * M_PI * m * c);
+	double beta = sqrt(1. - 1./(gamma*gamma));
+	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
+	double prefactor = - c * e*e / (2. * nu);
+	//polarization mode goes in below
+	double ans = prefactor*gamma*gamma*beta*D_thermal(gamma, nu)*K_s(gamma, n, nu)*(1./(nu*beta*fabs(cos(theta))));
+	return ans;
+}
+
+
+//modified for the absorptivity
 double gamma_integrand(double gamma, void * params)
 {
 	struct parameters n_and_nu = *(struct parameters*) params;
@@ -150,9 +223,9 @@ double gamma_integrand(double gamma, void * params)
 	double nu = n_and_nu.nu;
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	double beta = sqrt(1. - 1./(gamma*gamma));
-	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
-	double prefactor = 1./(nu * beta * fabs(cos(theta)));
-	double ans = prefactor * I(gamma, n, nu);
+	double prefactor = -c*e*e / (2. * nu);
+	//polarization mode goes in below
+	double ans = prefactor*gamma*gamma*beta*D_thermal(gamma, nu)*K_s(gamma, n, nu)*(1./(nu*beta*fabs(cos(theta))));
 	return ans;
 }
 
