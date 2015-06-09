@@ -47,6 +47,7 @@ double n_summation(double nu);
 double n_integration(double n_minus, double nu);
 double integrate(double min, double max, double n, double nu);
 double gsl_integrate(double min, double max, double n, double nu);
+double s_integrate(double min, double max, double n, double nu);
 double normalize_f();
 double power_law_to_be_normalized(double gamma, void * params);
 double power_law_f(double gamma);
@@ -72,7 +73,7 @@ struct parameters
 #define MJ (0)
 #define POWER_LAW (1)
 #define KAPPA_DIST (2)
-#define DISTRIBUTION_FUNCTION (MJ)
+#define DISTRIBUTION_FUNCTION (POWER_LAW)
 
 //choose absorptivity or emissivity
 #define ABSORP (10)
@@ -85,9 +86,10 @@ int main(int argc, char *argv[])
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	int index = 0;
 	//double nu = 1. * nu_c;
-	for(index; index < 15; index++)
+	for(index; index < 7; index++)
 	{
-		double nu = pow(10., index/2.) * nu_c;
+		double nu = pow(10., index) * nu_c;
+		//n_summation(nu);
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
 	}
 	printf("\n");
@@ -310,6 +312,7 @@ double n_integration_adaptive(double n_minus, double nu)
 	double ans = 0.;
 	double contrib = 0.;
 	int i = 0;
+	//double delta_n = 1.e2; if using Simpson's rule
 	double delta_n = 1.e5;
 	double deriv_tol = 1.e-10;
 	double tolerance = 1.e13;

@@ -58,61 +58,85 @@ double gsl_integrate(double min, double max, double n, double nu)
 	if(n < 0)
 	{
 		gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
-
  		double result, error;
-
 		gsl_function F;
   		F.function = &gamma_integration_result;
 		F.params = &nu;
-
 		gsl_integration_qag(&F, min, max, 0.0, 1e-3, 1000,
                       3,  w, &result, &error);
-
 		gsl_integration_workspace_free (w);
 		return result;
 	}
 	else
 	{
 		gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
-
 		double result, error;
 		struct parameters n_and_nu;
 		n_and_nu.n = n;
 		n_and_nu.nu = nu;
-
 		gsl_function F;
 		F.function = &gamma_integrand;
 		F.params = &n_and_nu;
-
 		gsl_integration_qag(&F, min, max, 0.0, 1e-3, 5000,
                       3,  w, &result, &error); 
-
 		gsl_integration_workspace_free (w);
-
 		return result; 
 	}
 }
-//still working on this
-/*
 double s_integrate(double min, double max, double n, double nu)
 {
-	int i = 10;
-	if(i % 2 != 0)
+	if(n < 0)
 	{
-		i = i + 1;
-	}
-	double h = (max - min)/i;
-	double s = gamma_integration_result(min, &nu) + gamma_integration_result(max, &nu);
+		int i = 1000;
+		if(i % 2 != 0)
+		{
+			i = i + 1;
+		}
+		double h = (max - min)/i;
+		double s = gamma_integration_result(min, &nu) + gamma_integration_result(max, &nu);
 
-	for(i; i < n; i+=2)
-	{
-		s += 4. * gamma_integration_result(min+i*h);
-	}
-	for(i; i < n-1; i+=2)
-	{
-		s += 2 * gamma_integration_result(min+i*h);
+		int index = 1;
+
+		for(index; index < i; index+=2)
+		{
+			s += 4. * gamma_integration_result(min+index*h, &nu);
+		}
+		index = 0;
+		for(index; index < i-1; index+=2)
+		{
+			s += 2 * gamma_integration_result(min+index*h, &nu);
+		}
+		return s * h / 3.;
 	}
 
-	return s * h / 3.;
+	else
+	{
+		struct parameters n_and_nu;
+		n_and_nu.n = n;
+		n_and_nu.nu = nu;
+
+		int i = 1000;
+		if(i % 2 != 0)
+		{
+			i = i + 1;
+		}
+		double h = (max - min)/i;
+		double s = 0.;
+		//double s = gamma_integrand(min+0.1, &n_and_nu) + gamma_integrand(max-0.1, &n_and_nu);
+		//printf("\n%e\n", s);
+		int index= 1;
+
+		for(index; index < i; index+=2)
+		{
+			s += 4. * gamma_integrand(min+index*h, &n_and_nu);
+		}
+		index = 2;
+		for(index; index < i-1; index+=2)
+		{
+			s += 2 * gamma_integrand(min+index*h, &n_and_nu);
+		}
+		//printf("\n%e\n", s);
+		return s * h / 3.;
+	}
 }
-*/
+
