@@ -139,4 +139,3 @@ double s_integrate(double min, double max, double n, double nu)
 		return s * h / 3.;
 	}
 }
-
