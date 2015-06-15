@@ -125,8 +125,7 @@ double K_s(double gamma, double n, double nu)
 	double K_xx = M*M * pow(my_Bessel_J(n, z), 2.);
 	double K_yy = N*N * pow(my_Bessel_dJ(n, z), 2.);
 #if STOKES_MODE == K_I
-	//double ans = K_xx + K_yy;
-	double ans = K_yy;
+	double ans = K_xx + K_yy;
 #elif STOKES_MODE == K_Q
 	double ans = K_xx - K_yy;
 #elif STOKES_MODE == K_U
@@ -178,8 +177,8 @@ double power_law_to_be_normalized(double gamma, void * params)
 {
 	double norm_term = 4. * M_PI;
 	double prefactor = n_e_NT * (p - 1.) / (pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
-	//double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
-	double body = pow(gamma, -p);
+	double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
+	//double body = pow(gamma, -p);
 	double ans = norm_term * prefactor * body;
 	return ans;
 }
@@ -188,8 +187,8 @@ double power_law_f(double gamma)
 {
 	double beta = sqrt(1. - 1./(gamma*gamma));
 	double prefactor = n_e_NT * (p - 1.) / (pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
-	//double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
-	double body = pow(gamma, -p);
+	double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
+	//double body = pow(gamma, -p);
 	double ans = 1./normalize_f() * prefactor * body * 1./(pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta);
 	return ans;
 }
@@ -311,7 +310,7 @@ double n_integration_adaptive(double n_minus, double nu)
 			//delta_n = 1. * delta_n;
 		}
 
-		contrib = integrate(n_start, (n_start + delta_n), -1, nu);
+		contrib = gsl_integrate(n_start, (n_start + delta_n), -1, nu);
 		ans = ans + contrib;
 		n_start = n_start + delta_n;
 		i++;
