@@ -20,7 +20,7 @@ double e = 4.80320680e-10;
 double B = 30.;
 double n_e = 1.;
 double theta = (M_PI  / 3.);
-int C = 10;
+int C = 20;
 double n_max = 30.;
 
 //power law parameters
@@ -36,7 +36,6 @@ double gamma_cutoff = 1000;
 
 //function declarations
 double n_peak(double nu);
-int n_peak_finder(double nu);
 double K_s(double gamma, double n, double nu);
 double my_Bessel_J(double n, double x);
 double my_Bessel_dJ(double n, double x);
@@ -90,7 +89,6 @@ int main(int argc, char *argv[])
 	for(index; index < 7; index++)
 	{
 		double nu = pow(10., index) * nu_c;
-		//n_summation(nu);
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
 	}
 	printf("\n");
@@ -310,18 +308,14 @@ double n_integration(double n_minus, double nu)
 	{
 		n_max = (int) (n_minus+1);
 	}
-#if DISTRIBUTION_FUNCTION == MJ
 	double ans = gsl_integrate(n_max, C * n_peak(nu), -1, nu);
-#else
-	double ans = gsl_integrate(n_max, C * n_peak_finder(nu), -1, nu);
-#endif
 	return ans;
 }
 
 double n_integration_adaptive(double n_minus, double nu)
 {
 	double n_start = (int)(n_max + n_minus + 1.);
-	printf("\n n_start:   %e\n", n_start);
+	//printf("\n n_start:   %e\n", n_start);
 	double ans = 0.;
 	double contrib = 0.;
 	int i = 0;
@@ -342,7 +336,7 @@ double n_integration_adaptive(double n_minus, double nu)
 		contrib = gsl_integrate(n_start, (n_start + delta_n), -1, nu);
 		ans = ans + contrib;
 		n_start = n_start + delta_n;
-		printf("\n n_end:   %e\n", n_start);
+		//printf("\n n_end:   %e\n", n_start);
 		i++;
 	}
 
@@ -360,13 +354,13 @@ double n_summation(double nu)
 		j_nu += gamma_integration_result(x, &nu);
 	}
 
-//#if DISTRIBUTION_FUNCTION == MJ //we know where peak is analytically
+#if DISTRIBUTION_FUNCTION == MJ //we know where peak is analytically
 	j_nu = j_nu + n_integration(n_minus, nu);
-//#elif DISTRIBUTION_FUNCTION != MJ //need to use adaptive integration
-//	j_nu = j_nu + n_integration_adaptive(n_minus, nu);
-//#else
-//	j_nu = 0.;
-//#endif
+#elif DISTRIBUTION_FUNCTION != MJ //need to use adaptive integration
+	j_nu = j_nu + n_integration_adaptive(n_minus, nu);
+#else
+	j_nu = 0.;
+#endif
 	return j_nu;
 }
 
@@ -417,66 +411,4 @@ double normalize_f()
 	return result;
 }
 
-int n_peak_finder(double nu)
-{
-	double nu_c = (e * B)/(2. * M_PI * m * c);
-	double n_minus = (nu/nu_c) * fabs(sin(theta));
-	int n_start = (int)n_max;
 
-	if(n_minus > n_max)
-	{
-		n_start = (int)n_minus + (int)n_max;
-	}
-
-	double deriv = derivative(n_start, nu);
-
-	if(deriv < 0)
-	{
-		return 50; //past the peak
-	}
-
-	int i = 0;
-	int n = n_start;
-
-	while(deriv == 0)
-	{
-		n = n + (int)(nu/nu_c);
-		deriv = derivative(n, nu);
-		//printf("\n%e\n", deriv);
-		if(deriv < 0)
-		{
-			i++;
-		}
-		if(i == 100)
-		{
-			printf("\nwhat\n");
-			return n;
-		}
-	}
-
-	//printf("\nGOT HERE\n");
-
-	while(deriv > 0)
-	{
-		n = n + (int)(nu/nu_c);
-		//printf("\nDERIV>0\n");
-		deriv = derivative(n, nu);
-		printf("\n%e\n", deriv);
-		if(deriv < 0)
-		{
-			i++;
-			deriv = 1;
-		}
-		if(deriv == 0)
-		{
-			n = n + (int)(nu/nu_c);
-			deriv = 1;
-		}
-		if(i == 10)
-		{
-			return n;
-		}
-	}
-	printf("\nSOMETHING STRANGE HAS HAPPENED\n");
-	return n;
-}
