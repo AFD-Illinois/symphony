@@ -20,7 +20,7 @@ double e = 4.80320680e-10;
 double B = 30.;
 double n_e = 1.;
 double theta = (M_PI  / 3.);
-int C = 20;
+int C = 10;
 double n_max = 30.;
 
 //power law parameters
@@ -55,9 +55,6 @@ double kappa_to_be_normalized(double gamma, void * params);
 double kappa_f(double gamma);
 double n_integration_adaptive(double n_max, double n_minus);
 double derivative(double n_start, double nu);
-double K_q(double gamma, double n, double nu);
-double K_u(double gamma, double n, double nu);
-double K_v(double gamma, double n, double nu);
 double D_thermal(double gamma, double nu);
 double D_pl(double gamma, double nu);
 double D_kappa(double gamma, double nu);
@@ -80,15 +77,22 @@ struct parameters
 #define EMISS  (11)
 #define MODE   (EMISS)
 
+//choose Stokes mode
+#define K_I (15)
+#define K_Q (16)
+#define K_U (17)
+#define K_V (18)
+#define STOKES_MODE (K_I)
+
 int main(int argc, char *argv[])
 {
 	//define parameters of calculation
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	int index = 0;
 	double nu = 1. * nu_c;
-	for(index; index < 7; index++)
+	for(index; index < 13; index++)
 	{
-		double nu = pow(10., index) * nu_c;
+		double nu = pow(10., index/2.) * nu_c;
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
 	}
 	printf("\n");
@@ -120,40 +124,16 @@ double K_s(double gamma, double n, double nu)
 	double z = (nu * gamma * beta * sin(theta) * sqrt(1. - cos_xi*cos_xi))/nu_c;
 	double K_xx = M*M * pow(my_Bessel_J(n, z), 2.);
 	double K_yy = N*N * pow(my_Bessel_dJ(n, z), 2.);
-	//double K_xx = 0.;
-	double ans = K_xx + K_yy;
-	return ans;
-}
-
-double K_q(double gamma, double n, double nu)
-{
-	double nu_c = (e * B)/(2. * M_PI * m * c);
-	double beta = sqrt(1. - 1./(gamma*gamma));
-	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
-	double M = (cos(theta) - beta * cos_xi)/sin(theta);
-	double N = beta * sqrt(1 - (cos_xi*cos_xi));
-	double z = (nu * gamma * beta * sin(theta) * sqrt(1. - cos_xi*cos_xi))/nu_c;
-	double K_xx = M*M * pow(my_Bessel_J(n, z), 2.);
-	double K_yy = N*N * pow(my_Bessel_dJ(n, z), 2.);
+#if STOKES_MODE == K_I
+	//double ans = K_xx + K_yy;
+	double ans = K_yy;
+#elif STOKES_MODE == K_Q
 	double ans = K_xx - K_yy;
-	return ans;
-}
-
-double K_u(double gamma, double n, double nu)
-{
+#elif STOKES_MODE == K_U
 	double ans = 0.;
-	return ans;
-}
-
-double K_v(double gamma, double n, double nu)
-{
-	double nu_c = (e * B)/(2. * M_PI * m * c);
-	double beta = sqrt(1. - 1./(gamma*gamma));
-	double cos_xi = (gamma * nu - n * nu_c)/(gamma * nu * beta * cos(theta));
-	double M = (cos(theta) - beta * cos_xi)/sin(theta);
-	double N = beta * sqrt(1 - (cos_xi*cos_xi));
-	double z = (nu * gamma * beta * sin(theta) * sqrt(1. - cos_xi*cos_xi))/nu_c;
+#elif STOKES_MODE == K_V
 	double ans = -2.*M*N*my_Bessel_J(n, z)*my_Bessel_dJ(n, z);
+#endif
 	return ans;
 }
 
@@ -278,7 +258,6 @@ double gamma_integrand(double gamma, void * params)
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	double beta = sqrt(1. - 1./(gamma*gamma));
 	double prefactor = -c*e*e / (2. * nu);
-	//polarization mode goes in below
 #if DISTRIBUTION_FUNCTION == MJ
 	double ans = prefactor*gamma*gamma*beta*D_thermal(gamma, nu)*K_s(gamma, n, nu)*(1./(nu*beta*fabs(cos(theta))));
 #elif DISTRIBUTION_FUNCTION == POWER_LAW
@@ -315,7 +294,6 @@ double n_integration(double n_minus, double nu)
 double n_integration_adaptive(double n_minus, double nu)
 {
 	double n_start = (int)(n_max + n_minus + 1.);
-	//printf("\n n_start:   %e\n", n_start);
 	double ans = 0.;
 	double contrib = 0.;
 	int i = 0;
@@ -333,10 +311,9 @@ double n_integration_adaptive(double n_minus, double nu)
 			//delta_n = 1. * delta_n;
 		}
 
-		contrib = gsl_integrate(n_start, (n_start + delta_n), -1, nu);
+		contrib = integrate(n_start, (n_start + delta_n), -1, nu);
 		ans = ans + contrib;
 		n_start = n_start + delta_n;
-		//printf("\n n_end:   %e\n", n_start);
 		i++;
 	}
 
@@ -366,13 +343,6 @@ double n_summation(double nu)
 
 double derivative(double n_start, double nu)
 {
-	//double dx = 0.01;
-	//double yhigh = gamma_integration_result(n_start + dx/2., &nu);
-	//double ylow  = gamma_integration_result(n_start - dx/2., &nu);
-	//double ans = (yhigh - ylow)/dx;
-	//return ans;
-
-
 	gsl_function F;
 	double result, abserr;
 	F.function = gamma_integration_result;
