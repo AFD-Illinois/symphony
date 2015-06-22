@@ -70,29 +70,32 @@ struct parameters
 #define MJ (0)
 #define POWER_LAW (1)
 #define KAPPA_DIST (2)
-#define DISTRIBUTION_FUNCTION (POWER_LAW)
+#define DISTRIBUTION_FUNCTION (MJ)
 
 //choose absorptivity or emissivity
 #define ABSORP (10)
 #define EMISS  (11)
-#define MODE   (EMISS)
+#define MODE   (ABSORP)
 
-//choose Stokes mode
+//choose polarization mode
 #define K_I (15)
 #define K_Q (16)
 #define K_U (17)
 #define K_V (18)
-#define STOKES_MODE (K_I)
+#define K_XX (19)
+#define K_OO (20)
+#define POL_MODE (K_OO)
 
 int main(int argc, char *argv[])
 {
 	//define parameters of calculation
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	int index = 0;
-	double nu = 1. * nu_c;
-	for(index; index < 13; index++)
+	//double nu = 1. * nu_c;
+	for(index; index < 151; index++)
 	{
-		double nu = pow(10., index/2.) * nu_c;
+		double nu = pow(10., index/100.) * nu_c;
+		//double nu = nu_c * index/5.;
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
 	}
 	printf("\n");
@@ -102,7 +105,7 @@ int main(int argc, char *argv[])
 double n_peak(double nu)
 {
 	double nu_c = (e * B)/(2. * M_PI * m * c);
-	if(nu <= nu_c * theta_e*theta_e){
+	if(nu <= nu_c * theta_e*theta_e || theta_e < 1.){
 		double beta_67 = sqrt((1. - 1./pow((1. + theta_e),2.)));
 		double n_peak = (theta_e + 1. + pow((2. * theta_e * nu / nu_c),1./3.)) * (nu/nu_c) * (1. - beta_67*beta_67 * pow(cos(theta),2.));
 		return n_peak;
@@ -124,14 +127,19 @@ double K_s(double gamma, double n, double nu)
 	double z = (nu * gamma * beta * sin(theta) * sqrt(1. - cos_xi*cos_xi))/nu_c;
 	double K_xx = M*M * pow(my_Bessel_J(n, z), 2.);
 	double K_yy = N*N * pow(my_Bessel_dJ(n, z), 2.);
-#if STOKES_MODE == K_I
+	double T_x = (2.*nu*cos(theta))/(nu_c*pow(sin(theta), 2.)+sqrt(nu_c*nu_c*pow(sin(theta), 4.)+4.*nu*nu*pow(cos(theta), 2.)));
+#if POL_MODE == K_I
 	double ans = K_xx + K_yy;
-#elif STOKES_MODE == K_Q
+#elif POL_MODE == K_Q
 	double ans = K_xx - K_yy;
-#elif STOKES_MODE == K_U
+#elif POL_MODE == K_U
 	double ans = 0.;
-#elif STOKES_MODE == K_V
+#elif POL_MODE == K_V
 	double ans = -2.*M*N*my_Bessel_J(n, z)*my_Bessel_dJ(n, z);
+#elif POL_MODE == K_XX //factor of 2 out front comes from eq. 43 as opposed to 42
+	double ans = 2.*pow(M*T_x*my_Bessel_J(n, z)+N*my_Bessel_dJ(n, z), 2.)/(1. + T_x*T_x);
+#elif POL_MODE == K_OO //factor of 2 again from eq. 43
+	double ans = 2.*pow(M*T_x*my_Bessel_J(n, z)-N*my_Bessel_dJ(n, z), 2.)/(1. + T_x*T_x);
 #endif
 	return ans;
 }
@@ -157,10 +165,15 @@ double D_pl(double gamma, double nu)
 
 double D_kappa(double gamma, double nu)
 {
-	double prefactor = (1./normalize_f()) * 4. * M_PI*M_PI * nu * m*m * c;
-	double term1 = ((- kappa - 1.) / (kappa * theta_e)) * pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-2.);
-	double term2 = pow((1. + (gamma - 1.)/(kappa * theta_e)), (- kappa - 1.)) * (- 1./gamma_cutoff);
-	double f = prefactor * (term1 + term2) * exp(-gamma/gamma_cutoff);
+	//double prefactor = (1./normalize_f()) * 4. * M_PI*M_PI * nu * m*m * c;
+	//double term1 = ((- kappa - 1.) / (kappa * theta_e)) * pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-2.);
+	//double term2 = pow((1. + (gamma - 1.)/(kappa * theta_e)), (- kappa - 1.)) * (- 1./gamma_cutoff);
+	//double f = prefactor * (term1 + term2) * exp(-gamma/gamma_cutoff);
+	//below is differential for kappa WITHOUT cutoff
+	double term1 = (-1.-kappa)*(-2.+kappa)*(-1.+kappa) * nu * M_PI * n_e;
+	double term2 = pow((1. + (gamma-1.)/(kappa*theta_e)), -2.-kappa);
+	double term3 = 2. * c*c * pow(kappa, 3.) * pow(theta_e, 3.) * m;
+	double f = (term1 * term2)/term3;
 	return f;
 }
 
@@ -177,8 +190,8 @@ double power_law_to_be_normalized(double gamma, void * params)
 {
 	double norm_term = 4. * M_PI;
 	double prefactor = n_e_NT * (p - 1.) / (pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
-	double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
-	//double body = pow(gamma, -p);
+	//double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
+	double body = pow(gamma, -p);
 	double ans = norm_term * prefactor * body;
 	return ans;
 }
@@ -187,8 +200,8 @@ double power_law_f(double gamma)
 {
 	double beta = sqrt(1. - 1./(gamma*gamma));
 	double prefactor = n_e_NT * (p - 1.) / (pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
-	double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
-	//double body = pow(gamma, -p);
+	//double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
+	double body = pow(gamma, -p);
 	double ans = 1./normalize_f() * prefactor * body * 1./(pow(m, 3.) * pow(c, 3.) * gamma*gamma * beta);
 	return ans;
 }
@@ -199,8 +212,8 @@ double kappa_to_be_normalized(double gamma, void * params)
 	//double kappa_body = pow((1. + gamma/(kappa*theta_e)), -kappa-1.);
 	double cutoff = exp(-gamma/gamma_cutoff);
 	double norm_term = 4. * M_PI * pow(m, 3.) * pow(c, 3.) * gamma * sqrt(gamma*gamma-1.);
-	double ans = kappa_body * cutoff * norm_term;
-	//double ans = kappa_body * norm_term;
+	//double ans = kappa_body * cutoff * norm_term;
+	double ans = kappa_body * norm_term;
 	return ans;
 }
 
@@ -210,8 +223,8 @@ double kappa_f(double gamma)
 	double kappa_body = pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-1);
 	//double kappa_body = pow((1.+ gamma/(kappa*theta_e)), -kappa-1.);
 	double cutoff = exp(-gamma/gamma_cutoff);
-	double ans = norm * kappa_body * cutoff;
-	//double ans = norm * kappa_body;
+	//double ans = norm * kappa_body * cutoff;
+	double ans = norm * kappa_body;
 	return ans;
 }
 
@@ -296,10 +309,10 @@ double n_integration_adaptive(double n_minus, double nu)
 	double ans = 0.;
 	double contrib = 0.;
 	int i = 0;
-	//double delta_n = 1.e2;// if using Simpson's rule
-	double delta_n = 1.e5;
+	double delta_n = 1.e5;// if using Simpson's rule
+	//double delta_n = 1.e5;
 	double deriv_tol = 1.e-10;
-	double tolerance = 1.e5;
+	double tolerance = 1.e13;
 
 	while(contrib >= ans/tolerance)
 	{

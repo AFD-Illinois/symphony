@@ -20,7 +20,7 @@ double integrate(double min, double max, double n, double nu)
 	{
 		int i;
 		float interval, sum=0., x;
-		int divisions = 1000;
+		int divisions = 1200;
 		interval = ((max-min) / (divisions-1));
 
 		for (i=2; i<divisions; i++)
@@ -35,7 +35,7 @@ double integrate(double min, double max, double n, double nu)
 	{
 		int i;
 		float interval, sum=0., x;
-		int divisions = 1000;
+		int divisions = 1200;
 		struct parameters n_and_nu;
 		n_and_nu.n = n;
 		n_and_nu.nu = nu;
@@ -57,13 +57,13 @@ double gsl_integrate(double min, double max, double n, double nu)
 	//n integration
 	if(n < 0)
 	{
-		gsl_set_error_handler_off();
+		//gsl_set_error_handler_off();
 		gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
  		double result, error;
 		gsl_function F;
   		F.function = &gamma_integration_result;
 		F.params = &nu;
-		gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
+		gsl_integration_qag(&F, min, max, 0., 1.e-3, 5000,
                       3,  w, &result, &error);
 		gsl_integration_workspace_free (w);
 		return result;
@@ -78,8 +78,8 @@ double gsl_integrate(double min, double max, double n, double nu)
 		gsl_function F;
 		F.function = &gamma_integrand;
 		F.params = &n_and_nu;
-		gsl_integration_qag(&F, min, max, 0.0, 1.e-3, 1000,
-                      3,  w, &result, &error); 
+		gsl_integration_qag(&F, min, max, 0., 1.e-3, 5000,
+                      3,  w, &result, &error);
 		gsl_integration_workspace_free (w);
 		return result; 
 	}
@@ -88,7 +88,7 @@ double s_integrate(double min, double max, double n, double nu)
 {
 	if(n < 0)
 	{
-		int i = 1000;
+		int i = 1500;
 		if(i % 2 != 0)
 		{
 			i = i + 1;
@@ -116,7 +116,7 @@ double s_integrate(double min, double max, double n, double nu)
 		n_and_nu.n = n;
 		n_and_nu.nu = nu;
 
-		int i = 1000;
+		int i = 1500;
 		if(i % 2 != 0)
 		{
 			i = i + 1;
