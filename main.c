@@ -32,7 +32,7 @@ double n_e_NT = 1.;
 
 //kappa distribution parameters
 double kappa = 3.5;
-double gamma_cutoff = 1000;
+double gamma_cutoff = 10000000;
 
 //function declarations
 double n_peak(double nu);
@@ -70,7 +70,7 @@ struct parameters
 #define MJ (0)
 #define POWER_LAW (1)
 #define KAPPA_DIST (2)
-#define DISTRIBUTION_FUNCTION (MJ)
+#define DISTRIBUTION_FUNCTION (KAPPA_DIST)
 
 //choose absorptivity or emissivity
 #define ABSORP (10)
@@ -84,18 +84,18 @@ struct parameters
 #define K_V (18)
 #define K_XX (19)
 #define K_OO (20)
-#define POL_MODE (K_OO)
+#define POL_MODE (K_I)
 
 int main(int argc, char *argv[])
 {
 	//define parameters of calculation
 	double nu_c = (e * B)/(2. * M_PI * m * c);
-	int index = 0;
+	int index = 1.;
 	//double nu = 1. * nu_c;
-	for(index; index < 151; index++)
+	for(index; index < 31; index++)
 	{
-		double nu = pow(10., index/100.) * nu_c;
-		//double nu = nu_c * index/5.;
+		double nu = pow(10., index/5.) * nu_c;
+		//double nu = nu_c * index;
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
 	}
 	printf("\n");
@@ -165,15 +165,10 @@ double D_pl(double gamma, double nu)
 
 double D_kappa(double gamma, double nu)
 {
-	//double prefactor = (1./normalize_f()) * 4. * M_PI*M_PI * nu * m*m * c;
-	//double term1 = ((- kappa - 1.) / (kappa * theta_e)) * pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-2.);
-	//double term2 = pow((1. + (gamma - 1.)/(kappa * theta_e)), (- kappa - 1.)) * (- 1./gamma_cutoff);
-	//double f = prefactor * (term1 + term2) * exp(-gamma/gamma_cutoff);
-	//below is differential for kappa WITHOUT cutoff
-	double term1 = (-1.-kappa)*(-2.+kappa)*(-1.+kappa) * nu * M_PI * n_e;
-	double term2 = pow((1. + (gamma-1.)/(kappa*theta_e)), -2.-kappa);
-	double term3 = 2. * c*c * pow(kappa, 3.) * pow(theta_e, 3.) * m;
-	double f = (term1 * term2)/term3;
+	double prefactor = (1./normalize_f()) * 4. * M_PI*M_PI * nu * m*m * c;
+	double term1 = ((- kappa - 1.) / (kappa * theta_e)) * pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-2.);
+	double term2 = pow((1. + (gamma - 1.)/(kappa * theta_e)), (- kappa - 1.)) * (- 1./gamma_cutoff);
+	double f = prefactor * (term1 + term2) * exp(-gamma/gamma_cutoff);
 	return f;
 }
 
@@ -209,11 +204,10 @@ double power_law_f(double gamma)
 double kappa_to_be_normalized(double gamma, void * params)
 {
 	double kappa_body = pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-1);
-	//double kappa_body = pow((1. + gamma/(kappa*theta_e)), -kappa-1.);
 	double cutoff = exp(-gamma/gamma_cutoff);
 	double norm_term = 4. * M_PI * pow(m, 3.) * pow(c, 3.) * gamma * sqrt(gamma*gamma-1.);
-	//double ans = kappa_body * cutoff * norm_term;
-	double ans = kappa_body * norm_term;
+	double ans = kappa_body * cutoff * norm_term;
+	//double ans = kappa_body * norm_term;
 	return ans;
 }
 
