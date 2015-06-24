@@ -32,7 +32,7 @@ double n_e_NT = 1.;
 
 //kappa distribution parameters
 double kappa = 3.5;
-double gamma_cutoff = 10000000;
+double gamma_cutoff = 1000000000000;
 
 //function declarations
 double n_peak(double nu);
@@ -70,12 +70,12 @@ struct parameters
 #define MJ (0)
 #define POWER_LAW (1)
 #define KAPPA_DIST (2)
-#define DISTRIBUTION_FUNCTION (KAPPA_DIST)
+#define DISTRIBUTION_FUNCTION (POWER_LAW)
 
 //choose absorptivity or emissivity
 #define ABSORP (10)
 #define EMISS  (11)
-#define MODE   (ABSORP)
+#define MODE   (EMISS)
 
 //choose polarization mode
 #define K_I (15)
@@ -90,13 +90,13 @@ int main(int argc, char *argv[])
 {
 	//define parameters of calculation
 	double nu_c = (e * B)/(2. * M_PI * m * c);
-	int index = 1.;
-	//double nu = 1. * nu_c;
-	for(index; index < 31; index++)
+	int index = 0;
+	//double nu = 1.e2 * nu_c;
+	for(index; index < 51; index++)
 	{
 		double nu = pow(10., index/5.) * nu_c;
-		//double nu = nu_c * index;
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
+		//n_summation(nu);
 	}
 	printf("\n");
 	return 0;
@@ -217,8 +217,8 @@ double kappa_f(double gamma)
 	double kappa_body = pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-1);
 	//double kappa_body = pow((1.+ gamma/(kappa*theta_e)), -kappa-1.);
 	double cutoff = exp(-gamma/gamma_cutoff);
-	//double ans = norm * kappa_body * cutoff;
-	double ans = norm * kappa_body;
+	double ans = norm * kappa_body * cutoff;
+	//double ans = norm * kappa_body;
 	return ans;
 }
 
@@ -283,7 +283,28 @@ double gamma_integration_result(double n, void * params)
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	double gamma_minus = ((n*nu_c)/nu - fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
 	double gamma_plus  = ((n*nu_c)/nu + fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
-	double result = gsl_integrate(gamma_minus, gamma_plus, n, nu);
+	double result = 0.;
+
+	//needs help resolving peak for nu/nu_c > 1e6
+	//used numerical fit to peak location
+	double gamma_peak = 1.33322780e-06 * n / ((nu/nu_c) / 1.e6);
+	double gamma_minus_high = gamma_peak - (gamma_peak-gamma_minus)/20.;
+	double gamma_plus_high = gamma_peak + (gamma_plus-gamma_peak)/20.;
+
+	if(nu/nu_c > 1.e6)
+	{
+		result = gsl_integrate(gamma_minus_high, gamma_plus_high, n, nu);
+	}
+	else
+	{
+		result = gsl_integrate(gamma_minus, gamma_plus, n, nu);
+	}
+
+	if(isnan(result) != 0)
+	{
+		result = 0.;
+	}
+	//printf("\n%e\n", result);
 	return result;
 }
 
@@ -294,6 +315,7 @@ double n_integration(double n_minus, double nu)
 		n_max = (int) (n_minus+1);
 	}
 	double ans = gsl_integrate(n_max, C * n_peak(nu), -1, nu);
+	printf("\n n integration \n");
 	return ans;
 }
 
@@ -306,7 +328,7 @@ double n_integration_adaptive(double n_minus, double nu)
 	double delta_n = 1.e5;// if using Simpson's rule
 	//double delta_n = 1.e5;
 	double deriv_tol = 1.e-10;
-	double tolerance = 1.e13;
+	double tolerance = 1.e5;
 
 	while(contrib >= ans/tolerance)
 	{
@@ -387,4 +409,40 @@ double normalize_f()
 	return result;
 }
 
+double gsl_integrate(double min, double max, double n, double nu)
+{
+	double nu_c = (e * B)/(2. * M_PI * m * c);
+	if(nu/nu_c > 1.e6)
+	{
+		gsl_set_error_handler_off();
+	}
 
+	if(n < 0)//do n integration
+	{
+		double nu_c = (e * B)/(2. * M_PI * m * c);
+		gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
+ 		double result, error;
+		gsl_function F;
+  		F.function = &gamma_integration_result;
+		F.params = &nu;
+		gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
+                      3,  w, &result, &error);
+		gsl_integration_workspace_free (w);
+		return result;
+	}
+	else//do gamma integration
+	{
+		gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
+		double result, error;
+		struct parameters n_and_nu;
+		n_and_nu.n = n;
+		n_and_nu.nu = nu;
+		gsl_function F;
+		F.function = &gamma_integrand;
+		F.params = &n_and_nu;
+		gsl_integration_qag(&F, min, max, 0., 1.e-4, 1000,
+                      3,  w, &result, &error);
+		gsl_integration_workspace_free (w);
+		return result; 
+	}
+}
