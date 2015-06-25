@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	int index = 0;
 	//double nu = 1.e2 * nu_c;
-	for(index; index < 51; index++)
+	for(index; index < 75; index++)
 	{
 		double nu = pow(10., index/5.) * nu_c;
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
@@ -279,34 +279,44 @@ double gamma_integrand(double gamma, void * params)
 
 double gamma_integration_result(double n, void * params)
 {
-	double nu = *(double *) params;
-	double nu_c = (e * B)/(2. * M_PI * m * c);
-	double gamma_minus = ((n*nu_c)/nu - fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
-	double gamma_plus  = ((n*nu_c)/nu + fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
-	double result = 0.;
+        double nu = *(double *) params;
+        double nu_c = (e * B)/(2. * M_PI * m * c);
+        double gamma_minus = ((n*nu_c)/nu - fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
+        double gamma_plus  = ((n*nu_c)/nu + fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
+        double result = 0.;
 
-	//needs help resolving peak for nu/nu_c > 1e6
-	//used numerical fit to peak location
-	double gamma_peak = 1.33322780e-06 * n / ((nu/nu_c) / 1.e6);
-	double gamma_minus_high = gamma_peak - (gamma_peak-gamma_minus)/20.;
-	double gamma_plus_high = gamma_peak + (gamma_plus-gamma_peak)/20.;
-
-	if(nu/nu_c > 1.e6)
-	{
-		result = gsl_integrate(gamma_minus_high, gamma_plus_high, n, nu);
-	}
+        //needs help resolving peak for nu/nu_c > 1e6
+        //used numerical fit to peak location
+        double gamma_peak = 1.33322780e-06 * n / ((nu/nu_c) / 1.e6);
+        double width = 0.;
+        if(nu/nu_c < 3.e8)
+        {
+                width = 10.;
+        }
 	else
 	{
-		result = gsl_integrate(gamma_minus, gamma_plus, n, nu);
-	}
+                width = 1000.;
+        }
+	double gamma_minus_high = gamma_peak - (gamma_peak-gamma_minus)/width;
+        double gamma_plus_high = gamma_peak + (gamma_plus-gamma_peak)/width;
+
+        if(nu/nu_c > 1.e6)
+        {
+                result = gsl_integrate(gamma_minus_high, gamma_plus_high, n, nu);
+        }
+	else
+	{
+                result = gsl_integrate(gamma_minus, gamma_plus, n, nu);
+        }
 
 	if(isnan(result) != 0)
-	{
-		result = 0.;
-	}
-	//printf("\n%e\n", result);
-	return result;
+        {
+                result = 0.;
+        }
+	//printf("\n%e\n", n);
+        return result;
 }
+
 
 double n_integration(double n_minus, double nu)
 {
@@ -335,8 +345,8 @@ double n_integration_adaptive(double n_minus, double nu)
 		double deriv = derivative(n_start, nu);
 		if(fabs(deriv) < deriv_tol)
 		{
-			delta_n = 100. * delta_n;
 			//delta_n = 1. * delta_n;
+			delta_n = 100. * delta_n;
 		}
 
 		contrib = gsl_integrate(n_start, (n_start + delta_n), -1, nu);
@@ -440,7 +450,7 @@ double gsl_integrate(double min, double max, double n, double nu)
 		gsl_function F;
 		F.function = &gamma_integrand;
 		F.params = &n_and_nu;
-		gsl_integration_qag(&F, min, max, 0., 1.e-4, 1000,
+		gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
                       3,  w, &result, &error);
 		gsl_integration_workspace_free (w);
 		return result; 
