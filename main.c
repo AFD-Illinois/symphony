@@ -24,7 +24,7 @@ int C = 10;
 double n_max = 30.;
 
 //power law parameters
-double p = 3.;
+double p = 6.;
 double gamma_min = 1.;
 double gamma_max = 1000.;
 double n_e_NT = 1.;
@@ -32,6 +32,7 @@ double n_e_NT = 1.;
 
 //kappa distribution parameters
 double kappa = 3.5;
+double w = 10.; //width of core of kappa dist.
 double gamma_cutoff = 1000000000000;
 
 //function declarations
@@ -65,12 +66,12 @@ struct parameters
 #define MJ (0)
 #define POWER_LAW (1)
 #define KAPPA_DIST (2)
-#define DISTRIBUTION_FUNCTION (POWER_LAW)
+#define DISTRIBUTION_FUNCTION (KAPPA_DIST)
 
 //choose absorptivity or emissivity
 #define ABSORP (10)
 #define EMISS  (11)
-#define MODE   (ABSORP)
+#define MODE   (EMISS)
 
 //choose polarization mode
 #define K_I (15)
@@ -151,8 +152,8 @@ double D_operator(double gamma, double nu)
 	double f = pl_norm * prefactor * (term1 - term2 - term3);
 #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
 	double prefactor = (1./normalize_f()) * 4. * M_PI*M_PI * nu * m*m * c;
-	double term1 = ((- kappa - 1.) / (kappa * theta_e)) * pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-2.);
-	double term2 = pow((1. + (gamma - 1.)/(kappa * theta_e)), (- kappa - 1.)) * (- 1./gamma_cutoff);
+	double term1 = ((- kappa - 1.) / (kappa * w)) * pow((1. + (gamma - 1.)/(kappa * w)), -kappa-2.);
+	double term2 = pow((1. + (gamma - 1.)/(kappa * w)), (- kappa - 1.)) * (- 1./gamma_cutoff);
 	double f = prefactor * (term1 + term2) * exp(-gamma/gamma_cutoff);
 #endif
 	return f;
@@ -188,7 +189,7 @@ double power_law_f(double gamma)
 
 double kappa_to_be_normalized(double gamma, void * params)
 {
-	double kappa_body = pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-1);
+	double kappa_body = pow((1. + (gamma - 1.)/(kappa * w)), -kappa-1);
 	double cutoff = exp(-gamma/gamma_cutoff);
 	double norm_term = 4. * M_PI * pow(m, 3.) * pow(c, 3.) * gamma * sqrt(gamma*gamma-1.);
 	//double ans = kappa_body * cutoff * norm_term;
@@ -199,7 +200,7 @@ double kappa_to_be_normalized(double gamma, void * params)
 double kappa_f(double gamma)
 {
 	double norm = 1./normalize_f();
-	double kappa_body = pow((1. + (gamma - 1.)/(kappa * theta_e)), -kappa-1);
+	double kappa_body = pow((1. + (gamma - 1.)/(kappa * w)), -kappa-1);
 	double cutoff = exp(-gamma/gamma_cutoff);
 	//double ans = norm * kappa_body * cutoff;
 	double ans = norm * kappa_body;
@@ -247,7 +248,8 @@ double gamma_integration_result(double n, void * params)
         double gamma_plus  = ((n*nu_c)/nu + fabs(cos(theta))*sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(theta), 2.)))/(pow(sin(theta), 2));
         double result = 0.;
 
-        //needs help resolving peak for nu/nu_c > 1e6; used numerical fit to peak location
+        //needs help resolving peak for nu/nu_c > 1e6
+	//gamma_peak is an accurate numerical fit to peak location
         double gamma_peak = 1.33322780e-06 * n / ((nu/nu_c) / 1.e6);
         double width = 0.;
         if(nu/nu_c < 3.e8)
@@ -270,7 +272,7 @@ double gamma_integration_result(double n, void * params)
                 result = gsl_integrate(gamma_minus, gamma_plus, n, nu);
         }
 
-	if(isnan(result) != 0)
+	if(isnan(result) != 0)//return 0 if result is NaN
         {
                 result = 0.;
         }
@@ -296,13 +298,10 @@ double n_integration(double n_minus, double nu)
 		double ans = 0.;
 		double contrib = 0.;
 		double delta_n = 1.e5;
-//#if POL_MODE == K_Q
-	//double delta_n = 1.e9;
-//#endif
 		double deriv_tol = 1.e-10;
 		double tolerance = 1.e5;
 
-		while(contrib >= ans/tolerance)
+		while(fabs(contrib) >= fabs(ans/tolerance))
 		{
 			double deriv = derivative(n_start, nu);
 			if(fabs(deriv) < deriv_tol)
