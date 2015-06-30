@@ -24,7 +24,7 @@ int C = 10;
 double n_max = 30.;
 
 //power law parameters
-double p = 6.;
+double p = 3.;
 double gamma_min = 1.;
 double gamma_max = 1000.;
 double n_e_NT = 1.;
@@ -66,12 +66,12 @@ struct parameters
 #define MJ (0)
 #define POWER_LAW (1)
 #define KAPPA_DIST (2)
-#define DISTRIBUTION_FUNCTION (KAPPA_DIST)
+#define DISTRIBUTION_FUNCTION (POWER_LAW)
 
 //choose absorptivity or emissivity
 #define ABSORP (10)
 #define EMISS  (11)
-#define MODE   (EMISS)
+#define MODE   (ABSORP)
 
 //choose polarization mode
 #define K_I (15)
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 	//define parameters of calculation
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	int index = 0;
-	for(index; index < 75; index++)
+	for(index; index < 31; index++)
 	{
 		double nu = pow(10., index/5.) * nu_c;
 		printf("\n%e	%e", nu/nu_c, n_summation(nu));
@@ -151,7 +151,7 @@ double D_operator(double gamma, double nu)
 	double term3 = (exp(-gamma/gamma_cutoff) * pow(gamma,-p))/pow((gamma*gamma - 1.), (3./2.));
 	double f = pl_norm * prefactor * (term1 - term2 - term3);
 #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
-	double prefactor = (1./normalize_f()) * 4. * M_PI*M_PI * nu * m*m * c;
+	double prefactor = n_e * (1./normalize_f()) * 4. * M_PI*M_PI * nu * m*m * c;
 	double term1 = ((- kappa - 1.) / (kappa * w)) * pow((1. + (gamma - 1.)/(kappa * w)), -kappa-2.);
 	double term2 = pow((1. + (gamma - 1.)/(kappa * w)), (- kappa - 1.)) * (- 1./gamma_cutoff);
 	double f = prefactor * (term1 + term2) * exp(-gamma/gamma_cutoff);
@@ -170,7 +170,7 @@ double MJ_f(double gamma)
 double power_law_to_be_normalized(double gamma, void * params)
 {
 	double norm_term = 4. * M_PI;
-	double prefactor = n_e_NT * (p - 1.) / (pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
+	double prefactor = (p - 1.) / (pow(gamma_min, 1. - p) - pow(gamma_max, 1. - p));
 	//double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
 	double body = pow(gamma, -p);
 	double ans = norm_term * prefactor * body;
@@ -200,7 +200,7 @@ double kappa_to_be_normalized(double gamma, void * params)
 double kappa_f(double gamma)
 {
 	double norm = 1./normalize_f();
-	double kappa_body = pow((1. + (gamma - 1.)/(kappa * w)), -kappa-1);
+	double kappa_body = n_e * pow((1. + (gamma - 1.)/(kappa * w)), -kappa-1);
 	double cutoff = exp(-gamma/gamma_cutoff);
 	//double ans = norm * kappa_body * cutoff;
 	double ans = norm * kappa_body;
@@ -284,22 +284,18 @@ double n_integration(double n_minus, double nu)
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	if(DISTRIBUTION_FUNCTION == MJ && nu/nu_c < 1e6)//know where peak is analytically
 	{
-		if(n_max < n_minus)
-		{
-			n_max = (int) (n_minus+1);
-		}
+		n_max = (int)(n_max + n_minus + 1.);
 		double ans = gsl_integrate(n_max, C * n_peak(nu), -1, nu);
 		return ans;
 	}
-
 	else//need to find peak adaptively; adaptive approach better for high freq MJ
-	{ 
+	{
 		double n_start = (int)(n_max + n_minus + 1.);
 		double ans = 0.;
 		double contrib = 0.;
-		double delta_n = 1.e5;
-		double deriv_tol = 1.e-10;
-		double tolerance = 1.e5;
+		double delta_n = 1.e2;
+		double deriv_tol = 1.e-5;
+		double tolerance = 1.e10;
 
 		while(fabs(contrib) >= fabs(ans/tolerance))
 		{
@@ -307,10 +303,12 @@ double n_integration(double n_minus, double nu)
 			if(fabs(deriv) < deriv_tol)
 			{
 				delta_n = 100. * delta_n;
+				//delta_n = 2. * delta_n;
 			}
 
 			contrib = gsl_integrate(n_start, (n_start + delta_n), -1, nu);
 			ans = ans + contrib;
+			//printf("\n%e\n", ans);
 			n_start = n_start + delta_n;
 		}
 
@@ -320,6 +318,9 @@ double n_integration(double n_minus, double nu)
 
 double n_summation(double nu)
 {
+#if POL_MODE == K_U
+	return 0.;
+#endif
 	double j_nu = 0.;
 	double nu_c = (e * B)/(2. * M_PI * m * c);
 	double n_minus = (nu/nu_c) * fabs(sin(theta));
@@ -371,7 +372,7 @@ double normalize_f()
 double gsl_integrate(double min, double max, double n, double nu)
 {
 	double nu_c = (e * B)/(2. * M_PI * m * c);
-	if(nu/nu_c > 1.e6)
+	if(nu/nu_c > 1.e6 || POL_MODE == K_V)
 	{
 		gsl_set_error_handler_off();
 	}
@@ -399,3 +400,4 @@ double gsl_integrate(double min, double max, double n, double nu)
 	gsl_integration_workspace_free (w);
 	return result;
 }
+
