@@ -89,19 +89,21 @@ struct parameters{
 #define STOKES_V (18)
 #define EXTRAORDINARY_MODE (19)
 #define ORDINARY_MODE (20)
-#define POL_MODE (STOKES_I)
+#define POL_MODE (STOKES_V)
 
-/* main: defines nu_c (cyclotron frequency) and
- * loops through values of nu, to give output
- * absorptivity or emissivity vs. nu/nu_c
+/* main: defines nu_c (cyclotron frequency) and loops through values of nu, 
+ * to give output absorptivity or emissivity vs. nu/nu_c; can also be modified
+ * to give abs/emiss as a function of its other parameters, like obs. angle
  */
 int main(int argc, char *argv[]) {
   double nu_c = (electron_charge * B_field)
  	       /(2. * M_PI * mass_electron * speed_light);
   int index = 0;
   for (index; index < 31; index++) {
+
     double nu = pow(10., index/5.) * nu_c;
     printf("\n%e	%e", nu/nu_c, n_summation(nu));
+
   }
   printf("\n");
   return 0;
@@ -388,17 +390,24 @@ double gamma_integration_result(double n, void * params)
   //gamma_peak is an accurate numerical fit to peak location
   double gamma_peak = 1.33322780e-06 * n / ((nu/nu_c) / 1.e6);
   double width = 0.;
+
   if (nu/nu_c < 3.e8) width = 10.;
-  else               width = 1000.;
+  else                width = 1000.;
 
   double gamma_minus_high = gamma_peak - (gamma_peak-gamma_minus)/width;
-  double gamma_plus_high = gamma_peak + (gamma_plus-gamma_peak)/width;
+  double gamma_plus_high = gamma_peak + (gamma_plus-gamma_peak)/1.;//width;
+
+  if (POL_MODE == STOKES_V) {
+    result = gsl_integrate(gamma_minus, gamma_peak, n, nu);
+    result = result + gsl_integrate(gamma_peak, gamma_plus, n, nu);
+    return result;
+  }
 
   if (nu/nu_c > 1.e6) {
     result = gsl_integrate(gamma_minus_high, gamma_plus_high, n, nu);
   }
   else {
-  result = gsl_integrate(gamma_minus, gamma_plus, n, nu);
+    result = gsl_integrate(gamma_minus, gamma_plus, n, nu);
   }
 
   if(isnan(result) != 0) result = 0.;
@@ -526,7 +535,7 @@ double gsl_integrate(double min, double max, double n, double nu)
 {
   double nu_c = (electron_charge * B_field)
                /(2. * M_PI * mass_electron * speed_light);
-  if (nu/nu_c > 1.e6 || POL_MODE == STOKES_V) {
+  if (nu/nu_c > 1.e6) {
     gsl_set_error_handler_off();
   }
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
