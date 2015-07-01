@@ -75,12 +75,12 @@ struct parameters{
 #define THERMAL (0)
 #define POWER_LAW (1)
 #define KAPPA_DIST (2)
-#define DISTRIBUTION_FUNCTION (POWER_LAW)
+#define DISTRIBUTION_FUNCTION (KAPPA_DIST)
 
 //choose absorptivity or emissivity
 #define ABSORP (10)
 #define EMISS  (11)
-#define MODE   (EMISS)
+#define MODE   (ABSORP)
 
 //choose polarization mode
 #define STOKES_I (15)
@@ -89,7 +89,7 @@ struct parameters{
 #define STOKES_V (18)
 #define EXTRAORDINARY_MODE (19)
 #define ORDINARY_MODE (20)
-#define POL_MODE (STOKES_V)
+#define POL_MODE (STOKES_I)
 
 /* main: defines nu_c (cyclotron frequency) and loops through values of nu, 
  * to give output absorptivity or emissivity vs. nu/nu_c; can also be modified
@@ -171,9 +171,10 @@ double polarization_term(double gamma, double n, double nu) {
   #endif
 
   //we need to account for factor of 2 difference between eq. 42 and 43 of [1]
-  if(POL_MODE == EXTRAORDINARY_MODE || ORDINARY_MODE && MODE == ABSORP) {
+  if((POL_MODE==EXTRAORDINARY_MODE||POL_MODE==ORDINARY_MODE)&&MODE==ABSORP) {
     ans = 2. * ans;
-  } 
+  }
+
 
   return ans;
 }
