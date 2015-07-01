@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
   double nu_c = (electron_charge * B_field)
  	       /(2. * M_PI * mass_electron * speed_light);
   int index = 0;
-  for (index; index < 31; index++) {
+  for (index; index < 76; index++) {
 
     double nu = pow(10., index/5.) * nu_c;
     printf("\n%e	%e", nu/nu_c, n_summation(nu));
@@ -396,7 +396,7 @@ double gamma_integration_result(double n, void * params)
   else                width = 1000.;
 
   double gamma_minus_high = gamma_peak - (gamma_peak-gamma_minus)/width;
-  double gamma_plus_high = gamma_peak + (gamma_plus-gamma_peak)/1.;//width;
+  double gamma_plus_high = gamma_peak + (gamma_plus-gamma_peak)/width;
 
   if (POL_MODE == STOKES_V) {
     result = gsl_integrate(gamma_minus, gamma_peak, n, nu);
@@ -438,7 +438,7 @@ double n_integration(double n_minus, double nu)
     double n_start = (int)(n_max + n_minus + 1.);
     double ans = 0.;
     double contrib = 0.;
-    double delta_n = 1.e2;
+    double delta_n = 1.e5;
     double deriv_tol = 1.e-5;
     double tolerance = 1.e10;
 
