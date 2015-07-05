@@ -89,10 +89,10 @@ struct parameters{
 #define STOKES_V (18)
 #define EXTRAORDINARY_MODE (19)
 #define ORDINARY_MODE (20)
-#define POL_MODE (STOKES_V)
+#define POL_MODE (STOKES_I)
 
 //need 2 separate n integrations to numerically resolve STOKES_V
-static int stokes_v_switch = 0;
+static int stokes_v_switch = 0.;
 
 /* main: defines nu_c (cyclotron frequency) and loops through values of nu, 
  * to give output absorptivity or emissivity vs. nu/nu_c; can also be modified
@@ -105,10 +105,10 @@ int main(int argc, char *argv[]) {
   double nu_c = (electron_charge * B_field)
  	       /(2. * M_PI * mass_electron * speed_light);
 
-  int index = 35;
-  for (index; index < 76; index++) {
+  int index = 0;
+  for (index; index < 11; index++) {
 
-    double nu = pow(10., index/5.) * nu_c;
+    double nu = pow(10., index) * nu_c;
     printf("\n%e	%e", nu/nu_c, n_summation(nu));
 
   }
@@ -397,10 +397,10 @@ double gamma_integration_result(double n, void * params)
 
   //needs help resolving peak for nu/nu_c > 1e6
   //gamma_peak is an accurate numerical fit to peak location
-  double gamma_peak = 1.33322780e-06 * n / ((nu/nu_c) / 1.e6);
+  double gamma_peak = (gamma_plus+gamma_minus)/2.;//1.33322780e-06 * n / ((nu/nu_c) / 1.e6);
   double width = 1.;
 
-  if (nu/nu_c > 2.e7 && nu/nu_c <= 3.e8) width = 10.;
+  if (nu/nu_c > 1.e6 && nu/nu_c <= 3.e8) width = 10.;
   else if (nu/nu_c > 3.e8)               width = 1000.;
 
   double gamma_minus_high = gamma_peak - (gamma_peak-gamma_minus)/width;
@@ -446,7 +446,7 @@ double n_integration(double n_minus, double nu)
     double contrib = 0.;
     double delta_n = 1.e5;
     double deriv_tol = 1.e-5;
-    double tolerance = 1.e10;
+    double tolerance = 1.e5;
 
     while (fabs(contrib) >= fabs(ans/tolerance)) {
       double deriv = derivative(n_start, nu);
@@ -483,7 +483,6 @@ double n_summation(double nu)
   for (x; x <= n_max + (int)n_minus ; x++) {
     ans += gamma_integration_result(x, &nu);
   }
-  //printf("\n%e\n", ans);
   stokes_v_switch = 0;
   ans += n_integration(n_minus, nu);
 
@@ -559,7 +558,7 @@ double gsl_integrate(double min, double max, double n, double nu)
   if (n < 0) { //do n integration
     F.function = &gamma_integration_result;
     F.params = &nu;
-    gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
+    gsl_integration_qag(&F, min, max, 0., 1.e-3, 200,
                          3,  w, &result, &error);
   }
   else {  //do gamma integration
@@ -568,10 +567,11 @@ double gsl_integrate(double min, double max, double n, double nu)
   n_and_nu.nu = nu;
   F.function = &gamma_integrand;
   F.params = &n_and_nu;
-  gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
+  gsl_integration_qag(&F, min, max, 0., 1.e-3, 200,
                        3,  w, &result, &error);
   }
 
   gsl_integration_workspace_free (w);
   return result;
 }
+
