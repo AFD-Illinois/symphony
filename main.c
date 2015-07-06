@@ -29,7 +29,7 @@ double theta_e = 10.;
 double electron_charge = 4.80320680e-10;
 double B_field = 30.;
 double n_e = 1.;
-double observer_angle = (M_PI  / 3.);
+double observer_angle = (17. * M_PI  / 36.);
 int C = 10;
 double n_max = 30.;
 
