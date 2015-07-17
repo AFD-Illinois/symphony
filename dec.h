@@ -31,9 +31,7 @@
 #define STOKES_V (18)
 #define EXTRAORDINARY_MODE (19)
 #define ORDINARY_MODE (20)
-#define POL_MODE (STOKES_V)
-
-//#include "params.h"
+#define POL_MODE (STOKES_I)
 
 //function declarations
 double n_peak(double nu);
@@ -56,6 +54,7 @@ double derivative(double n_start, double nu);
 double differential_of_f(double gamma, double nu);
 double thermal(double nu);
 
+//variable declarations
 extern double mass_electron;
 extern double speed_light;
 extern double theta_e;
@@ -65,14 +64,11 @@ extern double n_e;
 extern double obs_angle;
 extern int C;
 extern double n_max;
-
 //power law parameters
 extern double power_law_p;
 extern double gamma_min;
 extern double gamma_max;
 extern double n_e_NT;
-
-
 //kappa distribution parameters
 extern double kappa;
 extern double kappa_width; //width of core of kappa dist.
