@@ -5,6 +5,7 @@
 #include <gsl/gsl_sf_bessel.h>
 #include <gsl/gsl_deriv.h>
 #include <gsl/gsl_errno.h>
+#include <gsl/gsl_sf.h>
 
 //other C header files
 #include <stdio.h>
@@ -31,7 +32,7 @@
 #define STOKES_V (18)
 #define EXTRAORDINARY_MODE (19)
 #define ORDINARY_MODE (20)
-#define POL_MODE (STOKES_I)
+#define POL_MODE (STOKES_Q)
 
 //function declarations
 double n_peak(double nu);
@@ -54,8 +55,26 @@ double derivative(double n_start, double nu);
 double differential_of_f(double gamma, double nu);
 double thermal(double nu);
 
+//fitting formulae
+double thermal_I(double nu);
+double thermal_Q(double nu);
+double thermal_V(double nu);
+double planck_func(double nu);
+double thermal_I_abs(double nu);
+double thermal_Q_abs(double nu);
+double thermal_V_abs(double nu);
+double kappa_I(double nu);
+double kappa_Q(double nu);
+double kappa_V(double nu);
+double kappa_I_abs(double nu);
+double kappa_Q_abs(double nu);
+double kappa_V_abs(double nu);
+double power_law_I(double nu);
+double power_law_I_abs(double nu);
+
 //variable declarations
 extern double mass_electron;
+extern double h;
 extern double speed_light;
 extern double theta_e;
 extern double electron_charge;

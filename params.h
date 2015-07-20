@@ -4,12 +4,13 @@
 //we use Gaussian CGS units
 #define C_PI (3.1415926535897932384)
 double mass_electron = 9.1093826e-28;
+double h = 6.6260693e-27;
 double speed_light = 2.99792458e10;
 double theta_e = 10.;
 double electron_charge = 4.80320680e-10;
 double B_field = 30.;
 double n_e = 1.;
-double obs_angle = (60. * C_PI  / 180.);
+double obs_angle = (75. * C_PI  / 180.);
 int C = 10;
 double n_max = 30.;
 
