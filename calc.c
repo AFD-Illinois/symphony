@@ -8,16 +8,19 @@
  *@returns n_peak: Output, location of integrand's peak for the 
  * n-integral for the THERMAL distribution 
  */
-double n_peak(double nu) {
+double n_peak(double nu) 
+{
   double nu_c = (electron_charge * B_field)
 	      / (2. * M_PI * mass_electron * speed_light);
   
   double beta = 0.;
   
-  if (nu <= nu_c * theta_e*theta_e || theta_e < 1.) {
+  if (nu <= nu_c * theta_e*theta_e || theta_e < 1.) 
+  {
     beta = sqrt((1. - 1./pow((1. + theta_e),2.))); //beta in low nu limit
-    }
-  else {
+  }
+  else 
+  {
     beta = sqrt(1. - pow((2. * theta_e * nu / nu_c), -2./3.));//beta for high nu
   }
   
@@ -35,7 +38,8 @@ double n_peak(double nu) {
  *@param nu: Input, frequency of emission/absorption
  *@returns: piece of gamma integrand that determines polarization mode 
  */
-double polarization_term(double gamma, double n, double nu) {
+double polarization_term(double gamma, double n, double nu) 
+{
   /*below calculation is described in Section 3.1 of [1]*/
   
   double nu_c = (electron_charge * B_field)
@@ -69,7 +73,8 @@ double polarization_term(double gamma, double n, double nu) {
   #endif
 
   //we need to account for factor of 2 difference between eq. 42 and 43 of [1]
-  if((POL_MODE==EXTRAORDINARY_MODE||POL_MODE==ORDINARY_MODE)&&MODE==ABSORP) {
+  if((POL_MODE==EXTRAORDINARY_MODE||POL_MODE==ORDINARY_MODE)&&MODE==ABSORP) 
+  {
     ans = 2. * ans;
   }
 
@@ -86,7 +91,8 @@ double polarization_term(double gamma, double n, double nu) {
  *@param nu: Input, frequency of emission/absorption
  *@returns: Output, Df term in gamma integrand; depends on distribution function
  */
-double differential_of_f(double gamma, double nu) {
+double differential_of_f(double gamma, double nu) 
+{
   /*described in Section 3 of [1] */
 
   #if DISTRIBUTION_FUNCTION == THERMAL
@@ -124,7 +130,8 @@ double differential_of_f(double gamma, double nu) {
  *@param gamma: Input, Lorentz factor
  *@returns: THERMAL distribution function, which goes into the gamma integrand 
  */
-double maxwell_juttner_f(double gamma) {
+double maxwell_juttner_f(double gamma) 
+{
   double beta = sqrt(1. - 1./(gamma*gamma));
   double d = (n_e * gamma * sqrt(gamma*gamma-1.) * exp(-gamma/theta_e))
             /(4. * M_PI * theta_e * gsl_sf_bessel_Kn(2, 1./theta_e));
@@ -143,7 +150,8 @@ double maxwell_juttner_f(double gamma) {
  * n (harmonic number) and nu (frequency of emission/absorption)
  *@returns: Output, power-law distribution to be normalized via normalize_f()
  */
-double power_law_to_be_normalized(double gamma, void * params) {
+double power_law_to_be_normalized(double gamma, void * params) 
+{
   double norm_term = 4. * M_PI;
   double prefactor = (power_law_p - 1.) / (pow(gamma_min, 1. - power_law_p) 
                     - pow(gamma_max, 1. - power_law_p));
@@ -158,7 +166,8 @@ double power_law_to_be_normalized(double gamma, void * params) {
  *@param gamma: Input, Lorentz factor
  *@returns: Ouput, a normalized power-law distribution for the gamma integrand
  */
-double power_law_f(double gamma) {
+double power_law_f(double gamma) 
+{
   double beta = sqrt(1. - 1./(gamma*gamma));
   double prefactor = n_e_NT * (power_law_p - 1.) / (pow(gamma_min, 1. 
                      - power_law_p) - pow(gamma_max, 1. - power_law_p));
@@ -301,7 +310,8 @@ double gamma_integration_result(double n, void * params)
 
 
   //Stokes V is hard to resolve; do 2 separate integrations to make it easier
-  if(POL_MODE == STOKES_V && stokes_v_switch >= 0) {
+  if(POL_MODE == STOKES_V && stokes_v_switch >= 0) 
+  {
     double neg_result = gsl_integrate(gamma_minus_high, gamma_peak, n, nu);
     double pos_result = gsl_integrate(gamma_peak, gamma_plus_high, n, nu);
     if(stokes_v_switch == 0) result = pos_result;
@@ -330,12 +340,14 @@ double n_integration(double n_minus, double nu)
 {
   double nu_c = (electron_charge * B_field)
                /(2. * M_PI * mass_electron * speed_light);
-  if (DISTRIBUTION_FUNCTION == THERMAL && nu/nu_c < 1e6) {
+  if (DISTRIBUTION_FUNCTION == THERMAL && nu/nu_c < 1e6) 
+  {
     double n_start = (int)(n_max + n_minus + 1.);
     double ans = gsl_integrate(n_start, C * n_peak(nu), -1, nu);
     return ans;
-    }
-  else {
+  }
+  else 
+  {
     double n_start = (int)(n_max + n_minus + 1.);
     double ans = 0.;
     double contrib = 0.;
@@ -343,7 +355,8 @@ double n_integration(double n_minus, double nu)
     double deriv_tol = 1.e-5;
     double tolerance = 1.e5;
 
-    while (fabs(contrib) >= fabs(ans/tolerance)) {
+    while (fabs(contrib) >= fabs(ans/tolerance)) 
+    {
       double deriv = derivative(n_start, nu);
 
       if(fabs(deriv) < deriv_tol) delta_n = 100. * delta_n;
@@ -351,7 +364,6 @@ double n_integration(double n_minus, double nu)
       contrib = gsl_integrate(n_start, (n_start + delta_n), -1, nu);
       ans = ans + contrib;
       n_start = n_start + delta_n;
-
     }
 
   return ans;
@@ -371,13 +383,14 @@ double n_summation(double nu)
   double nu_c = (electron_charge * B_field)
                /(2. * M_PI * mass_electron * speed_light);
   double n_minus = (nu/nu_c) * fabs(sin(obs_angle));
-  int x = (int)(n_minus+1.);
 
   stokes_v_switch = -1;
 
-  for (x; x <= n_max + (int)n_minus ; x++) {
+  for (int x=(int)(n_minus+1.); x <= n_max + (int)n_minus ; x++) 
+  {
     ans += gamma_integration_result(x, &nu);
   }
+
   stokes_v_switch = 0;
   ans += n_integration(n_minus, nu);
 
@@ -416,6 +429,7 @@ double normalize_f()
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
   double result, error;
   gsl_function F;
+  
   #if DISTRIBUTION_FUNCTION == POWER_LAW
     F.function = &power_law_to_be_normalized;
   #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
@@ -430,6 +444,7 @@ double normalize_f()
                          w, &result, &error);
   gsl_integration_workspace_free (w);
   ans = result;
+
   return result;
 }
 
@@ -444,19 +459,23 @@ double gsl_integrate(double min, double max, double n, double nu)
 {
   double nu_c = (electron_charge * B_field)
                /(2. * M_PI * mass_electron * speed_light);
-  if (nu/nu_c > 1.e6) {
+  if (nu/nu_c > 1.e6) 
+  {
     gsl_set_error_handler_off();
   }
+
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
   double result, error;
   gsl_function F;
-  if (n < 0) { //do n integration
+  if (n < 0) //do n integration
+  {
     F.function = &gamma_integration_result;
     F.params = &nu;
     gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
                          3,  w, &result, &error);
   }
-  else {  //do gamma integration
+  else      //do gamma integration
+  {
   struct parameters n_and_nu;
   n_and_nu.n = n;
   n_and_nu.nu = nu;
@@ -467,5 +486,6 @@ double gsl_integrate(double min, double max, double n, double nu)
   }
 
   gsl_integration_workspace_free (w);
+
   return result;
 }

@@ -99,7 +99,7 @@ double my_Bessel_J( double n, double x )
 //#if FLAG_N_JN == JN_C_LIB
   /* At least for GNU C Library, jn(n,x) requires n to be integer. */
  if( n < N_JN ) { 
-    return( jn((int)n,x) );
+    return(gsl_sf_bessel_Jn((int)n,x));
   }
 //#elif FLAG_N_JN == JN_C_LIB_interpolate
 //  double dn;
