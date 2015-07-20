@@ -11,15 +11,19 @@
 double n_peak(double nu) {
   double nu_c = (electron_charge * B_field)
 	      / (2. * M_PI * mass_electron * speed_light);
+  
   double beta = 0.;
+  
   if (nu <= nu_c * theta_e*theta_e || theta_e < 1.) {
-    beta = sqrt((1. - 1./pow((1. + theta_e),2.))); 
+    beta = sqrt((1. - 1./pow((1. + theta_e),2.))); //beta in low nu limit
     }
   else {
-    beta = sqrt(1. - pow((2. * theta_e * nu / nu_c), -2./3.)); //beta68
+    beta = sqrt(1. - pow((2. * theta_e * nu / nu_c), -2./3.));//beta for high nu
   }
+  
   double n_peak =  (theta_e + 1. + pow((2. * theta_e * nu / nu_c),1./3.))
                  * (nu/nu_c) * (1. - beta*beta * pow(cos(obs_angle),2.));
+
   return n_peak;
 }
 
@@ -32,6 +36,8 @@ double n_peak(double nu) {
  *@returns: piece of gamma integrand that determines polarization mode 
  */
 double polarization_term(double gamma, double n, double nu) {
+  /*below calculation is described in Section 3.1 of [1]*/
+  
   double nu_c = (electron_charge * B_field)
 	       /(2. * M_PI * mass_electron * speed_light);
   double beta = sqrt(1. - 1./(gamma*gamma));
@@ -81,6 +87,8 @@ double polarization_term(double gamma, double n, double nu) {
  *@returns: Output, Df term in gamma integrand; depends on distribution function
  */
 double differential_of_f(double gamma, double nu) {
+  /*described in Section 3 of [1] */
+
   #if DISTRIBUTION_FUNCTION == THERMAL
     double prefactor = (M_PI * nu / (mass_electron*speed_light*speed_light)) 
 		     * (n_e/(theta_e * gsl_sf_bessel_Kn(2, 1./theta_e)));
@@ -139,8 +147,8 @@ double power_law_to_be_normalized(double gamma, void * params) {
   double norm_term = 4. * M_PI;
   double prefactor = (power_law_p - 1.) / (pow(gamma_min, 1. - power_law_p) 
                     - pow(gamma_max, 1. - power_law_p));
-  //double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
-  double body = pow(gamma, -power_law_p);
+  double body = pow(gamma, -power_law_p) * exp(- gamma / gamma_cutoff);
+  //double body = pow(gamma, -power_law_p); for PL w/o cutoff
   double ans = norm_term * prefactor * body;
   return ans;
 }
@@ -154,8 +162,8 @@ double power_law_f(double gamma) {
   double beta = sqrt(1. - 1./(gamma*gamma));
   double prefactor = n_e_NT * (power_law_p - 1.) / (pow(gamma_min, 1. 
                      - power_law_p) - pow(gamma_max, 1. - power_law_p));
-  //double body = pow(gamma, -p) * exp(- gamma / gamma_cutoff);
-  double body = pow(gamma, -power_law_p);
+  double body = pow(gamma, -power_law_p) * exp(- gamma / gamma_cutoff);
+  //double body = pow(gamma, -power_law_p); //for PL w/o cutoff
   double ans = 1./normalize_f() * prefactor * body * 1./(pow(mass_electron, 3.) 
                * pow(speed_light, 3.) * gamma*gamma * beta);
   return ans;
@@ -175,8 +183,8 @@ double kappa_to_be_normalized(double gamma, void * params)
   double cutoff = exp(-gamma/gamma_cutoff);
   double norm_term = 4. * M_PI * pow(mass_electron, 3.) * pow(speed_light, 3.) 
                    * gamma * sqrt(gamma*gamma-1.);
-  //double ans = kappa_body * cutoff * norm_term;
-  double ans = kappa_body * norm_term;
+  double ans = kappa_body * cutoff * norm_term;
+  //double ans = kappa_body * norm_term; //for kappa w/o cutoff
   return ans;
 }
 
@@ -190,8 +198,8 @@ double kappa_f(double gamma)
   double norm = 1./normalize_f();
   double kappa_body = n_e * pow((1. + (gamma - 1.)/(kappa * kappa_width)), -kappa-1);
   double cutoff = exp(-gamma/gamma_cutoff);
-  //double ans = norm * kappa_body * cutoff;
-  double ans = norm * kappa_body;
+  double ans = norm * kappa_body * cutoff;
+  //double ans = norm * kappa_body; //for kappa w/o cutoff
   return ans;
 }
 
@@ -205,6 +213,7 @@ double kappa_f(double gamma)
  */
 double integrand_without_extra_factor(double gamma, double n, double nu)
 {
+  /*This is the function I(n, xi, gamma) in Eq. 60 of [1]*/
   double nu_c = (electron_charge * B_field)
                /(2. * M_PI * mass_electron * speed_light);
   double beta = sqrt(1. - 1./(gamma*gamma));
@@ -268,6 +277,7 @@ double gamma_integrand(double gamma, void * params)
  */
 double gamma_integration_result(double n, void * params)
 {
+  /*This evaluates the gamma integral*/
   double nu = *(double *) params;
   double nu_c = (electron_charge * B_field)
                 /(2. * M_PI * mass_electron * speed_light);
@@ -279,9 +289,8 @@ double gamma_integration_result(double n, void * params)
                   /(pow(sin(obs_angle), 2));
   double result = 0.;
 
-  //needs help resolving peak for nu/nu_c > 1e6
-  //gamma_peak is an accurate numerical fit to peak location
-  double gamma_peak = (gamma_plus+gamma_minus)/2.;//1.33322780e-06 * n / ((nu/nu_c) / 1.e6);
+  //integrator needs help resolving peak for nu/nu_c > 1e6
+  double gamma_peak = (gamma_plus+gamma_minus)/2.;
   double width = 1.;
 
   if (nu/nu_c > 1.e6 && nu/nu_c <= 3.e8) width = 10.;
@@ -290,6 +299,8 @@ double gamma_integration_result(double n, void * params)
   double gamma_minus_high = gamma_peak - (gamma_peak-gamma_minus)/width;
   double gamma_plus_high = gamma_peak + (gamma_plus-gamma_peak)/width;
 
+
+  //Stokes V is hard to resolve; do 2 separate integrations to make it easier
   if(POL_MODE == STOKES_V && stokes_v_switch >= 0) {
     double neg_result = gsl_integrate(gamma_minus_high, gamma_peak, n, nu);
     double pos_result = gsl_integrate(gamma_peak, gamma_plus_high, n, nu);
@@ -433,16 +444,16 @@ double gsl_integrate(double min, double max, double n, double nu)
 {
   double nu_c = (electron_charge * B_field)
                /(2. * M_PI * mass_electron * speed_light);
-  //if (nu/nu_c > 1.e6) {
+  if (nu/nu_c > 1.e6) {
     gsl_set_error_handler_off();
-  //}
+  }
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
   double result, error;
   gsl_function F;
   if (n < 0) { //do n integration
     F.function = &gamma_integration_result;
     F.params = &nu;
-    gsl_integration_qag(&F, min, max, 0., 1.e-3, 200,
+    gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
                          3,  w, &result, &error);
   }
   else {  //do gamma integration
@@ -451,7 +462,7 @@ double gsl_integrate(double min, double max, double n, double nu)
   n_and_nu.nu = nu;
   F.function = &gamma_integrand;
   F.params = &n_and_nu;
-  gsl_integration_qag(&F, min, max, 0., 1.e-3, 200,
+  gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
                        3,  w, &result, &error);
   }
 

@@ -14,7 +14,6 @@
  * to give abs/emiss as a function of its other parameters, like obs. angle
  */
 
-
 int main(int argc, char *argv[]) {
 
   double nu_c = (electron_charge * B_field)
@@ -22,8 +21,8 @@ int main(int argc, char *argv[]) {
 
   printf("\nDIST: %d, MODE: %d, POL: %d", DISTRIBUTION_FUNCTION,
 		 	                  MODE, POL_MODE);
-  double max_nuratio = 1e6;
-  int points_per_pow_10 = 5.;
+  double max_nuratio = 1e10;
+  int points_per_pow_10 = 1;
   int index = 0;
   int max_index = (int) log10(max_nuratio)*points_per_pow_10;
 
@@ -35,6 +34,4 @@ int main(int argc, char *argv[]) {
   }
   printf("\n");
   return 0;
-
 }
-

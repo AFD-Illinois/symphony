@@ -8,7 +8,7 @@ double theta_e = 10.;
 double electron_charge = 4.80320680e-10;
 double B_field = 30.;
 double n_e = 1.;
-double obs_angle = (M_PI  / 3.);
+double obs_angle = (60. * M_PI  / 180.);
 int C = 10;
 double n_max = 30.;
 
@@ -21,7 +21,7 @@ double n_e_NT = 1.;
 
 //kappa distribution parameters
 double kappa = 3.5;
-double kappa_width = 10.; //width of core of kappa dist.
+double kappa_width = 10.;
 double gamma_cutoff = 1000000000000;
 
 //struct to pass parameters to the integrand

@@ -71,6 +71,5 @@ extern double gamma_max;
 extern double n_e_NT;
 //kappa distribution parameters
 extern double kappa;
-extern double kappa_width; //width of core of kappa dist.
+extern double kappa_width;
 extern double gamma_cutoff;
-
