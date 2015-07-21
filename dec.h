@@ -32,7 +32,7 @@
 #define STOKES_V (18)
 #define EXTRAORDINARY_MODE (19)
 #define ORDINARY_MODE (20)
-#define POL_MODE (STOKES_Q)
+#define POL_MODE (STOKES_V)
 
 //function declarations
 double n_peak(double nu);
@@ -70,6 +70,8 @@ double kappa_I_abs(double nu);
 double kappa_Q_abs(double nu);
 double kappa_V_abs(double nu);
 double power_law_I(double nu);
+double power_law_Q(double nu);
+double power_law_V(double nu);
 double power_law_I_abs(double nu);
 
 //variable declarations

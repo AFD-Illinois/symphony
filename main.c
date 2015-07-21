@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 
     double nu = pow(10., (double)index/(double)points_per_pow_10) * nu_c;
     printf("\n%e	%e", nu/nu_c, n_summation(nu));
-    //printf("\n%e	%e", nu/nu_c, power_law_I(nu));
+    printf("\n%e	%e", nu/nu_c, power_law_V(nu));
 
   }
   printf("\n");

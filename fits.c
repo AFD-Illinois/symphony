@@ -254,6 +254,23 @@ double power_law_I(double nu)
  return ans;
 }
 
+double power_law_Q(double nu)
+{
+  double p_term = -(power_law_p + 1.)/(power_law_p + 7./3.);
+  double ans = p_term * power_law_I(nu);
+  return ans;
+}
+
+double power_law_V(double nu)
+{
+  double nu_c = (electron_charge * B_field)
+               /(2. * M_PI * mass_electron * speed_light);
+  double term1 = -(171./250.)*pow(power_law_p, 49./100.);
+  double term2 = 1./tan(obs_angle) * pow(nu/(3.*nu_c*sin(obs_angle)), -1./2.);
+  double ans = term1*term2*power_law_I(nu);
+  return ans;
+}
+
 double power_law_I_abs(double nu)
 {
   double nu_c = (electron_charge * B_field)

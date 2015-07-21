@@ -10,12 +10,12 @@ double theta_e = 10.;
 double electron_charge = 4.80320680e-10;
 double B_field = 30.;
 double n_e = 1.;
-double obs_angle = (75. * C_PI  / 180.);
+double obs_angle = (60. * C_PI  / 180.);
 int C = 10;
 double n_max = 30.;
 
 //power law parameters
-double power_law_p = 3.;
+double power_law_p = 3.5;
 double gamma_min = 1.;
 double gamma_max = 1000.;
 double n_e_NT = 1.;
