@@ -73,6 +73,8 @@ double power_law_I(double nu);
 double power_law_Q(double nu);
 double power_law_V(double nu);
 double power_law_I_abs(double nu);
+double power_law_Q_abs(double nu);
+double power_law_V_abs(double nu);
 
 //variable declarations
 extern double mass_electron;
