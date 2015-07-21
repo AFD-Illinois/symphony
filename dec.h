@@ -23,7 +23,7 @@
 //choose absorptivity or emissivity
 #define ABSORP (10)
 #define EMISS  (11)
-#define MODE   (EMISS)
+#define MODE   (ABSORP)
 
 //choose polarization mode
 #define STOKES_I (15)

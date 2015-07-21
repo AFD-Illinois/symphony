@@ -288,3 +288,46 @@ double power_law_I_abs(double nu)
 
  return ans;
 }
+
+
+double power_law_Q_abs(double nu)
+{
+  double nu_c = (electron_charge * B_field)
+               /(2. * M_PI * mass_electron * speed_light);
+
+  double prefactor = (n_e_NT*pow(electron_charge,2.))
+                    /(nu*mass_electron*speed_light);
+  double term1 = pow(3., (power_law_p+1.)/2.)*(power_law_p-1.);
+  double term2 = 4.*(pow(gamma_min, 1.-power_law_p)
+                -pow(gamma_max, 1.-power_law_p));
+  double term3 = tgamma((3.*power_law_p+2.)/12.)
+                *tgamma((3.*power_law_p+22.)/12.);
+  double term4 = pow(nu/(nu_c*sin(obs_angle)), -(power_law_p+2.)/2.);
+  double term5 = -pow((17./500.)*power_law_p - 43./1250., 43./500);
+  double ans = prefactor*term1/term2*term3*term4*term5;
+
+ return ans;
+}
+
+double power_law_V_abs(double nu)
+{
+  double nu_c = (electron_charge * B_field)
+               /(2. * M_PI * mass_electron * speed_light);
+
+  double prefactor = (n_e_NT*pow(electron_charge,2.))
+                    /(nu*mass_electron*speed_light);
+  double term1 = pow(3., (power_law_p+1.)/2.)*(power_law_p-1.);
+  double term2 = 4.*(pow(gamma_min, 1.-power_law_p)
+                -pow(gamma_max, 1.-power_law_p));
+  double term3 = tgamma((3.*power_law_p+2.)/12.)
+                *tgamma((3.*power_law_p+22.)/12.);
+  double term4 = pow(nu/(nu_c*sin(obs_angle)), -(power_law_p+2.)/2.);
+  double term5 = -pow((71./100.)*power_law_p+22./625.,197./500.);
+  double term6 = pow((31./10.)*pow(sin(obs_angle),-48./25)-31./10.,
+                 64./125.);
+  double term7 = pow(nu/(nu_c*sin(obs_angle)), -1./2.); 
+  double ans = prefactor*term1/term2*term3*term4*term5*term6*term7;
+
+ return ans;
+}
+
