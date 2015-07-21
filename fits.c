@@ -141,6 +141,8 @@ double kappa_V(double nu)
 
 }
 
+/*GSL 2F1 only works for |z| < 1; had to apply a hypergeometric function
+  identity because in our case z = -kappa*w, so |z| > 1 */
 double kappa_I_abs(double nu)
 {
   double nu_c = (electron_charge * B_field)
@@ -189,7 +191,8 @@ double kappa_Q_abs(double nu)
   double Nlow = -(25./48.)*pow(3., 1./6.)*(10./41.)*pow(2.*M_PI, 2.)
                /pow(kappa_width*kappa, 16./3.-kappa)*(kappa-2.)*(kappa-1.)
                *kappa/(3.*kappa-1.)*tgamma(5./3.)*hyp2f1;
-  double Nhigh = -(pow(21., 2.)*pow(kappa, -144./25.)+11./20.)*2.*pow(M_PI, 5./2.)/3.*(kappa-2.)*(kappa-1.)*kappa
+  double Nhigh = -(pow(21., 2.)*pow(kappa, -144./25.)+11./20.)*2.
+                 *pow(M_PI, 5./2.)/3.*(kappa-2.)*(kappa-1.)*kappa
                  /pow(kappa_width*kappa, 5.)*(2*tgamma(2.+kappa/2.)
                  /(2.+kappa)-1.);
   double x = (7./5.)*pow(kappa, -23./20.);
@@ -215,11 +218,17 @@ double kappa_V_abs(double nu)
                  *gsl_sf_hyperg_2F1(a, c-b, a-b+1., 1./(1.-z))+pow(1.-z, -b)
                  *tgamma(c)*tgamma(a-b)/(tgamma(a)*tgamma(c-b))
                  *gsl_sf_hyperg_2F1(b, c-a, b-a+1., 1./(1.-z));
-  double Nlow = -(77./(100.*kappa_width))*pow(pow(sin(obs_angle), -114./50.)-1., 223./500.)*pow(X_k, -7./20.)*pow(kappa, -7./10)*pow(3., 1./6.)*(10./41.)*pow(2.*M_PI, 2.)
-               /pow(kappa_width*kappa, 16./3.-kappa)*(kappa-2.)*(kappa-1.)
-               *kappa/(3.*kappa-1.)*tgamma(5./3.)*hyp2f1;
-  double Nhigh = -(143./10. * pow(kappa_width, -116./125.))*pow(pow(sin(obs_angle), -41./20.)-1., 1./2.)*(13.*13.*pow(kappa, -8.)+13./(2500.)*kappa - 263./5000.+47./(200.*kappa))*pow(X_k, -1./2.)*2.*pow(M_PI, 5./2.)/3.*(kappa-2.)*(kappa-1.)*kappa
-                 /pow(kappa_width*kappa, 5.)*(2*tgamma(2.+kappa/2.)
+  double Nlow = -(77./(100.*kappa_width))*pow(pow(sin(obs_angle), -114./50.)
+                -1., 223./500.)*pow(X_k, -7./20.)*pow(kappa, -7./10)
+                *pow(3., 1./6.)*(10./41.)*pow(2.*M_PI, 2.)
+                /pow(kappa_width*kappa, 16./3.-kappa)*(kappa-2.)*(kappa-1.)
+                *kappa/(3.*kappa-1.)*tgamma(5./3.)*hyp2f1;
+  double Nhigh = -(143./10. * pow(kappa_width, -116./125.))
+                 *pow(pow(sin(obs_angle), -41./20.)-1., 1./2.)
+                 *(13.*13.*pow(kappa, -8.)+13./(2500.)*kappa - 263./5000.+47.
+                 /(200.*kappa))*pow(X_k, -1./2.)*2.*pow(M_PI, 5./2.)/3.
+                 *(kappa-2.)*(kappa-1.)*kappa/pow(kappa_width*kappa, 5.)
+                 *(2*tgamma(2.+kappa/2.)
                  /(2.+kappa)-1.);
   double x = (61./50.)*pow(kappa, -142./125.)+7./1000.;
   double ans = prefactor*Nlow*pow(X_k, -5./3.)
@@ -235,8 +244,10 @@ double power_law_I(double nu)
 
   double prefactor = (n_e_NT*pow(electron_charge,2.)*nu_c)/speed_light;
   double term1 = pow(3., power_law_p/2.)*(power_law_p-1.)*sin(obs_angle);
-  double term2 = 2.*(power_law_p+1.)*(pow(gamma_min, 1.-power_law_p)-pow(gamma_max, 1.-power_law_p));
-  double term3 = tgamma((3.*power_law_p-1.)/12.)*tgamma((3.*power_law_p+19.)/12.);
+  double term2 = 2.*(power_law_p+1.)*(pow(gamma_min, 1.-power_law_p)
+                -pow(gamma_max, 1.-power_law_p));
+  double term3 = tgamma((3.*power_law_p-1.)/12.)
+                *tgamma((3.*power_law_p+19.)/12.);
   double term4 = pow(nu/(nu_c*sin(obs_angle)), -(power_law_p-1.)/2.);
   double ans = prefactor*term1/term2*term3*term4;
 
@@ -248,10 +259,13 @@ double power_law_I_abs(double nu)
   double nu_c = (electron_charge * B_field)
                /(2. * M_PI * mass_electron * speed_light);
 
-  double prefactor = (n_e_NT*pow(electron_charge,2.))/(nu*mass_electron*speed_light);
+  double prefactor = (n_e_NT*pow(electron_charge,2.))
+                    /(nu*mass_electron*speed_light);
   double term1 = pow(3., (power_law_p+1.)/2.)*(power_law_p-1.);
-  double term2 = 4.*(pow(gamma_min, 1.-power_law_p)-pow(gamma_max, 1.-power_law_p));
-  double term3 = tgamma((3.*power_law_p+2.)/12.)*tgamma((3.*power_law_p+22.)/12.);
+  double term2 = 4.*(pow(gamma_min, 1.-power_law_p)
+                -pow(gamma_max, 1.-power_law_p));
+  double term3 = tgamma((3.*power_law_p+2.)/12.)
+                *tgamma((3.*power_law_p+22.)/12.);
   double term4 = pow(nu/(nu_c*sin(obs_angle)), -(power_law_p+2.)/2.);
   double ans = prefactor*term1/term2*term3*term4;
 
