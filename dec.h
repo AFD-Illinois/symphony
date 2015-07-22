@@ -23,7 +23,7 @@
 //choose absorptivity or emissivity
 #define ABSORP (10)
 #define EMISS  (11)
-#define MODE   (ABSORP)
+#define MODE   (EMISS)
 
 //choose polarization mode
 #define STOKES_I (15)
@@ -32,7 +32,7 @@
 #define STOKES_V (18)
 #define EXTRAORDINARY_MODE (19)
 #define ORDINARY_MODE (20)
-#define POL_MODE (STOKES_V)
+#define POL_MODE (STOKES_I)
 
 //function declarations
 double n_peak(double nu);

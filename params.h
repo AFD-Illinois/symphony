@@ -15,7 +15,7 @@ int C = 10;
 double n_max = 30.;
 
 //power law parameters
-double power_law_p = 3.5;
+double power_law_p = 3.;
 double gamma_min = 1.;
 double gamma_max = 1000.;
 double n_e_NT = 1.;

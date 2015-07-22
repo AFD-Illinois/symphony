@@ -25,16 +25,18 @@ int main(int argc, char *argv[])
 
   printf("\nDIST: %d, MODE: %d, POL: %d", DISTRIBUTION_FUNCTION,
 		 	                  MODE, POL_MODE);
+
   double max_nuratio = 1e10;
   int points_per_pow_10 = 1;
   int max_index = (int) log10(max_nuratio)*points_per_pow_10;
+
+  printf("\nnu/nu_c         ans             fit");
 
   for (int index=0; index <= max_index; index++) 
   {
 
     double nu = pow(10., (double)index/(double)points_per_pow_10) * nu_c;
-    printf("\n%e	%e", nu/nu_c, n_summation(nu));
-    printf("\n%e	%e", nu/nu_c, power_law_V_abs(nu));
+    printf("\n%e	%e	%e", nu/nu_c, n_summation(nu), power_law_I(nu));
 
   }
   printf("\n");
