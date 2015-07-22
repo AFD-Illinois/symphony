@@ -53,7 +53,10 @@ double kappa_to_be_normalized(double gamma, void * params);
 double kappa_f(double gamma);
 double derivative(double n_start, double nu);
 double differential_of_f(double gamma, double nu);
-double thermal(double nu);
+double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp);
+double alpha_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp);
+double j_nu_fit(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int pol);
+double alpha_nu_fit(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int pol);
 
 //fitting formulae
 double thermal_I(double nu);
@@ -77,12 +80,12 @@ double power_law_Q_abs(double nu);
 double power_law_V_abs(double nu);
 
 //variable declarations
-extern double mass_electron;
-extern double h;
-extern double speed_light;
+extern const double mass_electron;
+extern const double h;
+extern const double speed_light;
 extern double theta_e;
-extern double electron_charge;
-extern double B_field;
+extern const double electron_charge;
+extern double B;
 extern double n_e;
 extern double obs_angle;
 extern int C;
@@ -96,3 +99,9 @@ extern double n_e_NT;
 extern double kappa;
 extern double kappa_width;
 extern double gamma_cutoff;
+
+//struct to pass parameters to the integrand
+struct parameters{
+  double n;
+  double nu;
+};

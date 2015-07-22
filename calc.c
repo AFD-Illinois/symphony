@@ -1,5 +1,24 @@
-#include "dec.h"
+#include "symphony.h"
 #include "params.h"
+
+double B;
+double n_e;
+double obs_angle;
+double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp)
+{
+  B = B_temp;
+  n_e = n_e_temp;
+  obs_angle = obs_angl_temp;
+  return n_summation(nu);
+}
+
+double alpha_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp)
+{
+  B = B_temp;
+  n_e = n_e_temp;
+  obs_angle = obs_angl_temp;
+  return n_summation(nu);
+}
 
 /*n_peak: gives the location of the peak of the n integrand for 
  *the THERMAL distribution; uses Eq. 68 in [1]
@@ -10,7 +29,7 @@
  */
 double n_peak(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
 	      / (2. * M_PI * mass_electron * speed_light);
 
   double beta = 0.;
@@ -42,7 +61,7 @@ double polarization_term(double gamma, double n, double nu)
 {
   /*below calculation is described in Section 3.1 of [1]*/
   
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
 	       /(2. * M_PI * mass_electron * speed_light);
 
   double beta = sqrt(1. - 1./(gamma*gamma));
@@ -257,7 +276,7 @@ double integrand_without_extra_factor(double gamma, double n, double nu)
 {
   /*This is the function I(n, xi, gamma) in Eq. 60 of [1]*/
 
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double beta = sqrt(1. - 1./(gamma*gamma));
@@ -300,7 +319,7 @@ double gamma_integrand(double gamma, void * params)
   double n = n_and_nu.n;
   double nu = n_and_nu.nu;
 
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double beta = sqrt(1. - 1./(gamma*gamma));
@@ -337,7 +356,7 @@ double gamma_integration_result(double n, void * params)
   /*This evaluates the gamma integral*/
   double nu = *(double *) params;
 
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                 /(2. * M_PI * mass_electron * speed_light);
 
   double gamma_minus = ((n*nu_c)/nu - fabs(cos(obs_angle))
@@ -396,7 +415,7 @@ double gamma_integration_result(double n, void * params)
  */
 double n_integration(double n_minus, double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   if (DISTRIBUTION_FUNCTION == THERMAL && nu/nu_c < 1e6) 
@@ -443,9 +462,13 @@ double n_integration(double n_minus, double nu)
 double n_summation(double nu)
 {
 
+  #if POL_MODE == STOKES_U
+    return 0.;
+  #endif
+
   double ans = 0.;
 
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double n_minus = (nu/nu_c) * fabs(sin(obs_angle));
@@ -474,92 +497,4 @@ double n_summation(double nu)
   #endif
 
   return ans;
-}
-
-/*derivative: wrapper for the GSL derivative gsl_deriv_central(); used to
- *help speed up the integration over harmonic number n
- *@param n_start: Input, value of n at which the derivative is to be performed
- *@param nu: Input, frequency of absorption/emission
- */
-double derivative(double n_start, double nu)
-{
-  gsl_function F;
-  double result;
-  double abserr;
-  F.function = gamma_integration_result;
-  F.params = &nu;
-  gsl_deriv_central(&F, n_start, 1e-8, &result, &abserr);
-  return result;
-}
-
-/*normalize_f: normalizes the distribution function (power-law with cutoff
- * or kappa) using GSL's QAGIU integrator.
- *@returns: 1 over the normalization constant for the chosen distribution
- */
-double normalize_f()
-{
-  static double ans = 0;
-  if (ans != 0) return ans;
-  gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
-  double result, error;
-  gsl_function F;
-  
-  #if DISTRIBUTION_FUNCTION == POWER_LAW
-    F.function = &power_law_to_be_normalized;
-  #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
-    F.function = &kappa_to_be_normalized;
-  #else
-    return 0;
-  #endif
-
-  double unused = 0.;
-  F.params = &unused;
-  gsl_integration_qagiu(&F, 1, 0, 1e-8, 1000,
-                         w, &result, &error);
-  gsl_integration_workspace_free (w);
-  ans = result;
-
-  return result;
-}
-
-/*gsl_integrate: wrapper for the GSL QAG integration routine
- *@param min: Input, lower bound of integral
- *@param max: Input, upper bound of integral
- *@param n: Input, harmonic number and index of sum over n
- *@param nu: Input, frequency of emission/absorption
- *@returns: Output, result of either gamma integral or n integral
- */
-double gsl_integrate(double min, double max, double n, double nu)
-{
-  double nu_c = (electron_charge * B_field)
-               /(2. * M_PI * mass_electron * speed_light);
-  if (nu/nu_c > 1.e6) 
-  {
-    gsl_set_error_handler_off();
-  }
-
-  gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
-  double result, error;
-  gsl_function F;
-  if (n < 0) //do n integration
-  {
-    F.function = &gamma_integration_result;
-    F.params = &nu;
-    gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
-                         3,  w, &result, &error);
-  }
-  else      //do gamma integration
-  {
-  struct parameters n_and_nu;
-  n_and_nu.n = n;
-  n_and_nu.nu = nu;
-  F.function = &gamma_integrand;
-  F.params = &n_and_nu;
-  gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
-                       3,  w, &result, &error);
-  }
-
-  gsl_integration_workspace_free (w);
-
-  return result;
 }

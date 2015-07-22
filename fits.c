@@ -1,8 +1,69 @@
-#include "dec.h"
+#include "symphony.h"
+
+double B;
+double n_e;
+double obs_angle;
+double j_nu_fit(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int pol)
+{
+  B = B_temp;
+  n_e = n_e_temp;
+  obs_angle = obs_angl_temp;
+
+  #if DISTRIBUTION_FUNCTION == THERMAL
+    if     (pol == STOKES_I) return thermal_I(nu);
+    else if(pol == STOKES_Q) return thermal_Q(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return thermal_V(nu);
+
+  #elif DISTRIBUTION_FUNCTION == POWER_LAW
+    if     (pol == STOKES_I) return power_law_I(nu);
+    else if(pol == STOKES_Q) return power_law_Q(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return power_law_V(nu);
+
+  #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
+    if     (pol == STOKES_I) return kappa_I(nu);
+    else if(pol == STOKES_Q) return kappa_Q(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return kappa_V(nu);
+  #endif
+
+  return 0.;
+}
+
+double alpha_nu_fit(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int pol)
+{
+  B = B_temp;
+  n_e = n_e_temp;
+  obs_angle = obs_angl_temp;
+
+ #if DISTRIBUTION_FUNCTION == THERMAL
+    if     (pol == STOKES_I) return thermal_I_abs(nu);
+    else if(pol == STOKES_Q) return thermal_Q_abs(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return thermal_V_abs(nu);
+
+  #elif DISTRIBUTION_FUNCTION == POWER_LAW
+    if     (pol == STOKES_I) return power_law_I_abs(nu);
+    else if(pol == STOKES_Q) return power_law_Q_abs(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return power_law_V_abs(nu);
+
+  #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
+    if     (pol == STOKES_I) return kappa_I_abs(nu);
+    else if(pol == STOKES_Q) return kappa_Q_abs(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return kappa_V_abs(nu);
+  #endif
+
+  return 0.;
+}
+
+
 
 double thermal_I(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double nu_s = (2./9.)*nu_c*sin(obs_angle)*theta_e*theta_e;
@@ -18,7 +79,7 @@ double thermal_I(double nu)
 
 double thermal_Q(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double nu_s = (2./9.)*nu_c*sin(obs_angle)*theta_e*theta_e;
@@ -35,7 +96,7 @@ double thermal_Q(double nu)
 
 double thermal_V(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double nu_s = (2./9.)*nu_c*sin(obs_angle)*theta_e*theta_e;
@@ -77,7 +138,7 @@ double thermal_V_abs(double nu)
 
 double kappa_I(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double nu_w = pow(kappa_width*kappa, 2.)*nu_c*sin(obs_angle);
@@ -97,7 +158,7 @@ double kappa_I(double nu)
 
 double kappa_Q(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double nu_w = pow(kappa_width*kappa, 2.)*nu_c*sin(obs_angle);
@@ -119,7 +180,7 @@ double kappa_Q(double nu)
 
 double kappa_V(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double nu_w = pow(kappa_width*kappa, 2.)*nu_c*sin(obs_angle);
@@ -145,12 +206,12 @@ double kappa_V(double nu)
   identity because in our case z = -kappa*w, so |z| > 1 */
 double kappa_I_abs(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double nu_w = pow(kappa_width*kappa, 2.)*nu_c*sin(obs_angle);
   double X_k = nu/nu_w;
-  double prefactor = n_e*electron_charge/(B_field*sin(obs_angle));
+  double prefactor = n_e*electron_charge/(B*sin(obs_angle));
   double a = kappa - 1./3.; 
   double b = kappa + 1.;
   double c = kappa + 2./3.;
@@ -174,12 +235,12 @@ double kappa_I_abs(double nu)
 
 double kappa_Q_abs(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double nu_w = pow(kappa_width*kappa, 2.)*nu_c*sin(obs_angle);
   double X_k = nu/nu_w;
-  double prefactor = n_e*electron_charge/(B_field*sin(obs_angle));
+  double prefactor = n_e*electron_charge/(B*sin(obs_angle));
   double a = kappa - 1./3.; 
   double b = kappa + 1.;
   double c = kappa + 2./3.;
@@ -204,12 +265,12 @@ double kappa_Q_abs(double nu)
 
 double kappa_V_abs(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double nu_w = pow(kappa_width*kappa, 2.)*nu_c*sin(obs_angle);
   double X_k = nu/nu_w;
-  double prefactor = n_e*electron_charge/(B_field*sin(obs_angle));
+  double prefactor = n_e*electron_charge/(B*sin(obs_angle));
   double a = kappa - 1./3.; 
   double b = kappa + 1.;
   double c = kappa + 2./3.;
@@ -239,7 +300,7 @@ double kappa_V_abs(double nu)
 
 double power_law_I(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double prefactor = (n_e_NT*pow(electron_charge,2.)*nu_c)/speed_light;
@@ -263,7 +324,7 @@ double power_law_Q(double nu)
 
 double power_law_V(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
   double term1 = -(171./250.)*pow(power_law_p, 49./100.);
   double term2 = 1./tan(obs_angle) * pow(nu/(3.*nu_c*sin(obs_angle)), -1./2.);
@@ -273,7 +334,7 @@ double power_law_V(double nu)
 
 double power_law_I_abs(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double prefactor = (n_e_NT*pow(electron_charge,2.))
@@ -292,7 +353,7 @@ double power_law_I_abs(double nu)
 
 double power_law_Q_abs(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double prefactor = (n_e_NT*pow(electron_charge,2.))
@@ -311,7 +372,7 @@ double power_law_Q_abs(double nu)
 
 double power_law_V_abs(double nu)
 {
-  double nu_c = (electron_charge * B_field)
+  double nu_c = (electron_charge * B)
                /(2. * M_PI * mass_electron * speed_light);
 
   double prefactor = (n_e_NT*pow(electron_charge,2.))
