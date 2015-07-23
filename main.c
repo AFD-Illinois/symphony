@@ -14,14 +14,14 @@
  * to give abs/emiss as a function of its other parameters, like obs. angle
  *
  * The distribution function, polarization mode, and emissivity/absorptivity
- * can all be set in the file dec.h
+ * must all be set in the file symphony.h; parameters can be set in params.h
  */
 
 int main(int argc, char *argv[]) 
 {
   double B = 30.;
   double n_e = 1.;
-  double obs_angle = 60.*M_PI/180.;
+  double obs_angle = 120.*M_PI/180.;
 
   double nu_c = (electron_charge * B)
  	       /(2. * M_PI * mass_electron * speed_light);
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
   printf("\nDIST: %d, MODE: %d, POL: %d", DISTRIBUTION_FUNCTION,
 		 	                  MODE, POL_MODE);
 
-  double max_nuratio = 1e6;
+  double max_nuratio = 1e10;
   int points_per_pow_10 = 1;
   int max_index = (int) log10(max_nuratio)*points_per_pow_10;
 
@@ -42,11 +42,11 @@ int main(int argc, char *argv[])
 
     #if MODE == EMISS
     printf("\n%e	%e	%e", nu/nu_c, j_nu(nu, B, n_e, obs_angle), 
-                                              j_nu_fit(nu, B, n_e, obs_angle, POL_MODE));
+                               j_nu_fit(nu, B, n_e, obs_angle, POL_MODE));
 
     #elif MODE == ABSORP
     printf("\n%e	%e	%e", nu/nu_c, alpha_nu(nu, B, n_e, obs_angle), 
-                                              alpha_nu_fit(nu, B, n_e, obs_angle, POL_MODE));
+                               alpha_nu_fit(nu, B, n_e, obs_angle, POL_MODE));
     #endif
 
   }

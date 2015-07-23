@@ -18,7 +18,7 @@
 #define THERMAL (0)
 #define POWER_LAW (1)
 #define KAPPA_DIST (2)
-#define DISTRIBUTION_FUNCTION (POWER_LAW)
+#define DISTRIBUTION_FUNCTION (KAPPA_DIST)
 
 //choose absorptivity or emissivity
 #define ABSORP (10)
@@ -54,9 +54,12 @@ double kappa_f(double gamma);
 double derivative(double n_start, double nu);
 double differential_of_f(double gamma, double nu);
 double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp);
-double alpha_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp);
-double j_nu_fit(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int pol);
-double alpha_nu_fit(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int pol);
+double alpha_nu(double nu, double B_temp, double n_e_temp, 
+                double obs_angl_temp);
+double j_nu_fit(double nu, double B_temp, double n_e_temp, double obs_angl_temp, 
+                int pol);
+double alpha_nu_fit(double nu, double B_temp, double n_e_temp, 
+                    double obs_angl_temp, int pol);
 
 //fitting formulae
 double thermal_I(double nu);

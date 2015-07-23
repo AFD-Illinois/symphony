@@ -19,7 +19,7 @@ double n_e_NT = 1.;
 //double gamma_cutoff = 1000.; //also a kappa distribution parameter
 
 //kappa distribution parameters
-double kappa = 3.5;
+double kappa = 10.;
 double kappa_width = 10.;
 double gamma_cutoff = 1000000000000;
 

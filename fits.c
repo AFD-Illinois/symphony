@@ -1,9 +1,16 @@
 #include "symphony.h"
 
+/*fitting formulae*/
+
+
 double B;
 double n_e;
 double obs_angle;
-double j_nu_fit(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int pol)
+
+/*wrapper for emissivity fitting formulae; takes in arguments nu, B, n_e, 
+  theta, and the Stokes mode as pol*/
+double j_nu_fit(double nu, double B_temp, double n_e_temp, 
+                double obs_angl_temp, int pol)
 {
   B = B_temp;
   n_e = n_e_temp;
@@ -31,7 +38,10 @@ double j_nu_fit(double nu, double B_temp, double n_e_temp, double obs_angl_temp,
   return 0.;
 }
 
-double alpha_nu_fit(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int pol)
+/*wrapper for the absorptivity fitting formulae; takes in nu, B, n_e, theta,
+  and the Stokes parameter as pol*/
+double alpha_nu_fit(double nu, double B_temp, double n_e_temp, 
+                    double obs_angl_temp, int pol)
 {
   B = B_temp;
   n_e = n_e_temp;
