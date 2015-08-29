@@ -56,10 +56,10 @@ double differential_of_f(double gamma, double nu);
 double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp);
 double alpha_nu(double nu, double B_temp, double n_e_temp, 
                 double obs_angl_temp);
-double j_nu_fit(double nu, double B_temp, double n_e_temp, double obs_angl_temp, 
-                int pol);
+double j_nu_fit(double nu, double B_temp, double n_e_temp, 
+                double obs_angl_temp);
 double alpha_nu_fit(double nu, double B_temp, double n_e_temp, 
-                    double obs_angl_temp, int pol);
+                    double obs_angl_temp);
 
 //fitting formulae
 double thermal_I(double nu);
