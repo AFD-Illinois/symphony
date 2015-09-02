@@ -16,41 +16,7 @@ double j_nu_fit(double nu, double B_temp, double n_e_temp,
   n_e = n_e_temp;
   obs_angle = obs_angl_temp;
 
-  /* catch potential errors */
-  if(B < 0)
-  {
-    printf("\n ERROR: B out of range\n");
-    exit(0);
-  }
-  if(n_e < 0 || n_e_NT < 0)
-  {
-    printf("\n ERROR: n_e or n_e_NT out of range\n");
-    exit(0);
-  }
-  if(kappa < 2.5 || kappa > 7.5)
-  {
-    printf("\n ERROR: kappa out of range of fitting formula\n");
-    exit(0);
-  }
-  if(kappa_width < 3 || kappa_width > 200)
-  {
-    printf("\n WARNING: w out of range; fitting formula may be inaccurate\n");
-    exit(0);
-  }
-  if(gamma_min < 1)
-  {
-    printf("\n ERROR: gamma_min < 1\n");
-    exit(0);
-  }
-  if(obs_angle < 5.*(M_PI)/180. || obs_angle > 89.*(M_PI)/180.)
-  {
-    printf("\n ERROR: theta out of range; fitting formula may be inaccurate\n");
-    exit(0);
-  }
-
-
-  /* done error catching */
-
+  check_for_errors(nu, B, n_e, obs_angle);
 
   #if DISTRIBUTION_FUNCTION == THERMAL
     if     (POL_MODE == STOKES_I) return thermal_I(nu);
@@ -83,6 +49,8 @@ double alpha_nu_fit(double nu, double B_temp, double n_e_temp,
   n_e = n_e_temp;
   obs_angle = obs_angl_temp;
 
+  check_for_errors(nu, B, n_e, obs_angle);
+
  #if DISTRIBUTION_FUNCTION == THERMAL
     if     (POL_MODE == STOKES_I) return thermal_I_abs(nu);
     else if(POL_MODE == STOKES_Q) return thermal_Q_abs(nu);
@@ -105,7 +73,51 @@ double alpha_nu_fit(double nu, double B_temp, double n_e_temp,
   return 0.;
 }
 
+double check_for_errors(double nu, double B, double n_e, double obs_angle)
+{
 
+  double nu_c = (electron_charge * B)
+               /(2. * M_PI * mass_electron * speed_light);
+
+  /* catch potential errors */
+  if(nu/nu_c > 3e10)
+  {
+    printf("\n ERROR: nu out of range\n");
+    exit(0);
+  }
+  if(B < 0)
+  {
+    printf("\n ERROR: B out of range\n");
+    exit(0);
+  }
+  if(n_e < 0 || n_e_NT < 0)
+  {
+    printf("\n ERROR: n_e or n_e_NT out of range\n");
+    exit(0);
+  }
+  if(kappa < 2.5 || kappa > 7.5)
+  {
+    printf("\n ERROR: kappa out of range of fitting formula\n");
+    exit(0);
+  }
+  if(kappa_width < 3 || kappa_width > 200)
+  {
+    printf("\n WARNING: w out of range; fitting formula may be inaccurate\n");
+    exit(0);
+  }
+  if(gamma_min < 1)
+  {
+    printf("\n ERROR: gamma_min < 1\n");
+    exit(0);
+  }
+  if(obs_angle < 5.*(M_PI)/180. || obs_angle == 90.*(M_PI)/180.)
+  {
+    printf("\n ERROR: theta out of range; fitting formula may be inaccurate\n");
+    exit(0);
+  }
+
+  return 0.;
+}
 
 double thermal_I(double nu)
 {
