@@ -27,14 +27,14 @@ double j_nu_fit(double nu, double B_temp, double n_e_temp,
     printf("\n ERROR: n_e or n_e_NT out of range\n");
     exit(0);
   }
-  if(kappa < 3 || kappa > 8)
+  if(kappa < 2.5 || kappa > 7.5)
   {
     printf("\n ERROR: kappa out of range of fitting formula\n");
     exit(0);
   }
-  if(kappa_width < 3)
+  if(kappa_width < 3 || kappa_width > 200)
   {
-    printf("\n WARNING: w very low; fitting formula may be inaccurate\n");
+    printf("\n WARNING: w out of range; fitting formula may be inaccurate\n");
     exit(0);
   }
   if(gamma_min < 1)
@@ -42,6 +42,15 @@ double j_nu_fit(double nu, double B_temp, double n_e_temp,
     printf("\n ERROR: gamma_min < 1\n");
     exit(0);
   }
+  if(obs_angle < 5.*(M_PI)/180. || obs_angle > 89.*(M_PI)/180.)
+  {
+    printf("\n ERROR: theta out of range; fitting formula may be inaccurate\n");
+    exit(0);
+  }
+
+
+  /* done error catching */
+
 
   #if DISTRIBUTION_FUNCTION == THERMAL
     if     (POL_MODE == STOKES_I) return thermal_I(nu);
