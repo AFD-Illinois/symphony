@@ -20,21 +20,23 @@ double derivative(double n_start, double nu)
  * or kappa) using GSL's QAGIU integrator.
  *@returns: 1 over the normalization constant for the chosen distribution
  */
-double normalize_f()
+double normalize_f(double (*unnormalized_f)(double gamma, void *params))
 {
   static double ans = 0;
   if (ans != 0) return ans;
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
   double result, error;
   gsl_function F;
+
+  F.function = unnormalized_f;
   
-  #if DISTRIBUTION_FUNCTION == POWER_LAW
-    F.function = &power_law_to_be_normalized;
-  #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
-    F.function = &kappa_to_be_normalized;
-  #else
-    return 0;
-  #endif
+//  #if DISTRIBUTION_FUNCTION == POWER_LAW
+//    F.function = &power_law_to_be_normalized;
+//  #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
+//    F.function = &kappa_to_be_normalized;
+//  #else
+//    return 0;
+//  #endif
 
   double unused = 0.;
   F.params = &unused;

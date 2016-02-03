@@ -122,7 +122,7 @@ double differential_of_f(double gamma, double nu)
     double f = prefactor * body;
 
   #elif DISTRIBUTION_FUNCTION == POWER_LAW
-    double pl_norm = 4.* M_PI/(normalize_f());
+    double pl_norm = 4.* M_PI/(normalize_f(power_law_to_be_normalized));
 
     double prefactor = (M_PI * nu / (mass_electron*speed_light*speed_light)) 
                      * (n_e_NT*(power_law_p-1.))
@@ -141,7 +141,7 @@ double differential_of_f(double gamma, double nu)
     double f = pl_norm * prefactor * (term1 - term2 - term3);
 
   #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
-    double prefactor = n_e * (1./normalize_f()) * 4. * M_PI*M_PI * nu
+    double prefactor = n_e * (1./normalize_f(kappa_to_be_normalized)) * 4. * M_PI*M_PI * nu
                      * mass_electron*mass_electron * speed_light;
 
     double term1 = ((- kappa - 1.) / (kappa * kappa_width)) 
@@ -215,7 +215,8 @@ double power_law_f(double gamma)
   double body = pow(gamma, -power_law_p) * exp(- gamma / gamma_cutoff);
   //double body = pow(gamma, -power_law_p); //for PL w/o cutoff
 
-  double ans = 1./normalize_f() * prefactor * body * 1./(pow(mass_electron, 3.) 
+  double ans = 1./normalize_f(power_law_to_be_normalized) 
+               * prefactor * body * 1./(pow(mass_electron, 3.) 
                * pow(speed_light, 3.) * gamma*gamma * beta);
 
   return ans;
@@ -251,7 +252,7 @@ double kappa_to_be_normalized(double gamma, void * params)
  */
 double kappa_f(double gamma)
 {
-  double norm = 1./normalize_f();
+  double norm = 1./normalize_f(kappa_to_be_normalized);
 
   double kappa_body = n_e * pow((1. + (gamma - 1.)
                      /(kappa * kappa_width)), -kappa-1);

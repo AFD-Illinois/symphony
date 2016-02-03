@@ -46,7 +46,7 @@ double gamma_integration_result(double n, void * params);
 double n_summation(double nu);
 double n_integration(double n_minus, double nu);
 double gsl_integrate(double min, double max, double n, double nu);
-double normalize_f();
+double normalize_f(double (*unnormalized_f)(double gamma, void *params));
 double power_law_to_be_normalized(double gamma, void * params);
 double power_law_f(double gamma);
 double kappa_to_be_normalized(double gamma, void * params);
