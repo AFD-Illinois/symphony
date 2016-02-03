@@ -18,12 +18,10 @@
 #define THERMAL (0)
 #define POWER_LAW (1)
 #define KAPPA_DIST (2)
-#define DISTRIBUTION_FUNCTION (KAPPA_DIST)
 
 //choose absorptivity or emissivity
-#define ABSORP (10)
-#define EMISS  (11)
-#define MODE   (EMISS)
+#define ABSORPTIVITY (10)
+#define EMISSIVITY   (11)
 
 //choose polarization mode
 #define STOKES_I (15)
@@ -32,7 +30,6 @@
 #define STOKES_V (18)
 #define EXTRAORDINARY_MODE (19)
 #define ORDINARY_MODE (20)
-#define POL_MODE (STOKES_I)
 
 //function declarations
 double n_peak(double nu);
@@ -83,26 +80,6 @@ double power_law_I_abs(double nu);
 double power_law_Q_abs(double nu);
 double power_law_V_abs(double nu);
 
-//variable declarations
-extern const double mass_electron;
-extern const double h;
-extern const double speed_light;
-extern double theta_e;
-extern const double electron_charge;
-extern double B;
-extern double n_e;
-extern double obs_angle;
-extern int C;
-extern double n_max;
-//power law parameters
-extern double power_law_p;
-extern double gamma_min;
-extern double gamma_max;
-extern double n_e_NT;
-//kappa distribution parameters
-extern double kappa;
-extern double kappa_width;
-extern double gamma_cutoff;
 
 //struct to pass parameters to the integrand
 struct parameters{

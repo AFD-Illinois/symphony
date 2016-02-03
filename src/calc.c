@@ -1,23 +1,34 @@
 #include "symphony.h"
 #include "params.h"
 
-double B;
-double n_e;
-double obs_angle;
-double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp)
+/* Wrapper for n_summation */
+double j_nu(double nu, 
+            double magnetic_field,
+            double electron_density,
+            double observer_angle
+           )
 {
-  B = B_temp;
-  n_e = n_e_temp;
-  obs_angle = obs_angl_temp;
-  return n_summation(nu);
+  return n_summation(nu, 
+                     magnetic_field,
+                     electron_density,
+                     observer_angle,
+                     0 /* Compute j_nu */
+                     );
 }
 
-double alpha_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp)
+/* Wrapper for n_summation */
+double alpha_nu(double nu, 
+                double magnetic_field,
+                double electron_density,
+                double observer_angle
+               )
 {
-  B = B_temp;
-  n_e = n_e_temp;
-  obs_angle = obs_angl_temp;
-  return n_summation(nu);
+  return n_summation(nu, 
+                     magnetic_field,
+                     electron_density,
+                     observer_angle,
+                     1 /* Compute alpha_nu */
+                     );
 }
 
 /*n_peak: gives the location of the peak of the n integrand for 
@@ -30,7 +41,7 @@ double alpha_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp)
 double n_peak(double nu)
 {
   double nu_c = (electron_charge * B)
-	      / (2. * M_PI * mass_electron * speed_light);
+	      / (2. * M_PI * electron_mass * speed_light);
 
   double beta = 0.;
 
@@ -44,7 +55,7 @@ double n_peak(double nu)
   }
   
   double n_peak =  (theta_e + 1. + pow((2. * theta_e * nu / nu_c),1./3.))
-                 * (nu/nu_c) * (1. - beta*beta * pow(cos(obs_angle),2.));
+                 * (nu/nu_c) * (1. - beta*beta * pow(cos(observer_angle),2.));
 
   return n_peak;
 }
@@ -62,27 +73,27 @@ double polarization_term(double gamma, double n, double nu)
   /*below calculation is described in Section 3.1 of [1]*/
   
   double nu_c = (electron_charge * B)
-	       /(2. * M_PI * mass_electron * speed_light);
+	       /(2. * M_PI * electron_mass * speed_light);
 
   double beta = sqrt(1. - 1./(gamma*gamma));
 
   double cos_xi = (gamma * nu - n * nu_c)
-		 /(gamma * nu * beta * cos(obs_angle));
+		 /(gamma * nu * beta * cos(observer_angle));
 
-  double M = (cos(obs_angle) - beta * cos_xi)/sin(obs_angle);
+  double M = (cos(observer_angle) - beta * cos_xi)/sin(observer_angle);
 
   double N = beta * sqrt(1 - (cos_xi*cos_xi));
 
-  double z = (nu * gamma * beta * sin(obs_angle) 
+  double z = (nu * gamma * beta * sin(observer_angle) 
        * sqrt(1. - cos_xi*cos_xi))/nu_c;
 
   double K_xx = M*M * pow(my_Bessel_J(n, z), 2.);
 
   double K_yy = N*N * pow(my_Bessel_dJ(n, z), 2.);
 
-  double T_x = (2.*nu*cos(obs_angle))/(nu_c*pow(sin(obs_angle), 2.)
-          +sqrt(nu_c*nu_c*pow(sin(obs_angle), 4.)
-          +4.*nu*nu*pow(cos(obs_angle), 2.)));
+  double T_x = (2.*nu*cos(observer_angle))/(nu_c*pow(sin(observer_angle), 2.)
+          +sqrt(nu_c*nu_c*pow(sin(observer_angle), 4.)
+          +4.*nu*nu*pow(cos(observer_angle), 2.)));
 
   #if POL_MODE == STOKES_I
     double ans = K_xx + K_yy;
@@ -100,250 +111,6 @@ double polarization_term(double gamma, double n, double nu)
   return ans;
 }
 
-/*differential_of_f: term in gamma integrand only for absorptivity calculation; 
- *it is the differential Df = 2\pi\nu (1/(mc)*d/dgamma + (beta cos(theta)
- * -cos(xi))/(p*beta*c) * d/d(cos(xi))) f 
- *this is eq. 41 of [1]
- *below it is applied for the THERMAL, POWER_LAW, and KAPPA_DIST distributions
- *@param gamma: Input, Lorentz factor
- *@param nu: Input, frequency of emission/absorption
- *@returns: Output, Df term in gamma integrand; depends on distribution function
- */
-double differential_of_f(double gamma, double nu) 
-{
-  /*described in Section 3 of [1] */
-
-  #if DISTRIBUTION_FUNCTION == THERMAL
-    double prefactor = (M_PI * nu / (mass_electron*speed_light*speed_light)) 
-		     * (n_e/(theta_e * gsl_sf_bessel_Kn(2, 1./theta_e)));
-
-    double body = (-1./theta_e) * exp(-gamma/theta_e);
-
-    double f = prefactor * body;
-
-  #elif DISTRIBUTION_FUNCTION == POWER_LAW
-    double pl_norm = 4.* M_PI/(normalize_f(power_law_to_be_normalized));
-
-    double prefactor = (M_PI * nu / (mass_electron*speed_light*speed_light)) 
-                     * (n_e_NT*(power_law_p-1.))
-                     /((pow(gamma_min, 1.-power_law_p) 
-                     - pow(gamma_max, 1.-power_law_p)));
-
-    double term1 = ((-power_law_p-1.)*exp(-gamma/gamma_cutoff)
-               *pow(gamma,-power_law_p-2.)/(sqrt(gamma*gamma - 1.)));
-
-    double term2 = (exp(-gamma/gamma_cutoff) * pow(gamma,(-power_law_p-1.))
-                  /(gamma_cutoff * sqrt(gamma*gamma - 1.)));
-
-    double term3 = (exp(-gamma/gamma_cutoff) * pow(gamma,-power_law_p))
-               /pow((gamma*gamma - 1.), (3./2.));
-
-    double f = pl_norm * prefactor * (term1 - term2 - term3);
-
-  #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
-    double prefactor = n_e * (1./normalize_f(kappa_to_be_normalized)) * 4. * M_PI*M_PI * nu
-                     * mass_electron*mass_electron * speed_light;
-
-    double term1 = ((- kappa - 1.) / (kappa * kappa_width)) 
-		  * pow((1. + (gamma - 1.)/(kappa * kappa_width)), -kappa-2.);
-
-    double term2 = pow((1. + (gamma - 1.)/(kappa * kappa_width)),(- kappa - 1.)) 
-                    * (- 1./gamma_cutoff);
-
-    double f = prefactor * (term1 + term2) * exp(-gamma/gamma_cutoff);
-
-  #endif
-
-    return f;
-}
-
-/*maxwell_juttner_f: Maxwell-Juttner distribution function in terms of Lorentz 
- * factor gamma; uses eq. 47, 49, 50 of [1]
- *@param gamma: Input, Lorentz factor
- *@returns: THERMAL distribution function, which goes into the gamma integrand 
- */
-double maxwell_juttner_f(double gamma) 
-{
-  double beta = sqrt(1. - 1./(gamma*gamma));
-
-  double d = (n_e * gamma * sqrt(gamma*gamma-1.) * exp(-gamma/theta_e))
-            /(4. * M_PI * theta_e * gsl_sf_bessel_Kn(2, 1./theta_e));
-
-  double ans = 1./(pow(mass_electron, 3.) * pow(speed_light, 3.) * gamma*gamma 
-               * beta) * d;
-
-  return ans;
-}
-
-/*power_law_to_be_normalized: the power-law distribution is normalized as-is, 
- * but we have added an exponential cutoff e^(-gamma/gamma_cutoff), so it must 
- * be normalized again.  The normalization constant is given by 1 over
- * the integral of power_law_to_be_normalized from 1 to infinity.
- * uses eq. 50 of [1]
- *@param gamma: Input, Lorentz factor
- *@param *params: void pointer to struct parameters, which contains
- * n (harmonic number) and nu (frequency of emission/absorption)
- *@returns: Output, power-law distribution to be normalized via normalize_f()
- */
-double power_law_to_be_normalized(double gamma, void * params) 
-{
-  double norm_term = 4. * M_PI;
-
-  double prefactor = (power_law_p - 1.) / (pow(gamma_min, 1. - power_law_p) 
-                    - pow(gamma_max, 1. - power_law_p));
-
-  double body = pow(gamma, -power_law_p) * exp(- gamma / gamma_cutoff);
-  //double body = pow(gamma, -power_law_p); for PL w/o cutoff
-
-  double ans = norm_term * prefactor * body;
-
-  return ans;
-}
-
-/*power_law_f: power-law distribution function, normalized via call to the 
- * normalize_f() function. Uses eq. 50 of [1].
- *@param gamma: Input, Lorentz factor
- *@returns: Ouput, a normalized power-law distribution for the gamma integrand
- */
-double power_law_f(double gamma) 
-{
-  double beta = sqrt(1. - 1./(gamma*gamma));
-
-  double prefactor = n_e_NT * (power_law_p - 1.) / (pow(gamma_min, 1. 
-                     - power_law_p) - pow(gamma_max, 1. - power_law_p));
-
-  double body = pow(gamma, -power_law_p) * exp(- gamma / gamma_cutoff);
-  //double body = pow(gamma, -power_law_p); //for PL w/o cutoff
-
-  double ans = 1./normalize_f(power_law_to_be_normalized) 
-               * prefactor * body * 1./(pow(mass_electron, 3.) 
-               * pow(speed_light, 3.) * gamma*gamma * beta);
-
-  return ans;
-}
-
-/*kappa_to_be_normalized: the kappa distribution is not normalized, so we must 
- * find the normalization constant by taking 1 over the integral of the function
- * kappa_to_be_normalized from 1 to infinity.  Uses eq. 42 of [2].
- *@param gamma: Input, Lorentz factor
- *@param *params: void pointer to struct parameters, which contains
- * n (harmonic number) and nu (frequency of emission/absorption)
- *@returns: kappa distribution function to be normalized via normalize_f()
- */
-double kappa_to_be_normalized(double gamma, void * params)
-{
-  double kappa_body = pow((1. + (gamma - 1.)/(kappa * kappa_width)), -kappa-1);
-
-  double cutoff = exp(-gamma/gamma_cutoff);
-
-  double norm_term = 4. * M_PI * pow(mass_electron, 3.) * pow(speed_light, 3.) 
-                   * gamma * sqrt(gamma*gamma-1.);
-
-  double ans = kappa_body * cutoff * norm_term;
-  //double ans = kappa_body * norm_term; //for kappa w/o cutoff
-
-  return ans;
-}
-
-/*kappa_f: kappa distribution function, numerically normalized
- *uses eq. 42 of [2]
- *@param gamma: Input, Lorentz factor
- *@returns: normalized kappa distribution function to go into gamma integrand 
- */
-double kappa_f(double gamma)
-{
-  double norm = 1./normalize_f(kappa_to_be_normalized);
-
-  double kappa_body = n_e * pow((1. + (gamma - 1.)
-                     /(kappa * kappa_width)), -kappa-1);
-
-  double cutoff = exp(-gamma/gamma_cutoff);
-
-  double ans = norm * kappa_body * cutoff;
-  //double ans = norm * kappa_body; //for kappa w/o cutoff
-
-  return ans;
-}
-
-/*integrand_without_extra_factor: the function I(n, xi, gamma) from eq.
- * 60 of [1].
- *@param gamma: Input, Lorentz factor
- *@param n: Input, harmonic number; index of sum in gamma integrand
- *@param nu: Input, frequency of emission/absorption
- *@returns: Ouput, gamma integrand without terms pulled out of integral in
- * eq. 60, 62 of [1]
- */
-double integrand_without_extra_factor(double gamma, double n, double nu)
-{
-  /*This is the function I(n, xi, gamma) in Eq. 60 of [1]*/
-
-  double nu_c = (electron_charge * B)
-               /(2. * M_PI * mass_electron * speed_light);
-
-  double beta = sqrt(1. - 1./(gamma*gamma));
-
-  double cos_xi = (gamma * nu - n * nu_c)
-                 /(gamma * nu * beta * cos(obs_angle));
-
-  #if DISTRIBUTION_FUNCTION == THERMAL
-    double ans = (2. * M_PI * electron_charge*electron_charge * nu*nu)
-                / speed_light * (pow(mass_electron, 3.) * pow(speed_light, 3.) 
-                * gamma*gamma * beta * 2. * M_PI) * maxwell_juttner_f(gamma) 
-                * polarization_term(gamma, n, nu);
-
-  #elif DISTRIBUTION_FUNCTION == POWER_LAW
-    double ans = (2. * M_PI * electron_charge*electron_charge * nu*nu)
-                / speed_light * (pow(mass_electron, 3.) * pow(speed_light, 3.) 
-                * gamma*gamma * beta * 2. * M_PI) * power_law_f(gamma) 
-                * polarization_term(gamma, n, nu);
-
-  #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
-    double ans = (2. * M_PI * electron_charge*electron_charge * nu*nu)
-                / speed_light * (pow(mass_electron, 3.) * pow(speed_light, 3.) 
-                * gamma*gamma * beta * 2. * M_PI) * kappa_f(gamma) 
-                * polarization_term(gamma, n, nu);
-  #endif
-
-    return ans;
-}
-
-/*gamma_integrand: full gamma integrand, to be integrated from gamma_minus
- * to gamma_plus, set by eq. 64 of [1]
- *@param gamma: Lorentz factor
- *@param *params: void pointer to struct parameters, which contains
- * n (harmonic number) and nu (frequency of emission/absorption)
- *@returns: Output, integrand to be integrated by gamma_integration_result()
- */
-double gamma_integrand(double gamma, void * params)
-{
-  struct parameters n_and_nu = *(struct parameters*) params;
-  double n = n_and_nu.n;
-  double nu = n_and_nu.nu;
-
-  double nu_c = (electron_charge * B)
-               /(2. * M_PI * mass_electron * speed_light);
-
-  double beta = sqrt(1. - 1./(gamma*gamma));
-
-  #if MODE == EMISS
-    double cos_xi = (gamma * nu - n * nu_c)
-                   /(gamma * nu * beta * cos(obs_angle));
-
-    double prefactor = 1./(nu * beta * fabs(cos(obs_angle)));
-
-    double ans = prefactor * integrand_without_extra_factor(gamma, n, nu);
-
-  #elif MODE == ABSORP
-    double prefactor = -speed_light*electron_charge*electron_charge / (2. * nu);
-
-    double ans = prefactor*gamma*gamma*beta*differential_of_f(gamma, nu)
-                *polarization_term(gamma, n, nu)
-                *(1./(nu*beta*fabs(cos(obs_angle))));
-  #endif
-
-    return ans;
-}
-
 /*gamma_integration_result: performs gamma integral from gamma_minus to 
  * gamma_plus; calls gsl_integrate(), which is a wrapper for the GSL integrator
  * GSL QAG.
@@ -358,15 +125,15 @@ double gamma_integration_result(double n, void * params)
   double nu = *(double *) params;
 
   double nu_c = (electron_charge * B)
-                /(2. * M_PI * mass_electron * speed_light);
+                /(2. * M_PI * electron_mass * speed_light);
 
-  double gamma_minus = ((n*nu_c)/nu - fabs(cos(obs_angle))
-                  *sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(obs_angle), 2.)))
-                  /(pow(sin(obs_angle), 2));
+  double gamma_minus = ((n*nu_c)/nu - fabs(cos(observer_angle))
+                  *sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(observer_angle), 2.)))
+                  /(pow(sin(observer_angle), 2));
 
-  double gamma_plus  = ((n*nu_c)/nu + fabs(cos(obs_angle))
-                  *sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(obs_angle), 2.)))
-                  /(pow(sin(obs_angle), 2));
+  double gamma_plus  = ((n*nu_c)/nu + fabs(cos(observer_angle))
+                  *sqrt((pow((n*nu_c)/nu, 2.)) - pow(sin(observer_angle), 2.)))
+                  /(pow(sin(observer_angle), 2));
 
   double result = 0.;
 
@@ -417,7 +184,7 @@ double gamma_integration_result(double n, void * params)
 double n_integration(double n_minus, double nu)
 {
   double nu_c = (electron_charge * B)
-               /(2. * M_PI * mass_electron * speed_light);
+               /(2. * M_PI * electron_mass * speed_light);
 
   if (DISTRIBUTION_FUNCTION == THERMAL && nu/nu_c < 1e6) 
   {
@@ -460,21 +227,31 @@ double n_integration(double n_minus, double nu)
  *@param nu: Input, frequency of absorption/emission
  *@returns: j_nu or alpha_nu, the emissivity or absorptivity, respectively
  */
-double n_summation(double nu)
+double n_summation(double nu, 
+                   double magnetic_field,
+                   double electron_density,
+                   double observer_angle,
+                   double electron_charge,
+                   double electron_mass,
+                   double speed_light,
+                   int pol_mode,
+                   int j_nu_or_alpha_nu
+                  )
 {
-
-  #if POL_MODE == STOKES_U
+  if (pol_mode == STOKES_U)
+  {
     return 0.;
-  #endif
+  }
 
   double ans = 0.;
 
-  double nu_c = (electron_charge * B)
-               /(2. * M_PI * mass_electron * speed_light);
+  double nu_c = (electron_charge * magnetic_field)
+               /(2. * M_PI * electron_mass * speed_light);
 
-  double n_minus = (nu/nu_c) * fabs(sin(obs_angle));
+  double n_minus = (nu/nu_c) * fabs(sin(observer_angle));
 
-  stokes_v_switch = -1;
+  /* TODO: Describe why the stokes_v_switch is changing */
+  int stokes_v_switch = -1;
 
   /*perform n summation by summing the result of the gamma integral for 
     each value of n from 1 to n_max*/
