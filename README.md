@@ -6,5 +6,20 @@ This code, *symphony*, calculates synchrotron emissivition and absorption coeffi
 ## Features
 * Code to calculate synchrotron emission and absorption coefficients polarized in each of the four Stokes parameters {I, Q, U, V}, for the relativistic thermal, power-law, and kappa distribution functions
 * Fitting functions for each polarization/distribution function
-* Straightforward functions j_nu(nu, B, n_e, theta) and alpha_nu(nu, B, n_e, theta) can be used to calculate the emissivity or absorptivity for a given set of parameters
-  * Also included are functions j_nu_fit(nu, B, n_e, theta) and alpha_nu_fit(nu, B, n_e, theta), which produce values from the corresponding approximate fitting formulae, mentioned above, and are useful in cases where computation time is a constraint
+* Straightforward functions `j_nu(nu, B, n_e, theta)` and `alpha_nu(nu, B, n_e, theta)` can be used to calculate the emissivity or absorptivity for a given set of parameters
+  * Also included are functions `j_nu_fit(nu, B, n_e, theta)` and `alpha_nu_fit(nu, B, n_e, theta)`, which produce values from the corresponding approximate fitting formulae and can be useful in cases where computation time is a constraint.
+
+## How to use *symphony*
+
+1. To directly use *symphony* to calculate emission/absorption coefficients, or to test the provided fitting formulae:
+  1. Select the distribution function in file **symphony.h**.  Do this by setting the `#DEFINE DISTRIBUTION_FUNCTION` to `THERMAL` (for the relativistic thermal/Maxwell-Jüttner), `POWER_LAW` for the power-law, or `KAPPA_DIST` for the kappa distribution.
+  2. Select the Stokes parameter in file **symphony.h**.  Do this by setting the `#DEFINE POL_MODE` to `STOKES_I`, `STOKES_Q`, `STOKES_U`, or `STOKES_V`
+  3. Set parameters `B` (magnetic field strength), `n_e` (electron number density), `obs_angle` (observer angle, measured with respect to the magnetic field) in **main.c**
+  4. `make` the files
+  5. Running *symphony* at this point will output three columns: `nu/nu_c`, `ans`, and `fit`.  The first column outputs the frequency divided by the cyclotron frequency eB/2pimc; the second is the emissivity or absorptivity at that frequency for the set parameters; the third is the value of the corresponding fitting function for those parameters.
+
+2. To call `j_nu()`, `alpha_nu()`, `j_nu_fit()`, or `alpha_nu_fit()` from another C code:
+  1. Copy *symphony*'s files into the same directory as your code
+  2. `#include 'symphony.h'` in your code
+  3. [NEED TO FIX THIS] Select the distribution function and Stokes parameter as in steps 1.1 and 1.2 above in **symphony.h**
+  4. Use the functions as you wish. Each has the same arguments.  For example, `j_nu(nu, B, n_e, theta)`
