@@ -1,5 +1,6 @@
 #include "symphony.h"
 
+/* TODO : Describe the following function and the context in which it is used */
 /*derivative: wrapper for the GSL derivative gsl_deriv_central(); used to
  *help speed up the integration over harmonic number n
  *@param n_start: Input, value of n at which the derivative is to be performed
@@ -20,27 +21,16 @@ double derivative(double n_start, double nu)
  * or kappa) using GSL's QAGIU integrator.
  *@returns: 1 over the normalization constant for the chosen distribution
  */
-double normalize_f(int dist)
+double normalize_f(double (*unnormalized_f)(double gamma, void *params))
 {
   static double ans = 0;
   if (ans != 0) return ans;
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
   double result, error;
   gsl_function F;
-  
-  if(dist == POWER_LAW)
-  {
-    F.function = &power_law_to_be_normalized;
-  }
-  else if(dist == KAPPA_DIST)
-  {
-    F.function = &kappa_to_be_normalized;
-  }
-  else
-  {
-    return 0;
-  }
 
+  F.function = unnormalized_f;
+  
   double unused = 0.;
   F.params = &unused;
   gsl_integration_qagiu(&F, 1, 0, 1e-8, 1000,
