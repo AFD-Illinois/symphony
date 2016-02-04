@@ -10,7 +10,7 @@ double obs_angle;
 /*wrapper for emissivity fitting formulae; takes in arguments nu, B, n_e, 
   and observer angle theta*/
 double j_nu_fit(double nu, double B_temp, double n_e_temp, 
-                double obs_angl_temp)
+                double obs_angl_temp, int dist, int pol)
 {
   B = B_temp;
   n_e = n_e_temp;
@@ -18,24 +18,29 @@ double j_nu_fit(double nu, double B_temp, double n_e_temp,
 
   check_for_errors(nu, B, n_e, obs_angle);
 
-  #if DISTRIBUTION_FUNCTION == THERMAL
-    if     (POL_MODE == STOKES_I) return thermal_I(nu);
-    else if(POL_MODE == STOKES_Q) return thermal_Q(nu);
-    else if(POL_MODE == STOKES_U) return 0.;
-    else if(POL_MODE == STOKES_V) return thermal_V(nu);
+  if(dist == THERMAL)
+  {
+    if     (pol == STOKES_I) return thermal_I(nu);
+    else if(pol == STOKES_Q) return thermal_Q(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return thermal_V(nu);
+  }
 
-  #elif DISTRIBUTION_FUNCTION == POWER_LAW
-    if     (POL_MODE == STOKES_I) return power_law_I(nu);
-    else if(POL_MODE == STOKES_Q) return power_law_Q(nu);
-    else if(POL_MODE == STOKES_U) return 0.;
-    else if(POL_MODE == STOKES_V) return power_law_V(nu);
+  else if(dist == POWER_LAW)
+  {
+    if     (pol == STOKES_I) return power_law_I(nu);
+    else if(pol == STOKES_Q) return power_law_Q(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return power_law_V(nu);
+  }
 
-  #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
-    if     (POL_MODE == STOKES_I) return kappa_I(nu);
-    else if(POL_MODE == STOKES_Q) return kappa_Q(nu);
-    else if(POL_MODE == STOKES_U) return 0.;
-    else if(POL_MODE == STOKES_V) return kappa_V(nu);
-  #endif
+  else if(dist == KAPPA_DIST)
+  {
+    if     (pol == STOKES_I) return kappa_I(nu);
+    else if(pol == STOKES_Q) return kappa_Q(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return kappa_V(nu);
+  }
 
   return 0.;
 }
@@ -43,7 +48,7 @@ double j_nu_fit(double nu, double B_temp, double n_e_temp,
 /*wrapper for the absorptivity fitting formulae; takes in nu, B, n_e, and 
   observer angle theta*/
 double alpha_nu_fit(double nu, double B_temp, double n_e_temp, 
-                    double obs_angl_temp)
+                    double obs_angl_temp, int dist, int pol)
 {
   B = B_temp;
   n_e = n_e_temp;
@@ -51,24 +56,29 @@ double alpha_nu_fit(double nu, double B_temp, double n_e_temp,
 
   check_for_errors(nu, B, n_e, obs_angle);
 
- #if DISTRIBUTION_FUNCTION == THERMAL
-    if     (POL_MODE == STOKES_I) return thermal_I_abs(nu);
-    else if(POL_MODE == STOKES_Q) return thermal_Q_abs(nu);
-    else if(POL_MODE == STOKES_U) return 0.;
-    else if(POL_MODE == STOKES_V) return thermal_V_abs(nu);
+  if(dist == THERMAL)
+  {
+    if     (pol == STOKES_I) return thermal_I_abs(nu);
+    else if(pol == STOKES_Q) return thermal_Q_abs(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return thermal_V_abs(nu);
+  }
 
-  #elif DISTRIBUTION_FUNCTION == POWER_LAW
-    if     (POL_MODE == STOKES_I) return power_law_I_abs(nu);
-    else if(POL_MODE == STOKES_Q) return power_law_Q_abs(nu);
-    else if(POL_MODE == STOKES_U) return 0.;
-    else if(POL_MODE == STOKES_V) return power_law_V_abs(nu);
+  else if(dist == POWER_LAW)
+  {
+    if     (pol == STOKES_I) return power_law_I_abs(nu);
+    else if(pol == STOKES_Q) return power_law_Q_abs(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return power_law_V_abs(nu);
+  }
 
-  #elif DISTRIBUTION_FUNCTION == KAPPA_DIST
-    if     (POL_MODE == STOKES_I) return kappa_I_abs(nu);
-    else if(POL_MODE == STOKES_Q) return kappa_Q_abs(nu);
-    else if(POL_MODE == STOKES_U) return 0.;
-    else if(POL_MODE == STOKES_V) return kappa_V_abs(nu);
-  #endif
+  else if(dist == KAPPA_DIST)
+  {
+    if     (pol == STOKES_I) return kappa_I_abs(nu);
+    else if(pol == STOKES_Q) return kappa_Q_abs(nu);
+    else if(pol == STOKES_U) return 0.;
+    else if(pol == STOKES_V) return kappa_V_abs(nu);
+  }
 
   return 0.;
 }
