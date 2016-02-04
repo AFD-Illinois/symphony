@@ -25,8 +25,6 @@ int main(int argc, char *argv[])
   int dist = POWER_LAW;
   int pol = STOKES_I;
 
-  parameters allParams;
-
   double nu_c = (electron_charge * B)
  	       /(2. * M_PI * mass_electron * speed_light);
 
@@ -44,7 +42,7 @@ int main(int argc, char *argv[])
 
     double nu = pow(10., (double)index/(double)points_per_pow_10) * nu_c;
 
-    printf("\n%e	%e	%e", nu/nu_c, j_nu(nu, B, n_e, obs_angle, dist, pol, &allParams), 
+    printf("\n%e	%e	%e", nu/nu_c, j_nu(nu, B, n_e, obs_angle, dist, pol), 
                                j_nu_fit(nu, B, n_e, obs_angle, dist, pol));
 
 

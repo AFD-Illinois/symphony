@@ -8,7 +8,7 @@ int mode;
 int dist;
 int pol;
 
-double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int dist_temp, int pol_temp, void * params)
+double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int dist_temp, int pol_temp)
 {
   B = B_temp;
   n_e = n_e_temp;
@@ -18,16 +18,16 @@ double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int
   mode = EMISS;
 
 //fill the struct with values
-  struct parameters *paramsLocal = (struct parameters*) params;
-  paramsLocal->nu = nu;
-  paramsLocal->B = B;
-  paramsLocal->obs_angle = obs_angle;
-  paramsLocal->n_e = n_e;
-  paramsLocal->dist = dist;
-  paramsLocal->pol = pol;
-  paramsLocal->mode = mode;
+  struct parameters paramsLocal;
+  paramsLocal.nu = nu;
+  paramsLocal.B = B;
+  paramsLocal.obs_angle = obs_angle;
+  paramsLocal.n_e = n_e;
+  paramsLocal.dist = dist;
+  paramsLocal.pol = pol;
+  paramsLocal.mode = mode;
 
-  return n_summation(params);
+  return n_summation(&paramsLocal);
 }
 
 double alpha_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int dist_temp, int pol_temp)
@@ -515,14 +515,14 @@ double n_integration(double n_minus, double nu)
 double n_summation(void * params)
 {
 
-  struct parameters *paramsLocal = (struct parameters*) params;
-  double nu = paramsLocal->nu;
-  double B = paramsLocal->B;
-  double obs_angle = paramsLocal->obs_angle;
-  double n_e = paramsLocal->n_e;
-  int dist = paramsLocal->dist;
-  int pol = paramsLocal->pol;
-  int mode = paramsLocal->mode;
+  struct parameters paramsLocal = *(struct parameters*) params;
+  double nu = paramsLocal.nu;
+  double B = paramsLocal.B;
+  double obs_angle = paramsLocal.obs_angle;
+  double n_e = paramsLocal.n_e;
+  int dist = paramsLocal.dist;
+  int pol = paramsLocal.pol;
+  int mode = paramsLocal.mode;
 
   printf("\n%e\n", nu);
 
@@ -545,7 +545,7 @@ double n_summation(void * params)
     each value of n from 1 to n_max*/
   for (int x=(int)(n_minus+1.); x <= n_max + (int)n_minus ; x++) 
   {
-    ans += gamma_integration_result(x, params);
+    ans += gamma_integration_result(x, &paramsLocal);
   }
 
   stokes_v_switch = 0;

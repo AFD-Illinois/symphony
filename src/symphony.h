@@ -48,7 +48,7 @@ double kappa_to_be_normalized(double gamma, void * params);
 double kappa_f(double gamma);
 double derivative(double n_start, double nu);
 double differential_of_f(double gamma, double nu);
-double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int dist, int pol, void * params);
+double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int dist, int pol);
 double check_for_errors(double nu, double B, double n_e, double obs_angle);
 double alpha_nu(double nu, double B_temp, double n_e_temp, 
                 double obs_angl_temp, int dist, int pol);
