@@ -8,7 +8,7 @@ int mode;
 int dist;
 int pol;
 
-double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int dist_temp, int pol_temp)
+double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int dist_temp, int pol_temp, void * params)
 {
   B = B_temp;
   n_e = n_e_temp;
@@ -16,7 +16,18 @@ double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int
   dist = dist_temp;
   pol = pol_temp;
   mode = EMISS;
-  return n_summation(nu);
+
+//fill the struct with values
+  struct parameters *paramsLocal = (struct parameters*) params;
+  paramsLocal->nu = nu;
+  paramsLocal->B = B;
+  paramsLocal->obs_angle = obs_angle;
+  paramsLocal->n_e = n_e;
+  paramsLocal->dist = dist;
+  paramsLocal->pol = pol;
+  paramsLocal->mode = mode;
+
+  return n_summation(params);
 }
 
 double alpha_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int dist_temp, int pol_temp)
@@ -27,7 +38,19 @@ double alpha_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp,
   dist = dist_temp;
   pol = pol_temp;
   mode = ABSORP;
-  return n_summation(nu);
+
+//make the struct and fill it with values
+  parameters paramsLocal;
+  paramsLocal.nu = nu;
+  paramsLocal.B = B;
+  paramsLocal.obs_angle = obs_angle;
+  paramsLocal.n_e = n_e;
+  paramsLocal.dist = dist;
+  paramsLocal.pol = pol;
+  paramsLocal.mode = mode;
+
+
+  return n_summation(&paramsLocal);
 }
 
 /*n_peak: gives the location of the peak of the n integrand for 
@@ -370,7 +393,21 @@ double gamma_integrand(double gamma, void * params)
 double gamma_integration_result(double n, void * params)
 {
   /*This evaluates the gamma integral*/
-  double nu = *(double *) params;
+//  double nu = *(double *) params;
+
+
+struct parameters *paramsLocal = (struct parameters*) params;
+  double nu = paramsLocal->nu;
+  double B = paramsLocal->B;
+  double obs_angle = paramsLocal->obs_angle;
+  double n_e = paramsLocal->n_e;
+  int dist = paramsLocal->dist;
+  int pol = paramsLocal->pol;
+  int mode = paramsLocal->mode;
+  printf("\n%e\n", nu);
+
+
+
 
   double nu_c = (electron_charge * B)
                 /(2. * M_PI * mass_electron * speed_light);
@@ -475,8 +512,20 @@ double n_integration(double n_minus, double nu)
  *@param nu: Input, frequency of absorption/emission
  *@returns: j_nu or alpha_nu, the emissivity or absorptivity, respectively
  */
-double n_summation(double nu)
+double n_summation(void * params)
 {
+
+  struct parameters *paramsLocal = (struct parameters*) params;
+  double nu = paramsLocal->nu;
+  double B = paramsLocal->B;
+  double obs_angle = paramsLocal->obs_angle;
+  double n_e = paramsLocal->n_e;
+  int dist = paramsLocal->dist;
+  int pol = paramsLocal->pol;
+  int mode = paramsLocal->mode;
+
+  printf("\n%e\n", nu);
+
 
   if(pol == STOKES_U)
   {
@@ -496,7 +545,7 @@ double n_summation(double nu)
     each value of n from 1 to n_max*/
   for (int x=(int)(n_minus+1.); x <= n_max + (int)n_minus ; x++) 
   {
-    ans += gamma_integration_result(x, &nu);
+    ans += gamma_integration_result(x, params);
   }
 
   stokes_v_switch = 0;

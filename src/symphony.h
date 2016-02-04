@@ -28,7 +28,6 @@
 #define STOKES_Q (16)
 #define STOKES_U (17)
 #define STOKES_V (18)
-#define POL_MODE (STOKES_I)
 
 //function declarations
 double n_peak(double nu);
@@ -39,7 +38,7 @@ double maxwell_juttner_f(double gamma);
 double integrand_without_extra_factor(double gamma, double n, double nu);
 double gamma_integrand(double gamma, void * params);
 double gamma_integration_result(double n, void * params);
-double n_summation(double nu);
+double n_summation(void * params);
 double n_integration(double n_minus, double nu);
 double gsl_integrate(double min, double max, double n, double nu);
 double normalize_f(int dist);
@@ -49,7 +48,7 @@ double kappa_to_be_normalized(double gamma, void * params);
 double kappa_f(double gamma);
 double derivative(double n_start, double nu);
 double differential_of_f(double gamma, double nu);
-double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int dist, int pol);
+double j_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int dist, int pol, void * params);
 double check_for_errors(double nu, double B, double n_e, double obs_angle);
 double alpha_nu(double nu, double B_temp, double n_e_temp, 
                 double obs_angl_temp, int dist, int pol);
@@ -101,7 +100,14 @@ extern double kappa_width;
 extern double gamma_cutoff;
 
 //struct to pass parameters to the integrand
-struct parameters{
+typedef struct parameters{
   double n;
   double nu;
-};
+  int pol;
+  int dist;
+  int mode;
+  double B;
+  double obs_angle;
+  int stokes_v_switch;
+  double n_e;
+} parameters;
