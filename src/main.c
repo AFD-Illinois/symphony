@@ -19,14 +19,11 @@
 
 int main(int argc, char *argv[]) 
 {
-  double B = 30.;
-  double n_e = 1.;
-  double obs_angle = 60.*M_PI/180.;
-  int dist = POWER_LAW;
-  int pol = STOKES_I;
+  struct parameters params;
+  setConstParams(&params);
+  setUserParams(&params);
 
-  double nu_c = (electron_charge * B)
- 	       /(2. * M_PI * mass_electron * speed_light);
+  double nu_c = get_nu_c(params);
 
 //  printf("\nDIST: %d, MODE: %d, POL: %d", DISTRIBUTION_FUNCTION,
 //		 	                  MODE, POL_MODE);
@@ -42,8 +39,8 @@ int main(int argc, char *argv[])
 
     double nu = pow(10., (double)index/(double)points_per_pow_10) * nu_c;
 
-    printf("\n%e	%e	%e", nu/nu_c, j_nu(nu, B, n_e, obs_angle, dist, pol), 
-                               j_nu_fit(nu, B, n_e, obs_angle, dist, pol));
+//    printf("\n%e	%e	%e", nu/nu_c, j_nu(nu, B, n_e, obs_angle, dist, pol), 
+//                               j_nu_fit(nu, B, n_e, obs_angle, dist, pol));
 
 
 //   printf("\n%e	%e	%e", nu/nu_c, alpha_nu(nu, B, n_e, obs_angle, dist, pol), 

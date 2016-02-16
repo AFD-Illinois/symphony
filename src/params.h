@@ -1,27 +1,64 @@
+#ifndef SYMPHONY_PARAMS_H_
+#define SYMPHONY_PARAMS_H_
+
 #include <math.h>
 
-//parameters of calculation
-//we use Gaussian CGS units
-#define C_PI (3.1415926535897932384)
-const double mass_electron = 9.1093826e-28;
-const double h = 6.6260693e-27;
-const double speed_light = 2.99792458e10;
-const double electron_charge = 4.80320680e-10;
-double theta_e = 10.;
-int C = 10;
-double n_max = 30.;
+struct parameters
+{
+  //parameters of calculation
+  //we use Gaussian CGS units
+  double pi;        
+  double mass_electron;
+  double plancks_constant;
+  double speed_light;
+  double electron_charge;
+  double n_max;
+  int    C;       
+  // Keys for the distributions
+  int    THERMAL;
+  int    POWER_LAW;
+  int    KAPPA_DIST;
+  // Keys for the polarization modes
+  int    STOKES_I;
+  int    STOKES_Q;
+  int    STOKES_U;
+  int    STOKES_V;
+  // Keys for the mode: absorptivity or emmisivity
+  int    ABSORPTIVITY;
+  int    EMISSIVITY;
 
-//power law parameters
-double power_law_p = 3.;
-double gamma_min = 1.;
-double gamma_max = 1000.;
-double n_e_NT = 1.;
-//double gamma_cutoff = 1000.; //also a kappa distribution parameter
+  // USER PARAMS:
+  double nu;               // GHz
+  double magnetic_field;   // Gauss
+  double electron_density; // g/cc
+  double observer_angle;   // rad  
+  int    distribution;     
+  int    polarization; 
+  int    mode;             // Emissivity or Absorptivity
+  double gamma_cutoff;
 
-//kappa distribution parameters
-double kappa = 3.5;
-double kappa_width = 10.;
-double gamma_cutoff = 1000000000000;
+  // Thermal distribution parameters
+  double theta_e;
 
-//need 2 separate n integrations to numerically resolve STOKES_V
-static int stokes_v_switch = 0.;
+  //power law parameters
+  double power_law_p;
+  double gamma_min;
+  double gamma_max;
+
+  //kappa distribution parameters
+  double kappa;
+  double kappa_width;
+
+  int stokes_v_switch;
+};
+
+struct parametersGSL
+{
+  struct parameters params;
+  int n;
+};
+
+void setConstParams(struct parameters *params);
+void setUserParams(struct parameters *params);
+
+#endif /* SYMPHONY_PARAMS_H_ */
