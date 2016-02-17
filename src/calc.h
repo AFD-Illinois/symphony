@@ -4,12 +4,12 @@
 double get_nu_c(struct parameters params);
 double n_summation(struct parameters *params);
 double gamma_integrand(double gamma, void * paramsInput);
-double distribution_function(double gamma, struct parameters params);
+double distribution_function(double gamma, struct parameters * params);
 double my_Bessel_J(double n, double z);
 double my_Bessel_dJ(double n, double z);
-double maxwell_juttner_f(double gamma, struct parameters params);
-double power_law_f(double gamma, struct parameters params);
-double kappa_f(double gamma, struct parameters params);
+double maxwell_juttner_f(double gamma, struct parameters * params);
+double power_law_f(double gamma, struct parameters * params);
+double kappa_f(double gamma, struct parameters * params);
 double j_nu(double nu, 
             double magnetic_field, 
             double electron_density,

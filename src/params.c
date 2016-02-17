@@ -7,8 +7,8 @@ void setConstParams(struct parameters *params)
   params->plancks_constant = 6.6260693e-27;
   params->speed_light      = 2.99792458e10;
   params->electron_charge  = 4.80320680e-10;
-//  params->n_max            = 30;
-//  params->C                = 10;
+  params->n_max            = 30;
+  params->C                = 10;
   // Keys for the distributions
   params->THERMAL          = 0;
   params->POWER_LAW        = 1;

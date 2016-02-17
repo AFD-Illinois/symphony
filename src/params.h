@@ -55,7 +55,7 @@ struct parameters
 struct parametersGSL
 {
   struct parameters params;
-  int n;
+  double n;
 };
 
 void setConstParams(struct parameters *params);

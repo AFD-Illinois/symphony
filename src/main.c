@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 //  setUserParams(&params);
 
 //set some the parameters
-  double nu = 230e9;
+  double nu = 230e5;
   double magnetic_field = 30.;
   double electron_density = 1.;
   double observer_angle = 1.0472;
@@ -36,30 +36,35 @@ int main(int argc, char *argv[])
 //  printf("\nDIST: %d, MODE: %d, POL: %d", DISTRIBUTION_FUNCTION,
 //		 	                  MODE, POL_MODE);
 
-  double max_nuratio = 1e6;
+  double max_nuratio = 1e0;
   int points_per_pow_10 = 1;
   int max_index = (int) log10(max_nuratio)*points_per_pow_10;
 
-  printf("\nnu/nu_c         ans             fit");
+//  printf("\nnu/nu_c         ans             fit");
 
-  for (int index=1; index <= max_index; index++) 
-  {
+//  for (int index=0; index <= max_index; index++) 
+//  {
 
     //double nu = pow(10., (double)index/(double)points_per_pow_10) * nu_c;
-    nu = 5. * index * nu;
+    //nu = 5. * index * nu;
 
-//    printf("\n%e	%e	%e", nu/nu_c, j_nu(nu, B, n_e, obs_angle, dist, pol), 
-//                               j_nu_fit(nu, B, n_e, obs_angle, dist, pol));
+//    printf("\n%e	%e	%e", nu, 
+                               j_nu    (nu, magnetic_field, electron_density, 
+                                        observer_angle, distribution, 
+                                        polarization);//, 
+//                               j_nu_fit(nu, magnetic_field, electron_density, 
+//                                        observer_angle, distribution, 
+//                                        polarization));
 
-    printf("\n%e\n", j_nu_fit(nu, magnetic_field, electron_density,
-                              observer_angle, distribution, polarization));
+//    printf("\n%e\n", j_nu_fit(nu, magnetic_field, electron_density,
+//                              observer_angle, distribution, polarization));
 
 
 
 //   printf("\n%e	%e	%e", nu/nu_c, alpha_nu(nu, B, n_e, obs_angle, dist, pol), 
 //                               alpha_nu_fit(nu, B, n_e, obs_angle, dist, pol));
 
-  }
+//  }
   printf("\n");
   return 0;
 }

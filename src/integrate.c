@@ -22,7 +22,7 @@ double derivative(double n_start, double nu)
 // * or kappa) using GSL's QAGIU integrator.
 // *@returns: 1 over the normalization constant for the chosen distribution
 // */
-double normalize_f(struct parameters params)
+double normalize_f(struct parameters * params)
 {
   static double ans = 0;
   if (ans != 0) return ans;
@@ -30,11 +30,11 @@ double normalize_f(struct parameters params)
   double result, error;
   gsl_function F;
   
-  if(params.distribution == params.POWER_LAW)
+  if(params->distribution == params->POWER_LAW)
   {
     F.function = &power_law_to_be_normalized;
   }
-  else if(params.distribution == params.KAPPA_DIST)
+  else if(params->distribution == params->KAPPA_DIST)
   {
     F.function = &kappa_to_be_normalized;
   }
@@ -62,17 +62,17 @@ double normalize_f(struct parameters params)
 // *@returns: Output, result of either gamma integral or n integral
 // */
 double gsl_integrate(double min, double max, double n, 
-                     struct parameters params
+                     struct parameters * params
                     )
 {
-  double nu_c = get_nu_c(params);
-  if (params.nu/nu_c > 1.e6) 
+  double nu_c = get_nu_c(*params);
+  if (params->nu/nu_c > 1.e6) 
   {
     gsl_set_error_handler_off();
   }
 
   struct parametersGSL paramsGSL;
-  paramsGSL.params = params;
+  paramsGSL.params = *params;
 
 
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
@@ -82,7 +82,7 @@ double gsl_integrate(double min, double max, double n,
   {
     F.function = &gamma_integration_result;
     //F.params = &nu;
-    F.params = &params;
+    F.params = params;
     gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
                          3,  w, &result, &error);
   }
@@ -102,3 +102,24 @@ double gsl_integrate(double min, double max, double n,
 
   return result;
 }
+
+//trapezoidal rule integrator, useful while restructuring
+double gtrapezoid(double min, double max, double n,
+                 struct parameters * params)
+{
+  double nu_c = get_nu_c(*params);
+
+  struct parametersGSL paramsGSL;
+  paramsGSL.params = *params;
+  paramsGSL.n      = n;
+
+  printf("\nTRAPEZOID: %e\n", gamma_integrand((max+min)/2., &paramsGSL));
+
+  double result = 0.;
+
+  result = (max - min) * (gamma_integrand(max, &paramsGSL) 
+                        + gamma_integrand(min, &paramsGSL))/2.;
+
+  return result;
+}
+
