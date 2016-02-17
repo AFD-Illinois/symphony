@@ -5,8 +5,8 @@
 // *@param n_start: Input, value of n at which the derivative is to be performed
 // *@param nu: Input, frequency of absorption/emission
 // */
-//double derivative(double n_start, double nu)
-//{
+double derivative(double n_start, double nu)
+{
 //  gsl_function F;
 //  double result;
 //  double abserr;
@@ -14,14 +14,16 @@
 //  F.params = &nu;
 //  gsl_deriv_central(&F, n_start, 1e-8, &result, &abserr);
 //  return result;
-//}
+
+  return 0.;
+}
 //
 ///*normalize_f: normalizes the distribution function (power-law with cutoff
 // * or kappa) using GSL's QAGIU integrator.
 // *@returns: 1 over the normalization constant for the chosen distribution
 // */
-//double normalize_f(int dist)
-//{
+double normalize_f(int distribution)
+{
 //  static double ans = 0;
 //  if (ans != 0) return ans;
 //  gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
@@ -38,7 +40,7 @@
 //  }
 //  else
 //  {
-//    return 0;
+    return 0;
 //  }
 //
 //  double unused = 0.;
@@ -49,7 +51,7 @@
 //  ans = result;
 //
 //  return result;
-//}
+}
 //
 ///*gsl_integrate: wrapper for the GSL QAG integration routine
 // *@param min: Input, lower bound of integral

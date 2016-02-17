@@ -4,5 +4,8 @@
 double get_nu_c(struct parameters params);
 double n_summation(struct parameters *params);
 double gamma_integrand(double gamma, void * paramsInput);
+double distribution_function(double gamma, struct parameters params);
+double my_Bessel_J(double n, double z);
+double my_Bessel_dJ(double n, double z);
 
 #endif /* SYMPHONY_CALC_H_ */
