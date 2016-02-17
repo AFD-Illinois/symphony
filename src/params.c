@@ -46,8 +46,6 @@ void setUserParams(struct parameters *params)
   //kappa distribution parameters
   params->kappa       = 3.5;
   params->kappa_width = 10.;
-
-  //need 2 separate n integrations to numerically resolve STOKES_V
   params->stokes_v_switch = 0.; // TODO: describe: 0: , 1: 
 
 }
