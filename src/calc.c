@@ -22,31 +22,28 @@ double j_nu(double nu,
   return n_summation(&params);
 }
 
-////double alpha_nu(double nu, double B_temp, double n_e_temp, double obs_angl_temp, int dist_temp, int pol_temp)
-////{
-////  B = B_temp;
-////  n_e = n_e_temp;
-////  obs_angle = obs_angl_temp;
-////  dist = dist_temp;
-////  pol = pol_temp;
-////  mode = ABSORP;
-////
-//////make the struct and fill it with values
-////  parameters paramsLocal;
-////  paramsLocal.nu = nu;
-////  paramsLocal.B = B;
-////  paramsLocal.obs_angle = obs_angle;
-////  paramsLocal.n_e = n_e;
-////  paramsLocal.dist = dist;
-////  paramsLocal.pol = pol;
-////  paramsLocal.mode = mode;
-////
-////
-////  return n_summation(&paramsLocal);
-////}
-//
-///* Returns cyclotron frequency nu_c = ...
-// */
+double alpha_nu(double nu, 
+                double magnetic_field, 
+                double electron_density,
+                double observer_angle,
+                int distribution,
+                int polarization
+               )
+{
+//fill the struct with values
+  struct parameters params;
+  setConstParams(&params);
+  params.nu                 = nu;
+  params.magnetic_field     = magnetic_field;
+  params.observer_angle     = observer_angle;
+  params.electron_density   = electron_density;
+  params.distribution       = distribution;
+  params.polarization       = polarization;
+  params.mode               = params.ABSORPTIVITY;
+
+  return n_summation(&params);
+}
+
 double get_nu_c(struct parameters params)
 {
   return  (params.electron_charge * params.magnetic_field)
@@ -56,18 +53,18 @@ double get_nu_c(struct parameters params)
 
 double distribution_function(double gamma, struct parameters params)
 {
-//  if(params.distribution == params.THERMAL)
-//  {
-//    return maxwell_juttner_f(gamma, params);
-//  }
-//  else if(params.distribution == params.POWER_LAW)
-//  {
-//    return power_law_f(gamma, params);
-//  }
-//  else if(params.distribution == params.KAPPA_DIST)
-//  {
-//    return kappa_f(gamma, params);
-//  }
+  if(params.distribution == params.THERMAL)
+  {
+    return maxwell_juttner_f(gamma, params);
+  }
+  else if(params.distribution == params.POWER_LAW)
+  {
+    return power_law_f(gamma, params);
+  }
+  else if(params.distribution == params.KAPPA_DIST)
+  {
+    return kappa_f(gamma, params);
+  }
 
   return 0.;
 
@@ -236,20 +233,20 @@ double differential_of_f(double gamma, struct parameters params)
 //// *@param gamma: Input, Lorentz factor
 //// *@returns: THERMAL distribution function, which goes into the gamma integrand 
 //// */
-//double maxwell_juttner_f(double gamma, struct parameters params) 
-//{
-//  double beta = sqrt(1. - 1./(gamma*gamma));
-//
-//  double d = (params.electron_density * gamma * sqrt(gamma*gamma-1.) 
-//              * exp(-gamma/params.theta_e)) / (4. * M_PI 
-//                    * params.theta_e 
-//                    * gsl_sf_bessel_Kn(2, 1./params.theta_e));
-//
-//  double ans = 1./(pow(params.mass_electron, 3.) * pow(params.speed_light, 3.) 
-//                   * gamma*gamma * beta) * d;
-//
-//  return ans;
-//}
+double maxwell_juttner_f(double gamma, struct parameters params) 
+{
+  double beta = sqrt(1. - 1./(gamma*gamma));
+
+  double d = (params.electron_density * gamma * sqrt(gamma*gamma-1.) 
+              * exp(-gamma/params.theta_e)) / (4. * M_PI 
+                    * params.theta_e 
+                    * gsl_sf_bessel_Kn(2, 1./params.theta_e));
+
+  double ans = 1./(pow(params.mass_electron, 3.) * pow(params.speed_light, 3.) 
+                   * gamma*gamma * beta) * d;
+
+  return ans;
+}
 
 /////*power_law_to_be_normalized: the power-law distribution is normalized as-is, 
 //// * but we have added an exponential cutoff e^(-gamma/gamma_cutoff), so it must 
@@ -261,50 +258,50 @@ double differential_of_f(double gamma, struct parameters params)
 //// * n (harmonic number) and nu (frequency of emission/absorption)
 //// *@returns: Output, power-law distribution to be normalized via normalize_f()
 //// */
-//double power_law_to_be_normalized(double gamma, void * paramsInput) 
-//{
-//  struct parameters params = *(struct parameters*) paramsInput;
-//
-//  double norm_term = 4. * M_PI;
-//
-//  double prefactor = (params.power_law_p - 1.) / 
-//                     (pow(params.gamma_min, 1. - params.power_law_p) 
-//                      - pow(params.gamma_max, 1. 
-//                            - params.power_law_p));
-//
-//  double body = pow(gamma, -params.power_law_p) 
-//                * exp(- gamma / params.gamma_cutoff);
-////double body = pow(gamma, -power_law_p); for PL w/o cutoff
-//
-//  double ans = norm_term * prefactor * body;
-//
-//  return ans;
-//}
-////
+double power_law_to_be_normalized(double gamma, void * paramsInput) 
+{
+  struct parameters params = *(struct parameters*) paramsInput;
+
+  double norm_term = 4. * M_PI;
+
+  double prefactor = (params.power_law_p - 1.) / 
+                     (pow(params.gamma_min, 1. - params.power_law_p) 
+                      - pow(params.gamma_max, 1. 
+                            - params.power_law_p));
+
+  double body = pow(gamma, -params.power_law_p) 
+                * exp(- gamma / params.gamma_cutoff);
+//double body = pow(gamma, -power_law_p); for PL w/o cutoff
+
+  double ans = norm_term * prefactor * body;
+
+  return ans;
+}
+
 ////*power_law_f: power-law distribution function, normalized via call to the 
 //// * normalize_f() function. Uses eq. 50 of [1].
 //// *@param gamma: Input, Lorentz factor
 //// *@returns: Ouput, a normalized power-law distribution for the gamma integrand
 //// */
-//double power_law_f(double gamma, struct parameters params) 
-//{
-//  double beta = sqrt(1. - 1./(gamma*gamma));
-//
-//  double prefactor = params.electron_density * (params.power_law_p - 1.) 
-//                     / (pow(params.gamma_min, 1. - params.power_law_p) 
-//                        - pow(params.gamma_max, 1. - params.power_law_p));
-//
-//  double body = pow(gamma, -params.power_law_p) 
-//                * exp(- gamma / params.gamma_cutoff);
-////double body = pow(gamma, -power_law_p); //for PL w/o cutoff
-//
-//  double ans = 1./normalize_f(params.distribution) * prefactor * body 
-//                              * 1./(pow(params.mass_electron, 3.) 
-//                              * pow(params.speed_light, 3.) 
-//                              * gamma*gamma * beta);
-//
-//  return ans;
-//}
+double power_law_f(double gamma, struct parameters params) 
+{
+  double beta = sqrt(1. - 1./(gamma*gamma));
+
+  double prefactor = params.electron_density * (params.power_law_p - 1.) 
+                     / (pow(params.gamma_min, 1. - params.power_law_p) 
+                        - pow(params.gamma_max, 1. - params.power_law_p));
+
+  double body = pow(gamma, -params.power_law_p) 
+                * exp(- gamma / params.gamma_cutoff);
+//double body = pow(gamma, -power_law_p); //for PL w/o cutoff
+
+  double ans = 1./normalize_f(params.distribution) * prefactor * body 
+                              * 1./(pow(params.mass_electron, 3.) 
+                              * pow(params.speed_light, 3.) 
+                              * gamma*gamma * beta);
+
+  return ans;
+}
 
 /////*kappa_to_be_normalized: the kappa distribution is not normalized, so we must 
 //// * find the normalization constant by taking 1 over the integral of the function
@@ -314,42 +311,43 @@ double differential_of_f(double gamma, struct parameters params)
 //// * n (harmonic number) and nu (frequency of emission/absorption)
 //// *@returns: kappa distribution function to be normalized via normalize_f()
 //// */
-////double kappa_to_be_normalized(double gamma, void * params)
-////{
-////  double kappa_body = pow((1. + (gamma - 1.)/(kappa * kappa_width)), -kappa-1);
-////
-////  double cutoff = exp(-gamma/gamma_cutoff);
-////
-////  double norm_term = 4. * M_PI * pow(mass_electron, 3.) * pow(speed_light, 3.) 
-////                   * gamma * sqrt(gamma*gamma-1.);
-////
-////  double ans = kappa_body * cutoff * norm_term;
-////  //double ans = kappa_body * norm_term; //for kappa w/o cutoff
-////
-////  return ans;
-////}
-////
+double kappa_to_be_normalized(double gamma, void * paramsInput)
+{
+  struct parameters params = *(struct parameters*) paramsInput;
+
+  double kappa_body = pow((1. + (gamma - 1.)/(params.kappa * params.kappa_width)), -params.kappa-1);
+
+  double cutoff = exp(-gamma/params.gamma_cutoff);
+
+  double norm_term = 4. * M_PI * pow(params.mass_electron, 3.) * pow(params.speed_light, 3.) 
+                   * gamma * sqrt(gamma*gamma-1.);
+
+  double ans = kappa_body * cutoff * norm_term;
+  //double ans = kappa_body * norm_term; //for kappa w/o cutoff
+
+  return ans;
+}
+
 /////*kappa_f: kappa distribution function, numerically normalized
 //// *uses eq. 42 of [2]
 //// *@param gamma: Input, Lorentz factor
 //// *@returns: normalized kappa distribution function to go into gamma integrand 
 //// */
-////double kappa_f(double gamma)
-////{
-////  double norm = 1./normalize_f(dist);
-////
-////  double kappa_body = n_e * pow((1. + (gamma - 1.)
-////                     /(kappa * kappa_width)), -kappa-1);
-////
-////  double cutoff = exp(-gamma/gamma_cutoff);
-////
-////  double ans = norm * kappa_body * cutoff;
-////  //double ans = norm * kappa_body; //for kappa w/o cutoff
-////
-////  return ans;
-////}
-////
-////
+double kappa_f(double gamma, struct parameters params)
+{
+  double norm = 1./normalize_f(params.distribution);
+
+  double kappa_body = params.electron_density * pow((1. + (gamma - 1.)
+                     /(params.kappa * params.kappa_width)), -params.kappa-1);
+
+  double cutoff = exp(-gamma/params.gamma_cutoff);
+
+  double ans = norm * kappa_body * cutoff;
+  //double ans = norm * kappa_body; //for kappa w/o cutoff
+
+  return ans;
+}
+
 /*gamma_integrand: full gamma integrand, to be integrated from gamma_minus
  * to gamma_plus, set by eq. 64 of [1]
  *@param gamma: Lorentz factor
@@ -538,7 +536,7 @@ double n_integration(double n_minus, struct parameters params)
 double n_summation(struct parameters *params)
 {
 
-  printf("\n%e\n", params->nu);
+  //printf("\n%e\n", params->nu);
 
   if(params->polarization == params->STOKES_U)
   {
