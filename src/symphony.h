@@ -17,6 +17,7 @@
 #include "params.h"
 #include "calc.h"
 #include "integrate.h"
+#include "fits.h"
 
 //function declarations
 //double n_peak(double nu);
