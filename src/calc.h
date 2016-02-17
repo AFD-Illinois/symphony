@@ -16,6 +16,8 @@ double j_nu(double nu,
             double observer_angle,
             int distribution,
             int polarization);
-
+double gamma_integration_result(double n, void * paramsInput);
+double power_law_to_be_normalized(double gamma, void * paramsInput);
+double kappa_to_be_normalized(double gamma, void * paramsInput);
 
 #endif /* SYMPHONY_CALC_H_ */

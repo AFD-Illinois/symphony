@@ -191,7 +191,7 @@ double differential_of_f(double gamma, struct parameters params)
 
   else if(params.distribution == params.POWER_LAW)
   {
-    double pl_norm = 4.* M_PI/(normalize_f(params.distribution));
+    double pl_norm = 4.* M_PI/(normalize_f(params));
 
     double prefactor = (M_PI * params.nu / (params.mass_electron*params.speed_light*params.speed_light)) 
                      * (params.electron_density*(params.power_law_p-1.))
@@ -212,7 +212,7 @@ double differential_of_f(double gamma, struct parameters params)
 
   else if(params.distribution == params.KAPPA_DIST)
   {
-    double prefactor = params.electron_density * (1./normalize_f(params.distribution)) 
+    double prefactor = params.electron_density * (1./normalize_f(params)) 
                        * 4. * M_PI*M_PI * params.nu * params.mass_electron
                        * params.mass_electron * params.speed_light;
 
@@ -295,7 +295,7 @@ double power_law_f(double gamma, struct parameters params)
                 * exp(- gamma / params.gamma_cutoff);
 //double body = pow(gamma, -power_law_p); //for PL w/o cutoff
 
-  double ans = 1./normalize_f(params.distribution) * prefactor * body 
+  double ans = 1./normalize_f(params) * prefactor * body 
                               * 1./(pow(params.mass_electron, 3.) 
                               * pow(params.speed_light, 3.) 
                               * gamma*gamma * beta);
@@ -335,7 +335,7 @@ double kappa_to_be_normalized(double gamma, void * paramsInput)
 //// */
 double kappa_f(double gamma, struct parameters params)
 {
-  double norm = 1./normalize_f(params.distribution);
+  double norm = 1./normalize_f(params);
 
   double kappa_body = params.electron_density * pow((1. + (gamma - 1.)
                      /(params.kappa * params.kappa_width)), -params.kappa-1);
@@ -491,6 +491,7 @@ double n_integration(double n_minus, struct parameters params)
 
   int n_max = 30.; //set the number of terms to be summed over
   int C = 10.;     //set in Leung et al.; TODO: DESCRIBE MORE
+
 
   if (params.distribution == params.THERMAL && params.nu/nu_c < 1e6) 
   {

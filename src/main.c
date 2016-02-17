@@ -42,6 +42,9 @@ int main(int argc, char *argv[])
 //    printf("\n%e	%e	%e", nu/nu_c, j_nu(nu, B, n_e, obs_angle, dist, pol), 
 //                               j_nu_fit(nu, B, n_e, obs_angle, dist, pol));
 
+//  j_nu(55555., 30., 1., params.pi/3., 0, 11);
+
+
 //   printf("\n%e	%e	%e", nu/nu_c, alpha_nu(nu, B, n_e, obs_angle, dist, pol), 
 //                               alpha_nu_fit(nu, B, n_e, obs_angle, dist, pol));
 

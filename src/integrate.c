@@ -7,13 +7,13 @@
 // */
 double derivative(double n_start, double nu)
 {
-//  gsl_function F;
-//  double result;
-//  double abserr;
-//  F.function = gamma_integration_result;
-//  F.params = &nu;
-//  gsl_deriv_central(&F, n_start, 1e-8, &result, &abserr);
-//  return result;
+  gsl_function F;
+  double result;
+  double abserr;
+  F.function = gamma_integration_result;
+  F.params = &nu;
+  gsl_deriv_central(&F, n_start, 1e-8, &result, &abserr);
+  return result;
 
   return 0.;
 }
@@ -22,37 +22,38 @@ double derivative(double n_start, double nu)
 // * or kappa) using GSL's QAGIU integrator.
 // *@returns: 1 over the normalization constant for the chosen distribution
 // */
-double normalize_f(int distribution)
+double normalize_f(struct parameters params)
 {
-//  static double ans = 0;
-//  if (ans != 0) return ans;
-//  gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
-//  double result, error;
-//  gsl_function F;
-//  
-//  if(dist == POWER_LAW)
-//  {
-//    F.function = &power_law_to_be_normalized;
-//  }
-//  else if(dist == KAPPA_DIST)
-//  {
-//    F.function = &kappa_to_be_normalized;
-//  }
-//  else
-//  {
+  static double ans = 0;
+  if (ans != 0) return ans;
+  gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
+  double result, error;
+  gsl_function F;
+  
+  if(params.distribution == params.POWER_LAW)
+  {
+    F.function = &power_law_to_be_normalized;
+  }
+  else if(params.distribution == params.KAPPA_DIST)
+  {
+    F.function = &kappa_to_be_normalized;
+  }
+  else
+  {
     return 0;
-//  }
-//
-//  double unused = 0.;
-//  F.params = &unused;
-//  gsl_integration_qagiu(&F, 1, 0, 1e-8, 1000,
-//                         w, &result, &error);
-//  gsl_integration_workspace_free (w);
-//  ans = result;
-//
-//  return result;
+  }
+
+  //double unused = 0.;
+  //F.params = &unused;
+  F.params = &params;
+  gsl_integration_qagiu(&F, 1, 0, 1e-8, 1000,
+                         w, &result, &error);
+  gsl_integration_workspace_free (w);
+  ans = result;
+
+  return result;
 }
-//
+
 ///*gsl_integrate: wrapper for the GSL QAG integration routine
 // *@param min: Input, lower bound of integral
 // *@param max: Input, upper bound of integral
@@ -70,21 +71,26 @@ double gsl_integrate(double min, double max, double n,
     gsl_set_error_handler_off();
   }
 
+  struct parametersGSL paramsGSL;
+  paramsGSL.params = params;
+
+
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
   double result, error;
   gsl_function F;
   if (n < 0) //do n integration
   {
-//    F.function = &gamma_integration_result;
-//    F.params = &nu;
-//    gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
-//                         3,  w, &result, &error);
+    F.function = &gamma_integration_result;
+    //F.params = &nu;
+    F.params = &params;
+    gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
+                         3,  w, &result, &error);
   }
   else      //do gamma integration
   {
     F.function = &gamma_integrand;
-    struct parametersGSL paramsGSL;
-    paramsGSL.params = params;
+    //struct parametersGSL paramsGSL;
+    //paramsGSL.params = params;
     paramsGSL.n      = n;
     F.params   = &paramsGSL;
     gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
