@@ -85,23 +85,23 @@ double distribution_function(double gamma, struct parameters * params)
 //// *@returns n_peak: Output, location of integrand's peak for the 
 //// * n-integral for the THERMAL distribution 
 //// */
-double n_peak(struct parameters params)
+double n_peak(struct parameters * params)
 {
-  double nu_c = get_nu_c(params);
+  double nu_c = get_nu_c(*params);
 
   double beta = 0.;
 
-  if (params.nu <= nu_c * params.theta_e*params.theta_e || params.theta_e < 1.) 
+  if (params->nu <= nu_c * params->theta_e*params->theta_e || params->theta_e < 1.) 
   {
-    beta = sqrt((1. - 1./pow((1. + params.theta_e),2.))); //beta in low nu limit
+    beta = sqrt((1. - 1./pow((1. + params->theta_e),2.))); //beta in low nu limit
   }
   else 
   {
-    beta = sqrt(1. - pow((2. * params.theta_e * params.nu / nu_c), -2./3.));//beta for high nu
+    beta = sqrt(1. - pow((2. * params->theta_e * params->nu / nu_c), -2./3.));//beta for high nu
   }
   
-  double n_peak =  (params.theta_e + 1. + pow((2. * params.theta_e * params.nu / nu_c),1./3.))
-                 * (params.nu/nu_c) * (1. - beta*beta * pow(cos(params.observer_angle),2.));
+  double n_peak =  (params->theta_e + 1. + pow((2. * params->theta_e * params->nu / nu_c),1./3.))
+                 * (params->nu/nu_c) * (1. - beta*beta * pow(cos(params->observer_angle),2.));
 
   return n_peak;
 }
@@ -455,20 +455,22 @@ double gamma_integration_result(double n, void * paramsInput)
   double gamma_plus_high  = gamma_peak - (gamma_peak - gamma_plus) /width;
 
   /*Stokes V is hard to resolve; do 2 separate integrations to make it easier*/
-//  if(params->polarization == params->STOKES_V && params->stokes_v_switch >= 0) 
-//  {
-//    double neg_result = gsl_integrate(gamma_minus_high, gamma_peak, n, params);
-//    double pos_result = gsl_integrate(gamma_peak, gamma_plus_high,  n, params);
-//
-//    if (params->stokes_v_switch == 0)
-//    {
-//      result = pos_result;
-//    }
-//    else
-//    {
-//      result = neg_result;
-//    }
-//  }
+  if(params->polarization == params->STOKES_V && params->stokes_v_switch >= 0) 
+  {
+   // double neg_result = gsl_integrate(gamma_minus_high, gamma_peak, n, params);
+   // double pos_result = gsl_integrate(gamma_peak, gamma_plus_high,  n, params);
+    double neg_result = gamma_integral(gamma_minus_high, gamma_peak, n, params);
+    double pos_result = gamma_integral(gamma_peak, gamma_plus_high,  n, params);
+
+    if (params->stokes_v_switch == 0)
+    {
+      result = pos_result;
+    }
+    else
+    {
+      result = neg_result;
+    }
+  }
 
   if (params->polarization != params->STOKES_V || params->stokes_v_switch < 0) 
   {
@@ -492,24 +494,21 @@ double gamma_integration_result(double n, void * paramsInput)
 //// *@params nu: Input, frequency of absorption/emission
 //// *@returns: Output, result of integration over n
 //// */
-double n_integration(double n_minus, struct parameters params)
+double n_integration(double n_minus, struct parameters * params)
 {
-  double nu_c = get_nu_c(params);
+  double nu_c = get_nu_c(*params);
 
-  int n_max = 30.; //set the number of terms to be summed over
-  int C = 10.;     //set in Leung et al.; TODO: DESCRIBE MORE
-
-
-  if (params.distribution == params.THERMAL && params.nu/nu_c < 1e6) 
+  if (params->distribution == params->THERMAL && params->nu/nu_c < 1e6) 
   {
-    double n_start = (int)(n_max + n_minus + 1.);
-    double ans = gsl_integrate(n_start, C * n_peak(params), -1, &params);
+    double n_start = (int)(params->n_max + n_minus + 1.);
+    //double ans = gsl_integrate(n_start, params->C * n_peak(params), -1, params);
+    double ans = n_integral(n_start, params->C * n_peak(params), -1, params);
     return ans;
   }
 
   else 
   {
-    double n_start = (int)(n_max + n_minus + 1.);
+    double n_start = (int)(params->n_max + n_minus + 1.);
     double ans = 0.;
     double contrib = 0.;
 
@@ -522,10 +521,11 @@ double n_integration(double n_minus, struct parameters params)
       contributions greater than tolerance */
     while (fabs(contrib) >= fabs(ans/tolerance)) 
     {
-      double deriv = derivative(n_start, params.nu);
+      double deriv = derivative(n_start, params->nu);
       if(fabs(deriv) < deriv_tol) delta_n = 100. * delta_n;
 
-      contrib = gsl_integrate(n_start, (n_start + delta_n), -1, &params);
+      //contrib = gsl_integrate(n_start, (n_start + delta_n), -1, params);
+      contrib = n_integral(n_start, params->C * n_peak(params), -1, params);
       ans = ans + contrib;
 
       n_start = n_start + delta_n;
@@ -561,8 +561,6 @@ double n_summation(struct parameters *params)
     each value of n from 1 to n_max*/
   for (int n=(int)(n_minus+1.); n <= params->n_max + (int)n_minus ; n++) 
   {
-    //ans += gamma_integration_result(n, params);
-    //printf("\n n_summation n is: %e", nu_c);
      ans += gamma_integration_result(n, params);
   }
 
@@ -570,7 +568,7 @@ double n_summation(struct parameters *params)
 
   /*add result of n sum from 1 to n_max to an integral over n from n_max to
     the point where the integral no longer gives appreciable contributions*/
-  //ans += n_integration(n_minus, *params);
+  ans += n_integration(n_minus, params);
 
   /*if doing Stokes V, must perform two n integrals: one over the positive
     part of gamma integrand and one over the negative part; this helps GSL QAG
@@ -578,9 +576,8 @@ double n_summation(struct parameters *params)
   if(params->polarization == params->STOKES_V)
   {
     params->stokes_v_switch = 1;
-    //ans += n_integration(n_minus, *params);
+    ans += n_integration(n_minus, params);
   }
-
-  printf("\n ans = %e", ans);  
+  
   return ans;
 }

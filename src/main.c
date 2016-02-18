@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 //  setUserParams(&params);
 
 //set some the parameters
-  double nu = 230e7;
+  double nu = 8.397752e+07;
   double magnetic_field = 30.;
   double electron_density = 1.;
   double observer_angle = 1.0472;
@@ -49,9 +49,9 @@ int main(int argc, char *argv[])
     //nu = 5. * index * nu;
 
 //    printf("\n%e	%e	%e", nu, 
-                               j_nu    (nu, magnetic_field, electron_density, 
+   printf("\n total_ans = %e", j_nu    (nu, magnetic_field, electron_density, 
                                         observer_angle, distribution, 
-                                        polarization);//, 
+                                        polarization));//, 
 //                               j_nu_fit(nu, magnetic_field, electron_density, 
 //                                        observer_angle, distribution, 
 //                                        polarization));
