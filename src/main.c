@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
   double magnetic_field = 30.;
   double electron_density = 1.;
   double observer_angle = 1.0472;
-  int distribution = 0;
+  int distribution = 1;
   int polarization = 15;
 
   //double nu_c = get_nu_c(params);

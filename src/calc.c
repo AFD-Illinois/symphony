@@ -24,7 +24,7 @@ double j_nu(double nu,
   params.gamma_max          = 100.;
   params.gamma_cutoff       = 100000000000.;
 
-  //printf("\n POWER_LAW:  %e \n", power_law_f(1.5, &params));
+//  printf("\n POWER_LAW:  %e \n", power_law_f(1.5, &params));
 
   return n_summation(&params);
 }
@@ -47,6 +47,11 @@ double alpha_nu(double nu,
   params.distribution       = distribution;
   params.polarization       = polarization;
   params.mode               = params.ABSORPTIVITY;
+  params.theta_e            = 10.; //TODO: PASS THESE IN AS PARAMETERS
+  params.power_law_p        = 3.5;
+  params.gamma_min          = 1.;
+  params.gamma_max          = 100.;
+  params.gamma_cutoff       = 100000000000.;
 
   return n_summation(&params);
 }
@@ -64,14 +69,14 @@ double distribution_function(double gamma, struct parameters * params)
   {
     return maxwell_juttner_f(gamma, params);
   }
-//  else if(params->distribution == params->POWER_LAW)
-//  {
-//    return power_law_f(gamma, params);
-//  }
-//  else if(params->distribution == params->KAPPA_DIST)
-//  {
-//    return kappa_f(gamma, params);
-//  }
+  else if(params->distribution == params->POWER_LAW)
+  {
+    return power_law_f(gamma, params);
+  }
+  else if(params->distribution == params->KAPPA_DIST)
+  {
+    return kappa_f(gamma, params);
+  }
 
   return 0.;
 
@@ -179,61 +184,65 @@ double polarization_term(double gamma, double n,
 //// *@param nu: Input, frequency of emission/absorption
 //// *@returns: Output, Df term in gamma integrand; depends on distribution function
 //// */
-double differential_of_f(double gamma, struct parameters params) 
-{
-  /*described in Section 3 of [1] */
-
-  double f = 0.;
-
-  if(params.distribution == params.THERMAL)
-  {
-    double prefactor = (params.pi * params.nu 
-                     / (params.mass_electron*params.speed_light*params.speed_light)) 
-		     * (params.electron_density/(params.theta_e * gsl_sf_bessel_Kn(2, 1./params.theta_e)));
-
-    double body = (-1./params.theta_e) * exp(-gamma/params.theta_e);
-
-    f = prefactor * body;
-  }
-
-  else if(params.distribution == params.POWER_LAW)
-  {
-    double pl_norm = 4.* M_PI/(normalize_f(&params));
-
-    double prefactor = (M_PI * params.nu / (params.mass_electron*params.speed_light*params.speed_light)) 
-                     * (params.electron_density*(params.power_law_p-1.))
-                     /((pow(params.gamma_min, 1.-params.power_law_p) 
-                     - pow(params.gamma_max, 1.-params.power_law_p)));
-
-    double term1 = ((-params.power_law_p-1.)*exp(-gamma/params.gamma_cutoff)
-               *pow(gamma,-params.power_law_p-2.)/(sqrt(gamma*gamma - 1.)));
-
-    double term2 = (exp(-gamma/params.gamma_cutoff) * pow(gamma,(-params.power_law_p-1.))
-                  /(params.gamma_cutoff * sqrt(gamma*gamma - 1.)));
-
-    double term3 = (exp(-gamma/params.gamma_cutoff) * pow(gamma,-params.power_law_p))
-               /pow((gamma*gamma - 1.), (3./2.));
-
-    f = pl_norm * prefactor * (term1 - term2 - term3);
-  }
-
-  else if(params.distribution == params.KAPPA_DIST)
-  {
-    double prefactor = params.electron_density * (1./normalize_f(&params)) 
-                       * 4. * M_PI*M_PI * params.nu * params.mass_electron
-                       * params.mass_electron * params.speed_light;
-
-    double term1 = ((- params.kappa - 1.) / (params.kappa * params.kappa_width)) 
-		  * pow((1. + (gamma - 1.)/(params.kappa * params.kappa_width)), -params.kappa-2.);
-
-    double term2 = pow((1. + (gamma - 1.)/(params.kappa * params.kappa_width)),(- params.kappa - 1.)) 
-                    * (- 1./params.gamma_cutoff);
-
-    f = prefactor * (term1 + term2) * exp(-gamma/params.gamma_cutoff);
-  }
-
-    return f;
-}
+//double differential_of_f(double gamma, struct parameters * params) 
+//{
+//  /*described in Section 3 of [1] */
+//
+//  double f = 0.;
+//
+//  if(params->distribution == params->THERMAL)
+//  {
+//    double prefactor = (params->pi * params->nu 
+//                     / (params->mass_electron*params->speed_light*params->speed_light)) 
+//		     * (params->electron_density/(params->theta_e * gsl_sf_bessel_Kn(2, 1./params->theta_e)));
+//
+//    double body = (-1./params->theta_e) * exp(-gamma/params->theta_e);
+//
+//    f = prefactor * body;
+//  }
+//
+//  else if(params->distribution == params->POWER_LAW)
+//  {
+//    double (*unnormalized_pl)(double, void * paramsInput)= power_law_to_be_normalized;
+//
+//    double pl_norm = 4.* params->pi/(normalize_f(unnormalized_pl(gamma, (void *)params), params));
+//
+//    double prefactor = (params->pi * params->nu / (params->mass_electron*params->speed_light*params->speed_light)) 
+//                     * (params->electron_density*(params->power_law_p-1.))
+//                     /((pow(params->gamma_min, 1.-params->power_law_p) 
+//                     - pow(params->gamma_max, 1.-params->power_law_p)));
+//
+//    double term1 = ((-params->power_law_p-1.)*exp(-gamma/params->gamma_cutoff)
+//               *pow(gamma,-params->power_law_p-2.)/(sqrt(gamma*gamma - 1.)));
+//
+//    double term2 = (exp(-gamma/params->gamma_cutoff) * pow(gamma,(-params->power_law_p-1.))
+//                  /(params->gamma_cutoff * sqrt(gamma*gamma - 1.)));
+//
+//    double term3 = (exp(-gamma/params->gamma_cutoff) * pow(gamma,-params->power_law_p))
+//               /pow((gamma*gamma - 1.), (3./2.));
+//
+//    f = pl_norm * prefactor * (term1 - term2 - term3);
+//  }
+//
+//  else if(params->distribution == params->KAPPA_DIST)
+//  {
+//    double (*unnormalized_kappa)(double gamma, struct parameters * params) = kappa_to_be_normalized;    
+//
+//    double prefactor = params->electron_density * (1./normalize_f(unnormalized_kappa(1., params), params)) 
+//                       * 4. * params->pi*params->pi * params->nu * params->mass_electron
+//                       * params->mass_electron * params->speed_light;
+//
+//    double term1 = ((- params->kappa - 1.) / (params->kappa * params->kappa_width)) 
+//		  * pow((1. + (gamma - 1.)/(params->kappa * params->kappa_width)), -params->kappa-2.);
+//
+//    double term2 = pow((1. + (gamma - 1.)/(params->kappa * params->kappa_width)),(- params->kappa - 1.)) 
+//                    * (- 1./params->gamma_cutoff);
+//
+//    f = prefactor * (term1 + term2) * exp(-gamma/params->gamma_cutoff);
+//  }
+//
+//    return f;
+//}
 
 /////*maxwell_juttner_f: Maxwell-Juttner distribution function in terms of Lorentz 
 //// * factor gamma; uses eq. 47, 49, 50 of [1]
@@ -392,17 +401,17 @@ double gamma_integrand(double gamma, void * paramsGSLInput)
 
     ans = prefactor * func_I;
   }
-  else if (params->mode == params->ABSORPTIVITY)
-  {
-    double prefactor = -  params->speed_light
-                        * params->electron_charge
-                        * params->electron_charge 
-                        / (2. * params->nu);
-
-    ans = prefactor*gamma*gamma*beta*differential_of_f(gamma, *params)
-                *polarization_term(gamma, paramsGSL->n, params)
-                *(1./(params->nu*beta*fabs(cos(params->observer_angle))));
-  }
+//  else if (params->mode == params->ABSORPTIVITY)
+//  {
+//    double prefactor = -  params->speed_light
+//                        * params->electron_charge
+//                        * params->electron_charge 
+//                        / (2. * params->nu);
+//
+//    ans = prefactor*gamma*gamma*beta*differential_of_f(gamma, *params)
+//                *polarization_term(gamma, paramsGSL->n, params)
+//                *(1./(params->nu*beta*fabs(cos(params->observer_angle))));
+//  }
 
   return ans;
 }
@@ -517,11 +526,13 @@ double n_integration(double n_minus, struct parameters * params)
     double deriv_tol = 1.e-5;
     double tolerance = 1.e5;
 
+//    printf("GOT INTO N INTEGRATION");
+
     /*keep taking steps and integrating in n until the integral stops giving
       contributions greater than tolerance */
     while (fabs(contrib) >= fabs(ans/tolerance)) 
     {
-      double deriv = derivative(n_start, params->nu);
+      double deriv = derivative(n_start, params);
       if(fabs(deriv) < deriv_tol) delta_n = 100. * delta_n;
 
       //contrib = gsl_integrate(n_start, (n_start + delta_n), -1, params);

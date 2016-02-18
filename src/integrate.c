@@ -5,13 +5,14 @@
 // *@param n_start: Input, value of n at which the derivative is to be performed
 // *@param nu: Input, frequency of absorption/emission
 // */
-double derivative(double n_start, double nu)
+double derivative(double n_start, struct parameters * params)
 {
   gsl_function F;
   double result;
   double abserr;
   F.function = gamma_integration_result;
-  F.params = &nu;
+  //F.params = &nu;
+  F.params = params;
   gsl_deriv_central(&F, n_start, 1e-8, &result, &abserr);
   return result;
 
@@ -37,6 +38,7 @@ double normalize_f(struct parameters * params)
   else if(params->distribution == params->KAPPA_DIST)
   {
     F.function = &kappa_to_be_normalized;
+    //printf("SHOULD NOT GET HERE");
   }
   else
   {
@@ -44,13 +46,13 @@ double normalize_f(struct parameters * params)
   }
 
   //double unused = 0.;
-  //F.params = &unused;
-  F.params = &params;
+  F.params = params;
+  //F.function = unnormalized_dist;
   gsl_integration_qagiu(&F, 1, 0, 1e-8, 1000,
                          w, &result, &error);
   gsl_integration_workspace_free (w);
   ans = result;
-
+  //printf("\nRESULT of NORM = %e\n", result);
   return result;
 }
 
@@ -123,7 +125,7 @@ double gamma_integral(double min,
 
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
 
-  gsl_integration_qag(&F, min, max, 0., 1.e-7, 1000,
+  gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
                          3,  w, &result, &error); 
 
   gsl_integration_workspace_free (w);
@@ -146,7 +148,7 @@ double n_integral(double min,
 
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
 
-  gsl_integration_qag(&F, min, max, 0., 1.e-7, 1000,
+  gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
                          3,  w, &result, &error);
 
   gsl_integration_workspace_free (w);
