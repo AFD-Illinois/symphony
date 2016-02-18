@@ -59,16 +59,21 @@ int main(int argc, char *argv[])
 //    printf("\n%e\n", j_nu_fit(nu, magnetic_field, electron_density,
 //                              observer_angle, distribution, polarization));
 
-
+    printf("EMISS:  %e     %e\n", j_nu(nu, magnetic_field, electron_density,
+                                      observer_angle, distribution, polarization),
+                                 j_nu_fit(nu, magnetic_field, electron_density,
+                                      observer_angle, distribution, polarization));
 
 //   printf("\n%e	%e	%e", nu/nu_c, alpha_nu(nu, B, n_e, obs_angle, dist, pol), 
 //                               alpha_nu_fit(nu, B, n_e, obs_angle, dist, pol));
 
-    alpha_nu(nu, magnetic_field, electron_density,
-             observer_angle, distribution,
-             polarization);
+    printf("ABSORP: %e     %e\n", alpha_nu(nu, magnetic_field, electron_density,
+                                      observer_angle, distribution, polarization),
+                                alpha_nu_fit(nu, magnetic_field, electron_density,
+                                      observer_angle, distribution, polarization));
 
 //  }
   printf("\n");
   return 0;
 }
+

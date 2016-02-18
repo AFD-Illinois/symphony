@@ -54,6 +54,8 @@ double alpha_nu(double nu,
   params.gamma_min          = 1.;
   params.gamma_max          = 100.;
   params.gamma_cutoff       = 100000000000.;
+  params.kappa              = 3.5;
+  params.kappa_width        = 10.;
 
   return n_summation(&params);
 }
@@ -177,74 +179,70 @@ double polarization_term(double gamma, double n,
   return ans;
 }
 
-/////*differential_of_f: term in gamma integrand only for absorptivity calculation; 
-//// *it is the differential Df = 2\pi\nu (1/(mc)*d/dgamma + (beta cos(theta)
-//// * -cos(xi))/(p*beta*c) * d/d(cos(xi))) f 
-//// *this is eq. 41 of [1]
-//// *below it is applied for the THERMAL, POWER_LAW, and KAPPA_DIST distributions
-//// *@param gamma: Input, Lorentz factor
-//// *@param nu: Input, frequency of emission/absorption
-//// *@returns: Output, Df term in gamma integrand; depends on distribution function
-//// */
-//double differential_of_f(double gamma, struct parameters * params) 
-//{
-//  /*described in Section 3 of [1] */
-//
-//  double f = 0.;
-//
-//  if(params->distribution == params->THERMAL)
-//  {
-//    double prefactor = (params->pi * params->nu 
-//                     / (params->mass_electron*params->speed_light*params->speed_light)) 
-//		     * (params->electron_density/(params->theta_e * gsl_sf_bessel_Kn(2, 1./params->theta_e)));
-//
-//    double body = (-1./params->theta_e) * exp(-gamma/params->theta_e);
-//
-//    f = prefactor * body;
-//  }
-//
-//  else if(params->distribution == params->POWER_LAW)
-//  {
-//    double (*unnormalized_pl)(double, void * paramsInput)= power_law_to_be_normalized;
-//
-//    double pl_norm = 4.* params->pi/(normalize_f(unnormalized_pl(gamma, (void *)params), params));
-//
-//    double prefactor = (params->pi * params->nu / (params->mass_electron*params->speed_light*params->speed_light)) 
-//                     * (params->electron_density*(params->power_law_p-1.))
-//                     /((pow(params->gamma_min, 1.-params->power_law_p) 
-//                     - pow(params->gamma_max, 1.-params->power_law_p)));
-//
-//    double term1 = ((-params->power_law_p-1.)*exp(-gamma/params->gamma_cutoff)
-//               *pow(gamma,-params->power_law_p-2.)/(sqrt(gamma*gamma - 1.)));
-//
-//    double term2 = (exp(-gamma/params->gamma_cutoff) * pow(gamma,(-params->power_law_p-1.))
-//                  /(params->gamma_cutoff * sqrt(gamma*gamma - 1.)));
-//
-//    double term3 = (exp(-gamma/params->gamma_cutoff) * pow(gamma,-params->power_law_p))
-//               /pow((gamma*gamma - 1.), (3./2.));
-//
-//    f = pl_norm * prefactor * (term1 - term2 - term3);
-//  }
-//
-//  else if(params->distribution == params->KAPPA_DIST)
-//  {
-//    double (*unnormalized_kappa)(double gamma, struct parameters * params) = kappa_to_be_normalized;    
-//
-//    double prefactor = params->electron_density * (1./normalize_f(unnormalized_kappa(1., params), params)) 
-//                       * 4. * params->pi*params->pi * params->nu * params->mass_electron
-//                       * params->mass_electron * params->speed_light;
-//
-//    double term1 = ((- params->kappa - 1.) / (params->kappa * params->kappa_width)) 
-//		  * pow((1. + (gamma - 1.)/(params->kappa * params->kappa_width)), -params->kappa-2.);
-//
-//    double term2 = pow((1. + (gamma - 1.)/(params->kappa * params->kappa_width)),(- params->kappa - 1.)) 
-//                    * (- 1./params->gamma_cutoff);
-//
-//    f = prefactor * (term1 + term2) * exp(-gamma/params->gamma_cutoff);
-//  }
-//
-//    return f;
-//}
+/*differential_of_f: term in gamma integrand only for absorptivity calculation; 
+ *it is the differential Df = 2\pi\nu (1/(mc)*d/dgamma + (beta cos(theta)
+ * -cos(xi))/(p*beta*c) * d/d(cos(xi))) f 
+ *this is eq. 41 of [1]
+ *below it is applied for the THERMAL, POWER_LAW, and KAPPA_DIST distributions
+ *@param gamma: Input, Lorentz factor
+ *@param nu: Input, frequency of emission/absorption
+ *@returns: Output, Df term in gamma integrand; depends on distribution function
+ */
+double differential_of_f(double gamma, struct parameters * params) 
+{
+  /*described in Section 3 of [1] */
+
+  double f = 0.;
+
+  if(params->distribution == params->THERMAL)
+{
+    double prefactor = (params->pi * params->nu 
+                     / (params->mass_electron*params->speed_light*params->speed_light)) 
+		     * (params->electron_density/(params->theta_e * gsl_sf_bessel_Kn(2, 1./params->theta_e)));
+
+    double body = (-1./params->theta_e) * exp(-gamma/params->theta_e);
+
+    f = prefactor * body;
+  }
+
+  else if(params->distribution == params->POWER_LAW)
+  {
+    double pl_norm = 4.* params->pi/(normalize_f(params));
+
+    double prefactor = (params->pi * params->nu / (params->mass_electron*params->speed_light*params->speed_light)) 
+                     * (params->electron_density*(params->power_law_p-1.))
+                     /((pow(params->gamma_min, 1.-params->power_law_p) 
+                     - pow(params->gamma_max, 1.-params->power_law_p)));
+
+    double term1 = ((-params->power_law_p-1.)*exp(-gamma/params->gamma_cutoff)
+               *pow(gamma,-params->power_law_p-2.)/(sqrt(gamma*gamma - 1.)));
+
+    double term2 = (exp(-gamma/params->gamma_cutoff) * pow(gamma,(-params->power_law_p-1.))
+                  /(params->gamma_cutoff * sqrt(gamma*gamma - 1.)));
+
+    double term3 = (exp(-gamma/params->gamma_cutoff) * pow(gamma,-params->power_law_p))
+               /pow((gamma*gamma - 1.), (3./2.));
+
+    f = pl_norm * prefactor * (term1 - term2 - term3);
+  }
+
+  else if(params->distribution == params->KAPPA_DIST)
+  {
+    double prefactor = params->electron_density * (1./normalize_f(params)) 
+                       * 4. * params->pi*params->pi * params->nu * params->mass_electron
+                       * params->mass_electron * params->speed_light;
+
+    double term1 = ((- params->kappa - 1.) / (params->kappa * params->kappa_width)) 
+		  * pow((1. + (gamma - 1.)/(params->kappa * params->kappa_width)), -params->kappa-2.);
+
+    double term2 = pow((1. + (gamma - 1.)/(params->kappa * params->kappa_width)),(- params->kappa - 1.)) 
+                    * (- 1./params->gamma_cutoff);
+
+    f = prefactor * (term1 + term2) * exp(-gamma/params->gamma_cutoff);
+  }
+
+    return f;
+}
 
 /////*maxwell_juttner_f: Maxwell-Juttner distribution function in terms of Lorentz 
 //// * factor gamma; uses eq. 47, 49, 50 of [1]
@@ -403,17 +401,17 @@ double gamma_integrand(double gamma, void * paramsGSLInput)
 
     ans = prefactor * func_I;
   }
-//  else if (params->mode == params->ABSORPTIVITY)
-//  {
-//    double prefactor = -  params->speed_light
-//                        * params->electron_charge
-//                        * params->electron_charge 
-//                        / (2. * params->nu);
-//
-//    ans = prefactor*gamma*gamma*beta*differential_of_f(gamma, *params)
-//                *polarization_term(gamma, paramsGSL->n, params)
-//                *(1./(params->nu*beta*fabs(cos(params->observer_angle))));
-//  }
+  else if (params->mode == params->ABSORPTIVITY)
+  {
+    double prefactor = -  params->speed_light
+                        * params->electron_charge
+                        * params->electron_charge 
+                        / (2. * params->nu);
+
+    ans = prefactor*gamma*gamma*beta*differential_of_f(gamma, params)
+                *polarization_term(gamma, paramsGSL->n, params)
+                *(1./(params->nu*beta*fabs(cos(params->observer_angle))));
+  }
 
   return ans;
 }

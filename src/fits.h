@@ -27,6 +27,12 @@ double j_nu_fit(double nu,
                 int distribution, 
                 int polarization
                 );
-
+double alpha_nu_fit(double nu,
+                double magnetic_field,
+                double electron_density,
+                double observer_angle,
+                int distribution,
+                int polarization
+                );
 #endif /* SYMPHONY_FITS_H_ */
 
