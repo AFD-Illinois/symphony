@@ -23,6 +23,8 @@ double j_nu(double nu,
   params.gamma_min          = 1.;
   params.gamma_max          = 100.;
   params.gamma_cutoff       = 100000000000.;
+  params.kappa              = 3.5;
+  params.kappa_width        = 10.;
 
 //  printf("\n POWER_LAW:  %e \n", power_law_f(1.5, &params));
 

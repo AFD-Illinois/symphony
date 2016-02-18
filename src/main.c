@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
   double magnetic_field = 30.;
   double electron_density = 1.;
   double observer_angle = 1.0472;
-  int distribution = 1;
+  int distribution = 0;
   int polarization = 15;
 
   //double nu_c = get_nu_c(params);
@@ -49,9 +49,9 @@ int main(int argc, char *argv[])
     //nu = 5. * index * nu;
 
 //    printf("\n%e	%e	%e", nu, 
-   printf("\n total_ans = %e", j_nu    (nu, magnetic_field, electron_density, 
-                                        observer_angle, distribution, 
-                                        polarization));//, 
+//   printf("\n total_ans = %e", j_nu    (nu, magnetic_field, electron_density, 
+//                                        observer_angle, distribution, 
+//                                        polarization));//, 
 //                               j_nu_fit(nu, magnetic_field, electron_density, 
 //                                        observer_angle, distribution, 
 //                                        polarization));
@@ -63,6 +63,10 @@ int main(int argc, char *argv[])
 
 //   printf("\n%e	%e	%e", nu/nu_c, alpha_nu(nu, B, n_e, obs_angle, dist, pol), 
 //                               alpha_nu_fit(nu, B, n_e, obs_angle, dist, pol));
+
+    alpha_nu(nu, magnetic_field, electron_density,
+             observer_angle, distribution,
+             polarization);
 
 //  }
   printf("\n");
