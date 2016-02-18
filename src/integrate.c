@@ -104,7 +104,7 @@ double gsl_integrate(double min, double max, double n,
 }
 
 //trapezoidal rule integrator, useful while restructuring
-double gtrapezoid(double min, double max, double n,
+double gamma_integral(double min, double max, double n,
                  struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -112,14 +112,35 @@ double gtrapezoid(double min, double max, double n,
   struct parametersGSL paramsGSL;
   paramsGSL.params = *params;
   paramsGSL.n      = n;
+//
+//  printf("\nTRAPEZOID: %e\n", gamma_integrand((max+min)/2., &paramsGSL));
+//
+//  double result = 0.;
+//
+//  result = (max - min) * (gamma_integrand(max, &paramsGSL) 
+//                        + gamma_integrand(min, &paramsGSL))/2.;
+//  
+//  printf("\n trapezoid result = %e", result);
+//  
+//  return result;
 
-  printf("\nTRAPEZOID: %e\n", gamma_integrand((max+min)/2., &paramsGSL));
+  double result, error;
 
-  double result = 0.;
+  gsl_function F;
+  F.function = &gamma_integrand;
+  F.params = &paramsGSL;
 
-  result = (max - min) * (gamma_integrand(max, &paramsGSL) 
-                        + gamma_integrand(min, &paramsGSL))/2.;
+  gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
+
+  gsl_integration_qag(&F, min, max, 0., 1.e-7, 1000,
+                         3,  w, &result, &error); 
+
+  //printf ("result          = %e\n", result);
+
+  gsl_integration_workspace_free (w);
 
   return result;
+
+
 }
 

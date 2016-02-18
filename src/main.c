@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 //  setUserParams(&params);
 
 //set some the parameters
-  double nu = 230e5;
+  double nu = 230e7;
   double magnetic_field = 30.;
   double electron_density = 1.;
   double observer_angle = 1.0472;

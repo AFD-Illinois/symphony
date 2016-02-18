@@ -473,16 +473,14 @@ double gamma_integration_result(double n, void * paramsInput)
   if (params->polarization != params->STOKES_V || params->stokes_v_switch < 0) 
   {
     //result = gsl_integrate(gamma_minus_high, gamma_plus_high, n, params);
-    //printf("\n%e\n", gamma_plus_high);
-    result = gtrapezoid(gamma_minus_high, gamma_plus_high, n, params);
+    result = gamma_integral(gamma_minus_high, gamma_plus_high, n, params);
   }
 
   /*GSL QAG sometimes erroneously gives NaN instead of small values; 
     return 0 instead */
   if(isnan(result) != 0) result = 0.;
 
-//  return result;
-    return 0.;
+  return result;
 }
 
 /////*n_integration: j_nu and alpha_nu are given by an integral over gamma of
@@ -561,11 +559,12 @@ double n_summation(struct parameters *params)
 
   /*perform n summation by summing the result of the gamma integral for 
     each value of n from 1 to n_max*/
-//  for (int n=(int)(n_minus+1.); n <= params->n_max + (int)n_minus ; n++) 
-//  {
+  for (int n=(int)(n_minus+1.); n <= params->n_max + (int)n_minus ; n++) 
+  {
     //ans += gamma_integration_result(n, params);
-     ans += gamma_integration_result(n_minus + params->n_max, params);
-//  }
+    //printf("\n n_summation n is: %e", nu_c);
+     ans += gamma_integration_result(n, params);
+  }
 
   params->stokes_v_switch = 0;
 
@@ -582,5 +581,6 @@ double n_summation(struct parameters *params)
     //ans += n_integration(n_minus, *params);
   }
 
+  printf("\n ans = %e", ans);  
   return ans;
 }
