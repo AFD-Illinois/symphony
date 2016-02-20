@@ -10,18 +10,32 @@ double my_Bessel_dJ(double n, double z);
 double maxwell_juttner_f(double gamma, struct parameters * params);
 double power_law_f(double gamma, struct parameters * params);
 double kappa_f(double gamma, struct parameters * params);
-double j_nu(double nu, 
-            double magnetic_field, 
-            double electron_density,
-            double observer_angle,
-            int distribution,
-            int polarization);
-double alpha_nu(double nu,
+double j_nu(double nu,
             double magnetic_field,
             double electron_density,
             double observer_angle,
             int distribution,
-            int polarization);
+            int polarization,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width);
+double alpha_nu(double nu,
+                double magnetic_field,
+                double electron_density,
+                double observer_angle,
+                int distribution,
+                int polarization,
+                double theta_e,
+                double power_law_p,
+                double gamma_min,
+                double gamma_max,
+                double gamma_cutoff,
+                double kappa,
+                double kappa_width);
 double gamma_integration_result(double n, void * paramsInput);
 double power_law_to_be_normalized(double gamma, void * paramsInput);
 double kappa_to_be_normalized(double gamma, void * paramsInput);

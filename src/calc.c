@@ -5,7 +5,14 @@ double j_nu(double nu,
             double electron_density,
             double observer_angle,
             int distribution,
-            int polarization
+            int polarization,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width
            )
 {
 //fill the struct with values
@@ -18,25 +25,32 @@ double j_nu(double nu,
   params.distribution       = distribution;
   params.polarization       = polarization;
   params.mode               = params.EMISSIVITY;
-  params.theta_e            = 10.; //TODO: PASS THESE IN AS PARAMETERS
-  params.power_law_p        = 3.5;
-  params.gamma_min          = 1.;
-  params.gamma_max          = 100.;
-  params.gamma_cutoff       = 100000000000.;
-  params.kappa              = 3.5;
-  params.kappa_width        = 10.;
+  params.theta_e            = theta_e; //TODO: PASS THESE IN AS PARAMETERS
+  params.power_law_p        = power_law_p;
+  params.gamma_min          = gamma_min;
+  params.gamma_max          = gamma_max;
+  params.gamma_cutoff       = gamma_cutoff;
+  params.kappa              = kappa;
+  params.kappa_width        = kappa_width;
 
 //  printf("\n POWER_LAW:  %e \n", power_law_f(1.5, &params));
 
   return n_summation(&params);
 }
 
-double alpha_nu(double nu, 
-                double magnetic_field, 
+double alpha_nu(double nu,
+                double magnetic_field,
                 double electron_density,
                 double observer_angle,
                 int distribution,
-                int polarization
+                int polarization,
+                double theta_e,
+                double power_law_p,
+                double gamma_min,
+                double gamma_max,
+                double gamma_cutoff,
+                double kappa,
+                double kappa_width
                )
 {
 //fill the struct with values
@@ -49,13 +63,13 @@ double alpha_nu(double nu,
   params.distribution       = distribution;
   params.polarization       = polarization;
   params.mode               = params.ABSORPTIVITY;
-  params.theta_e            = 10.; //TODO: PASS THESE IN AS PARAMETERS
-  params.power_law_p        = 3.5;
-  params.gamma_min          = 1.;
-  params.gamma_max          = 100.;
-  params.gamma_cutoff       = 100000000000.;
-  params.kappa              = 3.5;
-  params.kappa_width        = 10.;
+  params.theta_e            = theta_e;
+  params.power_law_p        = power_law_p;
+  params.gamma_min          = gamma_min;
+  params.gamma_max          = gamma_max;
+  params.gamma_cutoff       = gamma_cutoff;
+  params.kappa              = kappa;
+  params.kappa_width        = kappa_width;
 
   return n_summation(&params);
 }

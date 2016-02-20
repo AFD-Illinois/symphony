@@ -20,19 +20,33 @@ double kappa_I_abs(struct parameters * params);
 double kappa_Q_abs(struct parameters * params);
 double kappa_V_abs(struct parameters * params);
 double check_for_errors(struct parameters * params);
-double j_nu_fit(double nu, 
-                double magnetic_field, 
-                double electron_density, 
-                double observer_angle, 
-                int distribution, 
-                int polarization
-                );
-double alpha_nu_fit(double nu,
+double j_nu_fit(double nu,
                 double magnetic_field,
                 double electron_density,
                 double observer_angle,
                 int distribution,
-                int polarization
+                int polarization,
+                double theta_e,
+                double power_law_p,
+                double gamma_min,
+                double gamma_max,
+                double gamma_cutoff,
+                double kappa,
+                double kappa_width
                 );
+double alpha_nu_fit(double nu,
+                    double magnetic_field,
+                    double electron_density,
+                    double observer_angle,
+                    int distribution,
+                    int polarization,
+                    double theta_e,
+                    double power_law_p,
+                    double gamma_min,
+                    double gamma_max,
+                    double gamma_cutoff,
+                    double kappa,
+                    double kappa_width
+                    );
 #endif /* SYMPHONY_FITS_H_ */
 
