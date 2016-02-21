@@ -1,6 +1,7 @@
 #ifndef SYMPHONY_POWER_LAW_H_
 #define SYMPHONY_POWER_LAW_H_
 #include "../params.h"
+#include "../symphony.h"
 
 double power_law_to_be_normalized(double gamma, void * paramsInput);
 double power_law_f(double gamma, struct parameters * params); 

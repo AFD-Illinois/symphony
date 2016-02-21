@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
   double magnetic_field = 30.;
   double electron_density = 1.;
   double observer_angle = 1.0472;
-  int distribution = 0;
+  int distribution = 1;
   int polarization = 15;
 
   //double nu_c = get_nu_c(params);
@@ -36,9 +36,9 @@ int main(int argc, char *argv[])
 //  printf("\nDIST: %d, MODE: %d, POL: %d", DISTRIBUTION_FUNCTION,
 //		 	                  MODE, POL_MODE);
 
-  double max_nuratio = 1e0;
-  int points_per_pow_10 = 1;
-  int max_index = (int) log10(max_nuratio)*points_per_pow_10;
+//  double max_nuratio = 1e0;
+//  int points_per_pow_10 = 1;
+//  int max_index = (int) log10(max_nuratio)*points_per_pow_10;
 
 //  printf("\nnu/nu_c         ans             fit");
 

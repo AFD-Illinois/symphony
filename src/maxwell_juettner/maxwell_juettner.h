@@ -1,6 +1,7 @@
 #ifndef SYMPHONY_MAXWELL_JUETTNER_H_
 #define SYMPHONY_MAXWELL_JUETTNER_H_
 #include "../params.h"
+#include "../symphony.h"
 
 double maxwell_juttner_f(double gamma, struct parameters * params);
 double differential_of_maxwell_juttner(double gamma, struct parameters * params);
