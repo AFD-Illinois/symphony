@@ -70,6 +70,11 @@ double gamma_integral(double min,
   paramsGSL.params = *params;
   paramsGSL.n      = n;
 
+  if(params->nu/nu_c >= 1.e6)
+  {
+     gsl_set_error_handler_off();//trying this
+  }
+
   double result, error;
 
   gsl_function F;
@@ -93,6 +98,11 @@ double n_integral(double min,
                   struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
+
+  if(params->nu/nu_c >= 1.e6)
+  {
+  gsl_set_error_handler_off();//trying this
+  }
 
   double result, error;
 

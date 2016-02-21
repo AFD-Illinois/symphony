@@ -24,28 +24,28 @@ void setConstParams(struct parameters *params)
 
 }
 
-void setUserParams(struct parameters *params)
-{
-  // USER PARAMS SET BELOW:
-  params->nu               = 230e9; // GHz
-  params->magnetic_field   = 100;   // Gauss
-  params->electron_density = 1;     // g/cc
-  params->observer_angle   = params->pi/3;  // rad  
-  params->distribution     = params->THERMAL;
-  params->polarization     = params->STOKES_I;
-  params->gamma_cutoff     = 1000000000000;
-
-  // Thermal distribution parameters
-  params->theta_e = 10.;
-
-  //power law parameters
-  params->power_law_p = 3.;
-  params->gamma_min   = 1.;
-  params->gamma_max   = 1000.;
-
-  //kappa distribution parameters
-  params->kappa       = 3.5;
-  params->kappa_width = 10.;
-  params->stokes_v_switch = 0.; // TODO: describe: 0: , 1: 
-
-}
+//void setUserParams(struct parameters *params)
+//{
+//  // USER PARAMS SET BELOW:
+//  params->nu               = 230e9; // GHz
+//  params->magnetic_field   = 100;   // Gauss
+//  params->electron_density = 1;     // g/cc
+//  params->observer_angle   = params->pi/3;  // rad  
+//  params->distribution     = params->THERMAL;
+//  params->polarization     = params->STOKES_I;
+//  params->gamma_cutoff     = 1000000000000;
+//
+//  // Thermal distribution parameters
+//  params->theta_e = 10.;
+//
+//  //power law parameters
+//  params->power_law_p = 3.;
+//  params->gamma_min   = 1.;
+//  params->gamma_max   = 1000.;
+//
+//  //kappa distribution parameters
+//  params->kappa       = 3.5;
+//  params->kappa_width = 10.;
+//  params->stokes_v_switch = 0.; // TODO: describe: 0: , 1: 
+//
+//}

@@ -59,6 +59,6 @@ struct parametersGSL
 };
 
 void setConstParams(struct parameters *params);
-void setUserParams(struct parameters *params);
+//void setUserParams(struct parameters *params);
 
 #endif /* SYMPHONY_PARAMS_H_ */

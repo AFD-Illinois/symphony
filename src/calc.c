@@ -387,7 +387,7 @@ double n_integration(double n_minus, struct parameters * params)
       double deriv = derivative(n_start, params);
       if(fabs(deriv) < deriv_tol) delta_n = 100. * delta_n;
 
-      contrib = n_integral(n_start, params->C * n_peak(params), -1, params);
+      contrib = n_integral(n_start, (n_start + delta_n), -1, params);
       ans = ans + contrib;
 
       n_start = n_start + delta_n;

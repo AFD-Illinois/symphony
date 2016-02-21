@@ -21,15 +21,20 @@ int main(int argc, char *argv[])
 {
   struct parameters paramsM;
   setConstParams(&paramsM);
-//  setUserParams(&params);
 
 //set some the parameters
-  //params.nu = 8.397752e+07;
-  paramsM.magnetic_field = 30.;
-  paramsM.electron_density = 1.;
-  paramsM.observer_angle = paramsM.pi/3.;
-  paramsM.distribution = paramsM.THERMAL;
-  paramsM.polarization = paramsM.STOKES_I;
+  paramsM.magnetic_field     = 30.;
+  paramsM.electron_density   = 1.;
+  paramsM.observer_angle     = paramsM.pi/3.;
+  paramsM.distribution       = paramsM.THERMAL;
+  paramsM.polarization       = paramsM.STOKES_I;
+  paramsM.theta_e            = 10.;
+  paramsM.power_law_p        = 3.5;
+  paramsM.gamma_min          = 1.;
+  paramsM.gamma_max          = 1000.;
+  paramsM.gamma_cutoff       = 10000000000.;
+  paramsM.kappa              = 3.5;
+  paramsM.kappa_width        = 10.;
 
   double nu_c = get_nu_c(paramsM);
 
@@ -46,7 +51,6 @@ int main(int argc, char *argv[])
   {
 
     paramsM.nu = pow(10., (double)index/(double)points_per_pow_10) * nu_c;
-//    printf("nu/nu_c = %e\n", paramsM.nu/nu_c);
 
     printf("\n%e	%e	%e", paramsM.nu/nu_c, 
                                      j_nu(paramsM.nu, 
@@ -55,36 +59,28 @@ int main(int argc, char *argv[])
                                           paramsM.observer_angle, 
                                           paramsM.distribution, 
                                           paramsM.polarization,
-                                          10.,3.5,1.,1000.,10000000.,3.5,10.
+                                          paramsM.theta_e,            
+                                          paramsM.power_law_p,        
+                                          paramsM.gamma_min,          
+                                          paramsM.gamma_max,        
+                                          paramsM.gamma_cutoff,      
+                                          paramsM.kappa,              
+                                          paramsM.kappa_width        
                                           ), 
-                                 j_nu_fit(paramsM.nu, 
-                                          paramsM.magnetic_field, 
-                                          paramsM.electron_density, 
-                                          paramsM.observer_angle, 
-                                          paramsM.distribution, 
+                                 j_nu_fit(paramsM.nu,
+                                          paramsM.magnetic_field,
+                                          paramsM.electron_density,
+                                          paramsM.observer_angle,
+                                          paramsM.distribution,
                                           paramsM.polarization,
-                                          10.,3.5,1.,1000.,10000000.,3.5,10.
+                                          paramsM.theta_e,           
+                                          paramsM.power_law_p,       
+                                          paramsM.gamma_min,         
+                                          paramsM.gamma_max,       
+                                          paramsM.gamma_cutoff,     
+                                          paramsM.kappa,             
+                                          paramsM.kappa_width 
                                           ));
-
-//    printf("\n%e\n", j_nu_fit(nu, magnetic_field, electron_density,
-//                              observer_angle, distribution, polarization));
-
-//    printf("EMISS:  %e     %e\n", j_nu(nu, magnetic_field, electron_density,
-//                                       observer_angle, distribution, polarization,
-//                                       10., 3.5, 1., 1000., 100000000., 3.5, 10.),
-//                                 j_nu_fit(nu, magnetic_field, electron_density,
-//                                          observer_angle, distribution, polarization,
-//                                          10., 3.5, 1., 1000., 100000000., 3.5, 10.));
-
-//   printf("\n%e	%e	%e", nu/nu_c, alpha_nu(nu, B, n_e, obs_angle, dist, pol), 
-//                               alpha_nu_fit(nu, B, n_e, obs_angle, dist, pol));
-
-//    printf("ABSORP: %e     %e\n", alpha_nu(nu, magnetic_field, electron_density,
-//                                           observer_angle, distribution, polarization,
-//                                           10., 3.5, 1., 1000., 100000000., 3.5, 10.),
-//                                alpha_nu_fit(nu, magnetic_field, electron_density,
-//                                             observer_angle, distribution, polarization,
-//                                             10., 3.5, 1., 1000., 100000000., 3.5, 10.));
 
   }
   printf("\n");
