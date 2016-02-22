@@ -33,8 +33,6 @@ double j_nu(double nu,
   params.kappa              = kappa;
   params.kappa_width        = kappa_width;
 
-//  distribution_function(1.5, &params);
-
   return n_summation(&params);
 }
 
@@ -233,12 +231,7 @@ double gamma_integrand(double gamma, void * paramsGSLInput)
   struct parametersGSL * paramsGSL = (struct parametersGSL*) paramsGSLInput;
   struct parameters * params       = &(paramsGSL->params);
 
-//  double nu_c = get_nu_c(*params);  \apparently this is unused
-
   double beta = sqrt(1. - 1./(gamma*gamma));
-
-//  double cos_xi = (gamma * params->nu - paramsGSL->n * nu_c)  //apparently this is unused
-//                 /(gamma * params->nu * beta * cos(params->observer_angle));
 
   double func_I = 
       (2. * params->pi * pow(params->electron_charge * params->nu, 2.) )
