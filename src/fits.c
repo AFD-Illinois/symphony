@@ -2,11 +2,6 @@
 
 /*fitting formulae*/
 
-
-//double B;
-//double n_e;
-//double obs_angle;
-//
 ///*wrapper for emissivity fitting formulae; takes in arguments nu, B, n_e, 
 //  and observer angle theta*/
 double j_nu_fit(double nu,
@@ -23,10 +18,6 @@ double j_nu_fit(double nu,
                 double kappa,
                 double kappa_width)
 {
-//  B = B_temp;
-//  n_e = n_e_temp;
-//  obs_angle = obs_angl_temp;
-
 //fill the struct with values
   struct parameters params;
   setConstParams(&params);

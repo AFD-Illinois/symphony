@@ -59,7 +59,7 @@ target_link_libraries(symphony maxwell_juettner power_law kappa
                       ${CBLAS_LIBRARIES})
 
 cython_add_module(symphonyPy symphonyPy.pyx calc.c integrate.c bessel_mod.c
-  params.c params.h)
+  params.c params.h fits.c fits.h)
 target_link_libraries(symphonyPy kappa power_law maxwell_juettner
   ${GSL_LIBRARIES} ${CBLAS_LIBRARIES})
 
