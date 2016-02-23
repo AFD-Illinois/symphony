@@ -235,7 +235,7 @@ void  set_At( double At[BESSEL_EPSILON_ORDER] )
 double BesselJ_Meissel_First( double n, double x ) 
 {
   double U, Z, eps, ninv, fn, z, Vsum1, Vsum2, exp_val, factor, exp2, invZp1; 
-  double t1, t2, t3, retval, loggamma_exp, sqrt_2;
+  double t1, t2, t3, retval, loggamma_exp;
 
   fn =  n ; 
   z = x/fn;

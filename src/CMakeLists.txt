@@ -39,8 +39,12 @@ find_library(MATH_LIBRARIES m REQUIRED)
 # External packages
 find_package(GSL REQUIRED)
 find_package(CBLAS REQUIRED)
+find_package(Cython REQUIRED)
+find_package(NumPy REQUIRED)
 
-include_directories(${GSL_INCLUDE_DIRS})
+include(UseCython)
+
+include_directories(${GSL_INCLUDE_DIRS}  ${PYTHON_NUMPY_INCLUDE_DIR} .)
 
 add_subdirectory(maxwell_juettner)
 add_subdirectory(power_law)
@@ -54,6 +58,11 @@ target_link_libraries(symphony maxwell_juettner power_law kappa
                       ${GSL_LIBRARIES}
                       ${CBLAS_LIBRARIES})
 
+cython_add_module(symphonyPy symphonyPy.pyx calc.c integrate.c bessel_mod.c
+  params.c params.h)
+target_link_libraries(symphonyPy kappa power_law maxwell_juettner
+  ${GSL_LIBRARIES} ${CBLAS_LIBRARIES})
+
 message("")
 message("#################")
 message("# Build options #")
@@ -63,4 +72,6 @@ message("C Compiler       : " ${CMAKE_C_COMPILER})
 message("C_FLAGS          : " ${CMAKE_C_FLAGS})
 message("GSL Libraries    : " ${GSL_LIBRARIES})
 message("CBLAS Libraries  : " ${CBLAS_LIBRARIES})
+message("NumPy dir        : " ${PYTHON_NUMPY_INCLUDE_DIR})
+message("Cython           : " ${CYTHON_EXECUTABLE})
 message("")
