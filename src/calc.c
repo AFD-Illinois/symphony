@@ -164,13 +164,14 @@ double n_peak(struct parameters * params)
 
   double beta = 0.;
 
-  if (params->nu <= nu_c * params->theta_e*params->theta_e || params->theta_e < 1.) 
+  if (params->nu <= nu_c * params->theta_e * params->theta_e 
+      || params->theta_e < 1.) /*beta low nu limit*/
   {
-    beta = sqrt((1. - 1./pow((1. + params->theta_e),2.))); //beta in low nu limit
+    beta = sqrt((1. - 1./pow((1. + params->theta_e),2.)));
   }
-  else 
+  else /*beta high nu limit */
   {
-    beta = sqrt(1. - pow((2. * params->theta_e * params->nu / nu_c), -2./3.));//beta for high nu
+    beta = sqrt(1. - pow((2. * params->theta_e * params->nu / nu_c), -2./3.));
   }
   
   double n_peak =  (params->theta_e + 1. + pow((2. * params->theta_e * params->nu / nu_c),1./3.))
@@ -180,36 +181,39 @@ double n_peak(struct parameters * params)
 }
 
 /*polarization_term: term in the gamma integrand that varies based upon the 
- *polarization mode; uses eq. 13-19, 22-25, 27-30, in [1]
+ *                   Stokes parameter; this term is denoted K_S in [1],
+ *                   eq. 3 and 12.  The functional form K_S takes is
+ *                   described in eq. 4-7 of [1].
  *
- *@param gamma: Input, Lorentz factor 
- *@param n: Input, index n of sum (synchrotron harmonic number)
- *@param nu: Input, frequency of emission/absorption
- *@returns: piece of gamma integrand that determines polarization mode 
+ *@params: Lorentz factor gamma, harmonic number n,
+ *         struct of parameters params 
+ *@returns: result of evaluating term K_S (the term dependent on Stokes
+ *          parameter) in the gamma integrand. 
  */
 double polarization_term(double gamma, double n,
                          struct parameters * params
                         ) 
 {
-  /*below calculation is described in Section 3.1 of [1]*/
+  /*below calculation is described in Section 2 of [1]*/
   
   double nu_c = get_nu_c(*params);
 
   double beta = sqrt(1. - 1./(gamma*gamma));
 
-  // TODO: Describe cos_xi angle
+  /*xi = the angle between the electron velocity vector and the magnetic
+         field vector */
   double cos_xi =   (gamma * params->nu - n * nu_c)
-		              / ( gamma * params->nu * beta 
+		  / ( gamma * params->nu * beta 
                      * cos(params->observer_angle)
                     );
 
   double M = (cos(params->observer_angle) - beta * cos_xi)
-             /sin(params->observer_angle);
+             / sin(params->observer_angle);
 
   double N = beta * sqrt(1 - (cos_xi*cos_xi));
 
   double z = (params->nu * gamma * beta * sin(params->observer_angle) 
-       * sqrt(1. - cos_xi*cos_xi))/nu_c;
+              * sqrt(1. - cos_xi*cos_xi))/nu_c;
 
   double K_xx = M*M * pow(my_Bessel_J(n, z), 2.);
 
@@ -240,19 +244,23 @@ double polarization_term(double gamma, double n,
   return ans;
 }
 
-/*differential_of_f: term in gamma integrand only for absorptivity calculation; 
- *it is the differential Df = 2\pi\nu (1/(mc)*d/dgamma + (beta cos(theta)
- * -cos(xi))/(p*beta*c) * d/d(cos(xi))) f 
- *this is eq. 41 of [1]
- *below it is applied for the MAXWELL_JUETTNER, POWER_LAW, and KAPPA_DIST 
- *distributions
- *@param gamma: Input, Lorentz factor
- *@param nu: Input, frequency of emission/absorption
- *@returns: Output, Df term in gamma integrand; depends on distribution function
+/*differential_of_f: The absorptivity integrand ([1] eq. 12) has a term 
+ *                   dependent on a differential operator ([1] eq. 13) 
+ *                   applied to the distribution function. This function
+ *                   calls each individual differential, evaluated 
+ *                   analytically, for the 3 distributions studied. 
+ *                   These are evaluated analytically for speed, but
+ *                   a calculator to evaluate this differential without
+ *                   the analytic result is also provided. This calculator
+ *                   works with any gyrotropic distribution function. TODO: add this.
+ * 
+ *@params: Lorentz factor gamma, struct of parameters params
+ *@returns: differential of the distribution function term in the gamma
+ *          integrand.  
  */
 double differential_of_f(double gamma, struct parameters * params) 
 {
-  /*described in Section 3 of [1] */
+  /*described in Section 2 of [1] */
 
   double Df = 0.;
 
@@ -272,12 +280,20 @@ double differential_of_f(double gamma, struct parameters * params)
   return Df;
 }
 
-/*gamma_integrand: full gamma integrand, to be integrated from gamma_minus
- * to gamma_plus, set by eq. 64 of [1]
- *@param gamma: Lorentz factor
- *@param *params: void pointer to struct parameters, which contains
- * n (harmonic number) and nu (frequency of emission/absorption)
- *@returns: Output, integrand to be integrated by gamma_integration_result()
+/*gamma_integrand: full gamma integrand (eq. 3, 12 of [1]) with the summation
+ *                 moved outside the integral and the delta function evaluated
+ *                 by setting eq. 10 of [1] to zero. Also, d^3p is converted
+ *                 to coordinates gamma (Lorentz factor), xi (angle between 
+ *                 electron velocity vector and magnetic field vector), 
+ *                 and phi (gyrophase).
+ *
+ *@params: Lorentz factor gamma, 
+ *         void pointer to paramsGSLInput (struct of params similar to
+ *         parameters, except also contains harmonic number n.  This is 
+ *         necessary because the gamma integral is moved inside the n
+ *         summation in order to get a smooth integrand.)
+ *returns: gamma integrand, which still needs to be integrated over
+ *         gamma and then summed over n.
  */
 double gamma_integrand(double gamma, void * paramsGSLInput)
 {
@@ -317,22 +333,23 @@ double gamma_integrand(double gamma, void * paramsGSLInput)
   return ans;
 }
 
-/*gamma_integration_result: performs gamma integral from gamma_minus to 
- * gamma_plus; calls gsl_integrate(), which is a wrapper for the GSL integrator
- * GSL QAG.
- *@param n: Input, harmonic number and index of sum n
- *@param *params: void pointer to struct parameters, which contains
- * n (harmonic number) and nu (frequency of emission/absorption)
- *@returns: Output, result of integral over gamma
+/*gamma_integration_result: integrates gamma_integrand() from gamma_minus to
+ *                          gamma_plus (described in section 4.1 of [1]).
+ *                          Calls the function gamma_integral() in file
+ *                          integrate.c, which is a wrapper for the GSL
+ *                          integrator QAG.
+ *
+ *@params: harmonic number n, 
+ *         void pointer to struct of parameters paramsInput
+ *@returns: result of integrating the gamma integrand over gamma.  Note that
+ *          this still remains to be summed over n.
  */
 double gamma_integration_result(double n, void * paramsInput)
 {
-  /*This evaluates the gamma integral*/
   struct parameters * params = (struct parameters*) paramsInput;
 
   double nu_c = get_nu_c(*params);
 
-  /* Eqn () in Leung et. al. */
   double gamma_minus =  
     (   (n*nu_c)/params->nu - fabs(cos(params->observer_angle))
       * sqrt(  pow((n*nu_c)/params->nu, 2.)
@@ -392,27 +409,35 @@ double gamma_integration_result(double n, void * paramsInput)
   return result;
 }
 
-/*n_integration: j_nu and alpha_nu are given by an integral over gamma of
- * an integrand that contains a sum over n; we do the integral over gamma
- * and then the sum over n.  For numerical accuracy and speed, we only sum up
- * to n = n_max = 30, and integrate from n_max to the point where our integral
- * stops giving appreciable contributions.  n_integration() does the n integral.
- *@params n_minus: Input, minimum n for which the integrand is real
- *@params nu: Input, frequency of absorption/emission
- *@returns: Output, result of integration over n
+/*n_integration: j_nu() and alpha_nu() are given by an integral over gamma of
+ *               an integrand that contains a sum over n; we do the integral 
+ *               over gamma and then the sum over n.  For numerical accuracy 
+ *               and speed, we only sum up to n = n_max = 30, and integrate 
+ *               from n_max to the point where our integral stops giving 
+ *               appreciable contributions.  n_integration() performs the
+ *               n integral by calling n_integral(), in integrate.c, which
+ *               is a wrapper for GSL's QAG integrator.
+ *
+ *@params: n_minus is minimum n for which the integrand is real,
+ *         struct of parameters params
+ *@returns: result of integral over n, evaluated adaptively from n_minus until the integral
+ *          contributions become approximately negligible.
  */
 double n_integration(double n_minus, struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
 
-  /* TODO: Describe why an if/else */
+  /*For the MAXWELL_JUETTNER distribution, the n-space peak location is known
+    analytically; this speeds up evaluation of MAXWELL_JUETTNER until
+    nu/nu_c = 1e6, where the approximation breaks down and the adaptive 
+    procedure works better.*/
   if (params->distribution == params->MAXWELL_JUETTNER && params->nu/nu_c < 1e6) 
   {
     double n_start = (int)(params->n_max + n_minus + 1.);
     double ans = n_integral(n_start, params->C * n_peak(params), -1, params);
     return ans;
   }
-  else 
+  else /*For other distributions, the n-space peak is found adaptively. */
   {
     double n_start = (int)(params->n_max + n_minus + 1.);
     double ans = 0.;
@@ -444,10 +469,12 @@ double n_integration(double n_minus, struct parameters * params)
 }
 
 /*n_summation: performs the sum over n (harmonic number) from n = 1 to value 
- * n_max = 30, set heuristically in [1].  Past n_max we integrate over n using
- * n_integration().
- *@param nu: Input, frequency of absorption/emission
- *@returns: j_nu or alpha_nu, the emissivity or absorptivity, respectively
+ *             n_max = 30, set heuristically in [2].  Past n_max we integrate 
+ *             over n using n_integration().
+ *
+ *@params: struct of parameters params
+ *@returns: j_nu or alpha_nu, the emissivity or absorptivity, respectively,
+ *          depending if the user has called j_nu() or alpha_nu().
  */
 double n_summation(struct parameters *params)
 {
@@ -463,7 +490,7 @@ double n_summation(struct parameters *params)
   double n_minus = (params->nu/nu_c) * fabs(sin(params->observer_angle)); 
 
   //need 2 separate n integrations to numerically resolve STOKES_V
-  params->stokes_v_switch = -1; // TODO: describe: 0: , 1: 
+  params->stokes_v_switch = -1; // TODO: describe: -1: , 1: 
 
   /*perform n summation by summing the result of the gamma integral for 
     each value of n from 1 to n_max*/
