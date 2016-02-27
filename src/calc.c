@@ -84,7 +84,7 @@ double distribution_function(double gamma, struct parameters * params)
 {
   if(params->distribution == params->THERMAL)
   {
-    return maxwell_juttner_f(gamma, params);
+    return maxwell_juettner_f(gamma, params);
   }
   else if(params->distribution == params->POWER_LAW)
   {
@@ -205,7 +205,7 @@ double differential_of_f(double gamma, struct parameters * params)
 
   if(params->distribution == params->THERMAL)
   {
-    Df = differential_of_maxwell_juttner(gamma, params);
+    Df = differential_of_maxwell_juettner(gamma, params);
   }
   else if(params->distribution == params->POWER_LAW)
   {

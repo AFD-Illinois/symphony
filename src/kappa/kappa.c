@@ -12,12 +12,15 @@ double kappa_to_be_normalized(double gamma, void * paramsInput)
 {
   struct parameters params = *(struct parameters*) paramsInput;
 
-  double kappa_body = pow((1. + (gamma - 1.)/(params.kappa * params.kappa_width)), -params.kappa-1);
+  double kappa_body = pow((1. + (gamma - 1.)
+                           /(params.kappa * params.kappa_width)), 
+                          -params.kappa-1);
 
   double cutoff = exp(-gamma/params.gamma_cutoff);
 
-  double norm_term = 4. * params.pi * pow(params.mass_electron, 3.) * pow(params.speed_light, 3.) 
-                   * gamma * sqrt(gamma*gamma-1.);
+  double norm_term = 4. * params.pi * pow(params.mass_electron, 3.) 
+                     * pow(params.speed_light, 3.) 
+                     * gamma * sqrt(gamma*gamma-1.);
 
   double ans = kappa_body * cutoff * norm_term;
 
@@ -45,16 +48,20 @@ double kappa_f(double gamma, struct parameters * params)
 
 double differential_of_kappa(double gamma, struct parameters * params) 
 {
-  // TODO: Follow equation formatting
   double prefactor = params->electron_density * (1./normalize_f(params)) 
-                     * 4. * params->pi*params->pi * params->nu * params->mass_electron
-                     * params->mass_electron * params->speed_light;
+                     * 4. * params->pi*params->pi * params->nu 
+                     * params->mass_electron * params->mass_electron 
+                     * params->speed_light;
 
-  double term1 = ((- params->kappa - 1.) / (params->kappa * params->kappa_width)) 
-	  * pow((1. + (gamma - 1.)/(params->kappa * params->kappa_width)), -params->kappa-2.);
+  double term1 = ((- params->kappa - 1.) 
+                  / (params->kappa * params->kappa_width)) 
+                * pow((1. + (gamma - 1.) 
+                      / (params->kappa * params->kappa_width)), 
+                      -params->kappa-2.);
 
-  double term2 = pow((1. + (gamma - 1.)/(params->kappa * params->kappa_width)),(- params->kappa - 1.)) 
-                  * (- 1./params->gamma_cutoff);
+  double term2 = pow((1. + (gamma - 1.)
+                     /(params->kappa * params->kappa_width)), 
+                     (- params->kappa - 1.)) * (- 1./params->gamma_cutoff);
 
   double Df = prefactor * (term1 + term2) * exp(-gamma/params->gamma_cutoff);
 

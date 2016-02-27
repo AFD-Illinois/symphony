@@ -1,11 +1,11 @@
 #include "maxwell_juettner.h"
 
-/*maxwell_juttner_f: Maxwell-Juttner distribution function in terms of Lorentz 
+/*maxwell_juettner_f: Maxwell-Juettner distribution function in terms of Lorentz 
  * factor gamma; uses eq. 47, 49, 50 of [1]
  *@param gamma: Input, Lorentz factor
  *@returns: THERMAL distribution function, which goes into the gamma integrand 
  */
-double maxwell_juttner_f(double gamma, struct parameters * params) 
+double maxwell_juettner_f(double gamma, struct parameters * params) 
 {
   double beta = sqrt(1. - 1./(gamma*gamma));
 
@@ -25,14 +25,15 @@ double maxwell_juttner_f(double gamma, struct parameters * params)
   return ans;
 }
 
-double differential_of_maxwell_juttner(double gamma, struct parameters * params)
+double differential_of_maxwell_juettner(double gamma, struct parameters * params)
 {
   double Df = 0.;
 
-  // TODO: Follow equation formatting
   double prefactor = (params->pi * params->nu 
-                   / (params->mass_electron*params->speed_light*params->speed_light)) 
-	     * (params->electron_density/(params->theta_e * gsl_sf_bessel_Kn(2, 1./params->theta_e)));
+                   / (params->mass_electron
+                      *params->speed_light*params->speed_light)) 
+	     * (params->electron_density
+                /(params->theta_e * gsl_sf_bessel_Kn(2, 1./params->theta_e)));
 
   double body = (-1./params->theta_e) * exp(-gamma/params->theta_e);
 

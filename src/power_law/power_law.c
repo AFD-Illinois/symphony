@@ -77,11 +77,13 @@ double differential_of_power_law(double gamma, struct parameters * params)
   double term1 = ((-params->power_law_p-1.)*exp(-gamma/params->gamma_cutoff)
              *pow(gamma,-params->power_law_p-2.)/(sqrt(gamma*gamma - 1.)));
 
-  double term2 = (exp(-gamma/params->gamma_cutoff) * pow(gamma,(-params->power_law_p-1.))
-                /(params->gamma_cutoff * sqrt(gamma*gamma - 1.)));
+  double term2 = (exp(-gamma/params->gamma_cutoff) 
+                  * pow(gamma,(-params->power_law_p-1.))
+                  /(params->gamma_cutoff * sqrt(gamma*gamma - 1.)));
 
-  double term3 = (exp(-gamma/params->gamma_cutoff) * pow(gamma,-params->power_law_p))
-             /pow((gamma*gamma - 1.), (3./2.));
+  double term3 = (exp(-gamma/params->gamma_cutoff) 
+                  * pow(gamma,-params->power_law_p))
+                 /pow((gamma*gamma - 1.), (3./2.));
 
   double Df = pl_norm * prefactor * (term1 - term2 - term3);
 

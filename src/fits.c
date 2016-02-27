@@ -37,14 +37,14 @@ double j_nu_fit(double nu,
   params.kappa_width        = kappa_width;
 
 
-//  check_for_errors(params);
+//  check_for_errors(params); TODO: fix this
   
  if(params.distribution == params.THERMAL)
   {
-    if     (params.polarization == params.STOKES_I) return thermal_I(&params); 
-    else if(params.polarization == params.STOKES_Q) return thermal_Q(&params);
+    if     (params.polarization == params.STOKES_I) return maxwell_juettner_I(&params); 
+    else if(params.polarization == params.STOKES_Q) return maxwell_juettner_Q(&params);
     else if(params.polarization == params.STOKES_U) return 0.;
-    else if(params.polarization == params.STOKES_V) return thermal_V(&params);
+    else if(params.polarization == params.STOKES_V) return maxwell_juettner_V(&params);
   }
 
   else if(params.distribution == params.POWER_LAW)
@@ -104,10 +104,10 @@ double alpha_nu_fit(double nu,
 
   if(params.distribution == params.THERMAL)
   {
-    if     (params.polarization == params.STOKES_I) return thermal_I_abs(&params);
-    else if(params.polarization == params.STOKES_Q) return thermal_Q_abs(&params);
+    if     (params.polarization == params.STOKES_I) return maxwell_juettner_I_abs(&params);
+    else if(params.polarization == params.STOKES_Q) return maxwell_juettner_Q_abs(&params);
     else if(params.polarization == params.STOKES_U) return 0.;
-    else if(params.polarization == params.STOKES_V) return thermal_V_abs(&params);
+    else if(params.polarization == params.STOKES_V) return maxwell_juettner_V_abs(&params);
   }
 
   else if(params.distribution == params.POWER_LAW)
