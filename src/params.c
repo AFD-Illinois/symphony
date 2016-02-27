@@ -1,5 +1,14 @@
 #include "params.h"
 
+/*setConstParams: sets values of constant parameters used throughout
+ *                the calculation, such as pi or the charge of an 
+ *                electron (in CGS units).  Also sets valeus of 
+ *                the keys for the distribution, emissivity/
+ *                absorptivity, and Stokes parameter.
+ *
+ *@params: struct of parameters params
+ *@returns: sets values of constant parameters.
+ */
 void setConstParams(struct parameters *params)
 {
   params->pi               = 3.1415926535897932384;
