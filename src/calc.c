@@ -378,7 +378,7 @@ double n_integration(double n_minus, struct parameters * params)
       contributions greater than tolerance */
     while (fabs(contrib) >= fabs(ans/tolerance)) 
     {
-      double deriv = derivative(n_start, params);
+      double deriv = derivative_of_n(n_start, params);
       if(fabs(deriv) < deriv_tol) delta_n = 100. * delta_n;
 
       contrib = n_integral(n_start, (n_start + delta_n), -1, params);

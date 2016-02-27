@@ -5,8 +5,7 @@
  *@param n_start: Input, value of n at which the derivative is to be performed
  *@param nu: Input, frequency of absorption/emission
  */
-/* TODO: Change name to derivative_of_n */
-double derivative(double n_start, struct parameters * params)
+double derivative_of_n(double n_start, struct parameters * params)
 {
   gsl_function F;
   double result;

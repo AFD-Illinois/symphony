@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
   paramsM.magnetic_field     = 30.;
   paramsM.electron_density   = 1.;
   paramsM.observer_angle     = paramsM.pi/3.;
-  paramsM.distribution       = paramsM.KAPPA_DIST;
+  paramsM.distribution       = paramsM.POWER_LAW;
   paramsM.polarization       = paramsM.STOKES_I;
   paramsM.theta_e            = 10.;
   paramsM.power_law_p        = 3.5;
@@ -37,9 +37,6 @@ int main(int argc, char *argv[])
   paramsM.kappa_width        = 10.;
 
   double nu_c = get_nu_c(paramsM);
-
-//  printf("\nDIST: %d, MODE: %d, POL: %d", DISTRIBUTION_FUNCTION,
-//		 	                  MODE, POL_MODE);
 
   double max_nuratio = 1e6;
   int points_per_pow_10 = 1;
