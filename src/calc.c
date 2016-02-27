@@ -1,5 +1,21 @@
 #include "symphony.h"
 
+//TODO: fix all descriptions of functions
+
+/*j_nu: wrapper for the emissivity calculation; takes in values of all
+ *      necessary paramters and sets a struct of parameters using the input
+ *      values.  It then passes this struct to n_summation(), which begins
+ *      the emissivity calculation.
+ *
+ *@params: nu, magnetic_field, electron_density, observer_angle,
+ *         distribution, polarization, theta_e, power_law_p,
+ *         gamma_min, gamma_max, gamma_cutoff, kappa, 
+ *         kappa_width
+ *
+ *@returns: n_summation(&params), which takes the struct of 
+ *          parameters (now populated with values) and 
+ *          performs the integration to evaluate j_nu().
+ */
 double j_nu(double nu, 
             double magnetic_field, 
             double electron_density,
@@ -15,7 +31,7 @@ double j_nu(double nu,
             double kappa_width
            )
 {
-//fill the struct with values
+/*fill the struct with values*/
   struct parameters params;
   setConstParams(&params);
   params.nu                 = nu;
@@ -36,6 +52,21 @@ double j_nu(double nu,
   return n_summation(&params);
 }
 
+/*alpha_nu: wrapper for the absorptivity calculation; takes in values of all
+ *          necessary paramters and sets a struct of parameters using the input
+ *          values.  It then passes this struct to n_summation(), which begins
+ *          the absorptivity calculation.
+ *
+ *@params: nu, magnetic_field, electron_density, observer_angle,
+ *         distribution, polarization, theta_e, power_law_p,
+ *         gamma_min, gamma_max, gamma_cutoff, kappa, 
+ *         kappa_width
+ *
+ *@returns: n_summation(&params), which takes the struct of 
+ *          parameters (now populated with values) and 
+ *          performs the integration to evaluate alpha_nu().
+ */
+
 double alpha_nu(double nu,
                 double magnetic_field,
                 double electron_density,
@@ -51,7 +82,7 @@ double alpha_nu(double nu,
                 double kappa_width
                )
 {
-//fill the struct with values
+/*fill the struct with values*/
   struct parameters params;
   setConstParams(&params);
   params.nu                 = nu;
@@ -72,14 +103,30 @@ double alpha_nu(double nu,
   return n_summation(&params);
 }
 
-//TODO: Describe the function
+/*get_nu_c: takes in values of electron_charge, magnetic_field, mass_electron,
+ *          and speed_light, and returns the cyclotron frequency nu_c.  
+ * 
+ *@params:  struct parameters params, contains parameters mentioned above
+ *@returns: cyclotron frequency, nu_c, for the provided parameters
+ */
 double get_nu_c(struct parameters params)
 {
   return  (params.electron_charge * params.magnetic_field)
         / (2. * M_PI * params.mass_electron * params.speed_light);
 }
 
-//TODO: Describe the function
+/*distribution_function: wrapper for the electron momentum-space distribution
+ *                       function.  The value of params->distribution 
+ *                       determines which distribution function is called.
+ *                       The procedure to add a new gyrotropic distribution
+ *                       function is outlined in the README. TODO: README
+ *
+ *@params: electron Lorentz factor gamma, struct parameters * params
+ *         described above
+ *@returns: the selected distribution function, evaluated at the 
+ *          input Lorentz factor gamma, for the parameters set in
+ *          params.
+ */
 double distribution_function(double gamma, struct parameters * params)
 {
   if(params->distribution == params->MAXWELL_JUETTNER)
@@ -99,12 +146,17 @@ double distribution_function(double gamma, struct parameters * params)
 }
 
 
-/*n_peak: gives the location of the peak of the n integrand for 
- *the MAXWELL_JUETTNER distribution; uses Eq. 68 in [1]
+/*n_peak: Calculates and returns the location of the peak of the n integrand for 
+ *        the MAXWELL_JUETTNER distribution; uses Eq. 68 in [2] to do this. 
+ *        This analytic estimate of peak location in n-space speeds up the 
+ *        evaluation of j_nu() and alpha_nu() for the MAXWELL_JUETTNER 
+ *        distribution.  Analytic locations of the peak in n-space for
+ *        other distributions are not known, so peak locations are found
+ *        adaptively in n_integration().
  *
- *@param nu: Input, frequency of emission/absorption
- *@returns n_peak: Output, location of integrand's peak for the 
- * n-integral for the MAXWELL_JUETTNER distribution 
+ *@params: struct of parameters params
+ *@returns: location of the peak of the n integrand for the 
+ *          MAXWELL_JUETTNER distribution 
  */
 double n_peak(struct parameters * params)
 {

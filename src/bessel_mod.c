@@ -1,3 +1,5 @@
+/*TODO: cite Leung et. al for this; note that it is modified */
+
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_sf_gamma.h>

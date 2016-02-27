@@ -1,20 +1,18 @@
 /* Symphony
  * by Alex Pandya, Zhaowei Zhang
- * 6/30/15
+ * 2/26/2016
  *
  *References:
- * 1) Leung, Gammie, and Noble (2011)
- * 2) Xiao (2006)
-*/
+ * 1) Pandya, Zhang, Chandra, Gammie (Accepted to ApJ 2016)
+ * 2) Leung, Gammie, and Noble (2011)
+ * 3) Xiao (2006)
+ */
 
 #include "symphony.h"
 
-/* main: defines nu_c (cyclotron frequency) and loops through values of nu, 
- * to give output absorptivity or emissivity vs. nu/nu_c; can also be modified
- * to give abs/emiss as a function of its other parameters, like obs. angle
- *
- * The distribution function, polarization mode, and emissivity/absorptivity
- * must all be set in the file symphony.h; parameters can be set in params.h
+/* main: runs through a demo of symphony's capabilities; currently
+ * sets parameters to sample values and outputs nu/nu_c 
+ * (where nu_c is the cyclotron frequency) vs. j_nu(). 
  */
 
 int main(int argc, char *argv[]) 
