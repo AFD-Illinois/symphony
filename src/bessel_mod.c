@@ -1,4 +1,12 @@
-/*TODO: cite Leung et. al for this; note that it is modified */
+/*bessel_mod.c: A fast bessel function calculator, useful for evaluating
+ *              bessel functions J(n, z) and J'(n, z) for large n. Adapted
+ *              with permission from Leung, Gammie, and Noble (2011).
+ *
+ * References:
+ * [1] Pandya, Zhang, Chandra, Gammie (Accepted to ApJ 2016)
+ * [2] Leung, Gammie, and Noble (2011)
+ * [3] Xiao (2006)
+ */
 
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_spline.h>

@@ -1,9 +1,22 @@
 #include "symphony.h"
 
-/*fitting formulae*/
+/*Wrappers for the fitting formulae*/
 
-///*wrapper for emissivity fitting formulae; takes in arguments nu, B, n_e, 
-//  and observer angle theta*/
+/*j_nu_fit: wrapper for the emissivity fitting formulae.  Takes in the
+ *          same parameters as j_nu(), populates the struct of 
+ *          parameters, and passes them to the fitting formulae.  The
+ *          fitting formulae for each distribution function are located
+ *          in their corresponding folders, so for example the
+ *          KAPPA_DIST fitting formulae are located in the kappa folder,
+ *          in the file kappa_fits.c
+ *
+ *@params: nu, magnetic_field, electron_density, observer_angle,
+ *         distribution, polarization, theta_e, power_law_p,
+ *         gamma_min, gamma_max, gamma_cutoff, kappa, 
+ *         kappa_width 
+ *@returns: the corresponding fitting formula (based on the distribution
+ *          function) evaluated for the input parameters.
+*/
 double j_nu_fit(double nu,
                 double magnetic_field,
                 double electron_density,
@@ -18,7 +31,7 @@ double j_nu_fit(double nu,
                 double kappa,
                 double kappa_width)
 {
-//fill the struct with values
+/*fill the struct with values*/
   struct parameters params;
   setConstParams(&params);
   params.nu                 = nu;
@@ -66,8 +79,22 @@ double j_nu_fit(double nu,
   return 0.;
 }
 
-///*wrapper for the absorptivity fitting formulae; takes in nu, B, n_e, and 
-//  observer angle theta*/
+/*alpha_nu_fit: wrapper for the absorptivity fitting formulae.  Takes in the
+ *              same parameters as alpha_nu(), populates the struct of 
+ *              parameters, and passes them to the fitting formulae.  The
+ *              fitting formulae for each distribution function are located
+ *              in their corresponding folders, so for example the
+ *              KAPPA_DIST fitting formulae are located in the kappa folder,
+ *              in the file kappa_fits.c
+ *
+ *@params: nu, magnetic_field, electron_density, observer_angle,
+ *         distribution, polarization, theta_e, power_law_p,
+ *         gamma_min, gamma_max, gamma_cutoff, kappa, 
+ *         kappa_width 
+ *@returns: the corresponding fitting formula (based on the distribution
+ *          function) evaluated for the input parameters.
+*/
+
 double alpha_nu_fit(double nu,
                     double magnetic_field,
                     double electron_density,
@@ -82,7 +109,7 @@ double alpha_nu_fit(double nu,
                     double kappa,
                     double kappa_width)
 {
-//fill the struct with values
+/*fill the struct with values*/
   struct parameters params;
   setConstParams(&params);
   params.nu                 = nu;
@@ -129,6 +156,15 @@ double alpha_nu_fit(double nu,
   return 0.;
 }
 
+/*check_for_errors: takes in struct of parameters and checks the provided
+ *                  user inputs for values that are not physical or are 
+ *                  outside of the limits of validity for the fitting 
+ *                  formulae.
+ *
+ *@params: struct of parameters params
+ *@returns: prints error messages or quits if disallowed values
+ *          (such as magnitude of magnetic field < 0) are entered.
+ */
 double check_for_errors(struct parameters * params)
 {
 
