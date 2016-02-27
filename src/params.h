@@ -15,7 +15,7 @@ struct parameters
   double n_max;
   int    C;       
   // Keys for the distributions
-  int    THERMAL;
+  int    MAXWELL_JUETTNER;
   int    POWER_LAW;
   int    KAPPA_DIST;
   // Keys for the polarization modes

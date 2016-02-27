@@ -39,7 +39,7 @@ double j_nu_fit(double nu,
 
 //  check_for_errors(params); TODO: fix this
   
- if(params.distribution == params.THERMAL)
+ if(params.distribution == params.MAXWELL_JUETTNER)
   {
     if     (params.polarization == params.STOKES_I) return maxwell_juettner_I(&params); 
     else if(params.polarization == params.STOKES_Q) return maxwell_juettner_Q(&params);
@@ -102,7 +102,7 @@ double alpha_nu_fit(double nu,
 
 //  check_for_errors(nu, B, n_e, obs_angle);
 
-  if(params.distribution == params.THERMAL)
+  if(params.distribution == params.MAXWELL_JUETTNER)
   {
     if     (params.polarization == params.STOKES_I) return maxwell_juettner_I_abs(&params);
     else if(params.polarization == params.STOKES_Q) return maxwell_juettner_Q_abs(&params);

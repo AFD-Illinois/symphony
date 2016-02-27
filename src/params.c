@@ -10,7 +10,7 @@ void setConstParams(struct parameters *params)
   params->n_max            = 30;
   params->C                = 10;
   // Keys for the distributions
-  params->THERMAL          = 0;
+  params->MAXWELL_JUETTNER = 0;
   params->POWER_LAW        = 1;
   params->KAPPA_DIST       = 2;
   // Keys for the polarization modes

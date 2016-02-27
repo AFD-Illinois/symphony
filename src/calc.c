@@ -82,7 +82,7 @@ double get_nu_c(struct parameters params)
 //TODO: Describe the function
 double distribution_function(double gamma, struct parameters * params)
 {
-  if(params->distribution == params->THERMAL)
+  if(params->distribution == params->MAXWELL_JUETTNER)
   {
     return maxwell_juettner_f(gamma, params);
   }
@@ -100,11 +100,11 @@ double distribution_function(double gamma, struct parameters * params)
 
 
 /*n_peak: gives the location of the peak of the n integrand for 
- *the THERMAL distribution; uses Eq. 68 in [1]
+ *the MAXWELL_JUETTNER distribution; uses Eq. 68 in [1]
  *
  *@param nu: Input, frequency of emission/absorption
  *@returns n_peak: Output, location of integrand's peak for the 
- * n-integral for the THERMAL distribution 
+ * n-integral for the MAXWELL_JUETTNER distribution 
  */
 double n_peak(struct parameters * params)
 {
@@ -192,7 +192,8 @@ double polarization_term(double gamma, double n,
  *it is the differential Df = 2\pi\nu (1/(mc)*d/dgamma + (beta cos(theta)
  * -cos(xi))/(p*beta*c) * d/d(cos(xi))) f 
  *this is eq. 41 of [1]
- *below it is applied for the THERMAL, POWER_LAW, and KAPPA_DIST distributions
+ *below it is applied for the MAXWELL_JUETTNER, POWER_LAW, and KAPPA_DIST 
+ *distributions
  *@param gamma: Input, Lorentz factor
  *@param nu: Input, frequency of emission/absorption
  *@returns: Output, Df term in gamma integrand; depends on distribution function
@@ -203,7 +204,7 @@ double differential_of_f(double gamma, struct parameters * params)
 
   double Df = 0.;
 
-  if(params->distribution == params->THERMAL)
+  if(params->distribution == params->MAXWELL_JUETTNER)
   {
     Df = differential_of_maxwell_juettner(gamma, params);
   }
@@ -353,7 +354,7 @@ double n_integration(double n_minus, struct parameters * params)
   double nu_c = get_nu_c(*params);
 
   /* TODO: Describe why an if/else */
-  if (params->distribution == params->THERMAL && params->nu/nu_c < 1e6) 
+  if (params->distribution == params->MAXWELL_JUETTNER && params->nu/nu_c < 1e6) 
   {
     double n_start = (int)(params->n_max + n_minus + 1.);
     double ans = n_integral(n_start, params->C * n_peak(params), -1, params);
