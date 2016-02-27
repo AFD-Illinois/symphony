@@ -11,7 +11,7 @@
 
 double gamma_integral(double min, double max, double n,
                  struct parameters * params);
-double n_integral(double min, double max, double n,
+double n_integral(double min, double max,
                   struct parameters * params);
 double normalize_f(struct parameters * params);
 double derivative_of_n(double n_start, struct parameters * params);

@@ -434,7 +434,7 @@ double n_integration(double n_minus, struct parameters * params)
   if (params->distribution == params->MAXWELL_JUETTNER && params->nu/nu_c < 1e6) 
   {
     double n_start = (int)(params->n_max + n_minus + 1.);
-    double ans = n_integral(n_start, params->C * n_peak(params), -1, params);
+    double ans = n_integral(n_start, params->C * n_peak(params), params);
     return ans;
   }
   else /*For other distributions, the n-space peak is found adaptively. */
@@ -458,7 +458,7 @@ double n_integration(double n_minus, struct parameters * params)
       double deriv = derivative_of_n(n_start, params);
       if(fabs(deriv) < deriv_tol) delta_n = 100. * delta_n;
 
-      contrib = n_integral(n_start, (n_start + delta_n), -1, params);
+      contrib = n_integral(n_start, (n_start + delta_n), params);
       ans = ans + contrib;
 
       n_start = n_start + delta_n;
