@@ -1,5 +1,12 @@
 #include "power_law.h"
 
+/*power_law_I: fitting formula to the emissivity, in Stokes I, produced by a
+ *             power-law distribution of electrons (without any exponential
+ *             cutoff).  Uses eq. 29, 33 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to power-law emissivity polarized in Stokes I
+ */
 double power_law_I(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -25,6 +32,13 @@ double power_law_I(struct parameters * params)
   return ans;
 }
 
+/*power_law_Q: fitting formula to the emissivity, in Stokes Q, produced by a
+ *             power-law distribution of electrons (without any exponential
+ *             cutoff).  Uses eq. 29, 33 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to power-law emissivity polarized in Stokes Q
+ */
 double power_law_Q(struct parameters * params)
 {
   double p_term = -(params->power_law_p + 1.)/(params->power_law_p + 7./3.);
@@ -34,6 +48,13 @@ double power_law_Q(struct parameters * params)
   return ans;
 }
 
+/*power_law_V: fitting formula to the emissivity, in Stokes V, produced by a
+ *             power-law distribution of electrons (without any exponential
+ *             cutoff).  Uses eq. 29, 33 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to power-law emissivity polarized in Stokes V
+ */
 double power_law_V(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -49,6 +70,13 @@ double power_law_V(struct parameters * params)
   return ans;
 }
 
+/*power_law_I_abs: fitting formula to the absorptivity, in Stokes I, from
+ *                 by a power-law distribution of electrons (without any 
+ *                 exponential cutoff).  Uses eq. 30, 34 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to power-law absorptivity polarized in Stokes I
+ */
 double power_law_I_abs(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -72,7 +100,13 @@ double power_law_I_abs(struct parameters * params)
   return ans;
 }
 
-
+/*power_law_Q_abs: fitting formula to the absorptivity, in Stokes Q, from
+ *                 by a power-law distribution of electrons (without any 
+ *                 exponential cutoff).  Uses eq. 30, 34 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to power-law absorptivity polarized in Stokes Q
+ */
 double power_law_Q_abs(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -98,6 +132,13 @@ double power_law_Q_abs(struct parameters * params)
   return ans;
 }
 
+/*power_law_V_abs: fitting formula to the absorptivity, in Stokes V, from
+ *                 by a power-law distribution of electrons (without any 
+ *                 exponential cutoff).  Uses eq. 30, 34 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to power-law absorptivity polarized in Stokes V
+ */
 double power_law_V_abs(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);

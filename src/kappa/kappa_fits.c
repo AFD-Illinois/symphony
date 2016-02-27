@@ -1,5 +1,12 @@
 #include "kappa.h"
 
+/*kappa_I: fitting formula to the emissivity, in Stokes I, produced by a
+ *         kappa distribution of electrons (without any exponential
+ *         cutoff).  Uses eq. 29, 35, 36, 37, 38 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to kappa emissivity polarized in Stokes I
+ */
 double kappa_I(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -32,6 +39,13 @@ double kappa_I(struct parameters * params)
 
 }
 
+/*kappa_Q: fitting formula to the emissivity, in Stokes Q, produced by a
+ *         kappa distribution of electrons (without any exponential
+ *         cutoff).  Uses eq. 29, 35, 36, 37, 38 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to kappa emissivity polarized in Stokes Q
+ */
 double kappa_Q(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -64,6 +78,13 @@ double kappa_Q(struct parameters * params)
 
 }
 
+/*kappa_V: fitting formula to the emissivity, in Stokes V, produced by a
+ *         kappa distribution of electrons (without any exponential
+ *         cutoff).  Uses eq. 29, 35, 36, 37, 38 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to kappa emissivity polarized in Stokes V
+ */
 double kappa_V(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -103,8 +124,13 @@ double kappa_V(struct parameters * params)
 
 }
 
-/*GSL 2F1 only works for |z| < 1; had to apply a hypergeometric function
-  identity because in our case z = -kappa*w, so |z| > 1 */
+/*kappa_I_abs: fitting formula to the absorptivity, in Stokes I, from
+ *             by a kappa distribution of electrons (without any 
+ *             exponential cutoff).  Uses eq. 30, 39, 40, 41, 42 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to kappa absorptivity polarized in Stokes I
+ */
 double kappa_I_abs(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -125,6 +151,8 @@ double kappa_I_abs(struct parameters * params)
 
   double z = -params->kappa*params->kappa_width;
 
+/*GSL 2F1 only works for |z| < 1; had to apply a hypergeometric function
+  identity because in our case z = -kappa*w, so |z| > 1 */
   double hyp2f1 = pow(1.-z, -a) * tgamma(c) * tgamma(b-a) 
                  / (tgamma(b)*tgamma(c-a)) 
                  * gsl_sf_hyperg_2F1(a, c-b, a-b+1., 1./(1.-z)) 
@@ -153,6 +181,13 @@ double kappa_I_abs(struct parameters * params)
   return ans;
 }
 
+/*kappa_Q_abs: fitting formula to the absorptivity, in Stokes Q, from
+ *             by a kappa distribution of electrons (without any 
+ *             exponential cutoff).  Uses eq. 30, 39, 40, 41, 42 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to kappa absorptivity polarized in Stokes Q
+ */
 double kappa_Q_abs(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -173,6 +208,8 @@ double kappa_Q_abs(struct parameters * params)
 
   double z = -params->kappa * params->kappa_width;
 
+/*GSL 2F1 only works for |z| < 1; had to apply a hypergeometric function
+  identity because in our case z = -kappa*w, so |z| > 1 */
   double hyp2f1 = pow(1.-z, -a) * tgamma(c) * tgamma(b-a) 
                   / (tgamma(b) * tgamma(c-a))
                  * gsl_sf_hyperg_2F1(a, c-b, a-b+1., 1./(1.-z))+pow(1.-z, -b)
@@ -200,6 +237,13 @@ double kappa_Q_abs(struct parameters * params)
   return ans;
 }
 
+/*kappa_V_abs: fitting formula to the absorptivity, in Stokes V, from
+ *             by a kappa distribution of electrons (without any 
+ *             exponential cutoff).  Uses eq. 30, 39, 40, 41, 42 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to kappa absorptivity polarized in Stokes V
+ */
 double kappa_V_abs(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -220,6 +264,8 @@ double kappa_V_abs(struct parameters * params)
 
   double z = -params->kappa * params->kappa_width;
 
+/*GSL 2F1 only works for |z| < 1; had to apply a hypergeometric function
+  identity because in our case z = -kappa*w, so |z| > 1 */
   double hyp2f1 = pow(1.-z, -a) * tgamma(c) * tgamma(b-a) 
                   / (tgamma(b) * tgamma(c-a))
                   * gsl_sf_hyperg_2F1(a, c-b, a-b+1., 1./(1.-z)) 

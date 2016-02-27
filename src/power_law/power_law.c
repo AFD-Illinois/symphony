@@ -10,7 +10,7 @@
  *                            numerically by normalize_f()).  One can 
  *                            "turn off" the exponential cutoff by setting the
  *                            parameter gamma_cutoff to be very large, in which
- *                            case the cutoff is approximately 1.
+ *                            case the cutoff term is approximately equal to 1.
  *
  *@params: Lorentz factor gamma, void pointer to struct of parameters
  *@returns: unnormalized power-law distribution function with exponential
@@ -40,7 +40,7 @@ double power_law_to_be_normalized(double gamma, void * paramsInput)
  *             file integrate.c, which uses GSL's QAGIU integrator.
  *
  *@params: Lorentz factor gamma, struct of parameters params
- *@returns: normalized power-law disribution function with
+ *@returns: normalized power-law distribution function with
  *          exponential cutoff.
  */
 double power_law_f(double gamma, struct parameters * params) 
@@ -80,7 +80,7 @@ double power_law_f(double gamma, struct parameters * params)
  *
  *@params: Lorentz factor gamma, struct of parameters params
  *@returns: the differential of the power-law distribution function
- *          ([1] eq. 12 and 13) for the alpha_nu() calculation.
+ *          ([1] eq. 12, 13, and 17) for the alpha_nu() calculation.
  *
  */
 

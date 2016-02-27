@@ -1,12 +1,19 @@
 #include "kappa.h"
 
-/*kappa_to_be_normalized: the kappa distribution is not normalized, so we must 
- * find the normalization constant by taking 1 over the integral of the function
- * kappa_to_be_normalized from 1 to infinity.  Uses eq. 42 of [2].
- *@param gamma: Input, Lorentz factor
- *@param *params: void pointer to struct parameters, which contains
- * n (harmonic number) and nu (frequency of emission/absorption)
- *@returns: kappa distribution function to be normalized via normalize_f()
+/*kappa_law_to_be_normalized: Unnormalized kappa distribution function 
+ *                            (eq. 18 of [1]), along with an exponential
+ *                            cutoff because the kappa distribution has a
+ *                            power-law tail at high energy.  The kappa
+ *                            distribution is normalized numerically by 
+ *                            the functionnormalize_f(), in the file
+ *                            integrate.c.  One can "turn off" the exponential 
+ *                            cutoff by setting the parameter gamma_cutoff to 
+ *                            be very large, in which case the cutoff term is 
+ *                            approximately equal to 1.
+ *
+ *@params: Lorentz factor gamma, void pointer to struct of parameters
+ *@returns: unnormalized kappa distribution function with exponential
+ *          cutoff.
  */
 double kappa_to_be_normalized(double gamma, void * paramsInput)
 {
@@ -27,11 +34,14 @@ double kappa_to_be_normalized(double gamma, void * paramsInput)
   return ans;
 }
 
-/*kappa_f: kappa distribution function, numerically normalized
- *uses eq. 42 of [2]
- *@param gamma: Input, Lorentz factor
- *@returns: normalized kappa distribution function to go into gamma integrand 
+/*kappa_f: normalized kappa distribution function with exponential cutoff.  
+ *         This is normalized by calling normalize_f(), in the file 
+ *         integrate.c, which uses GSL's QAGIU integrator.
+ *
+ *@params: Lorentz factor gamma, struct of parameters params
+ *@returns: normalized kappa distribution function with exponential cutoff.
  */
+
 double kappa_f(double gamma, struct parameters * params)
 {
   double norm = 1./normalize_f(params);
@@ -46,6 +56,19 @@ double kappa_f(double gamma, struct parameters * params)
   return ans;
 }
 
+/*differential_of_kappa: The integrand for the absorptivity calculation 
+ *                       ([1] eq. 12) depends on a differential of the 
+ *                       distribution function ([1] eq. 13).  For the 
+ *                       kappa distribution, this is evaluated analytically 
+ *                       for speed and accuracy. 
+ *                       TODO: numerical derivative calculator
+ *                       for any gyrotropic distribution function.
+ *
+ *@params: Lorentz factor gamma, struct of parameters params
+ *@returns: the differential of the kappa distribution function
+ *          ([1] eq. 12, 13, and 18) for the alpha_nu() calculation.
+ *
+ */
 double differential_of_kappa(double gamma, struct parameters * params) 
 {
   double prefactor = params->electron_density * (1./normalize_f(params)) 

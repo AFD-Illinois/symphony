@@ -2,7 +2,7 @@
 
 /*maxwell_juettner_I: fitting formula for the emissivity (polarized in Stokes I)
  *                    produced by a Maxwell-Juettner (relativistic thermal) 
- *                    distribution of electrons.
+ *                    distribution of electrons. (Eq. 29, 31 of [1])
  *
  *@params: struct of parameters params
  *@returns: fit to the emissivity, polarized in Stokes I, for the given 
@@ -34,7 +34,7 @@ double maxwell_juettner_I(struct parameters * params)
 
 /*maxwell_juettner_Q: fitting formula for the emissivity (polarized in Stokes Q)
  *                    produced by a Maxwell-Juettner (relativistic thermal) 
- *                    distribution of electrons.
+ *                    distribution of electrons. (Eq. 29, 31 of [1])
  *
  *@params: struct of parameters params
  *@returns: fit to the emissivity, polarized in Stokes Q, for the given 
@@ -67,7 +67,7 @@ double maxwell_juettner_Q(struct parameters * params)
 
 /*maxwell_juettner_V: fitting formula for the emissivity (polarized in Stokes V)
  *                    produced by a Maxwell-Juettner (relativistic thermal) 
- *                    distribution of electrons.
+ *                    distribution of electrons. (Eq. 29, 31 of [1])
  *
  *@params: struct of parameters params
  *@returns: fit to the emissivity, polarized in Stokes V, for the given 
@@ -121,8 +121,7 @@ double planck_func(struct parameters * params)
 
 /*maxwell_juettner_I_abs: Fitting formula for the absorptivity, polarized in
  *                        Stokes I, for a Maxwell-Juettner electron momentum 
- *                        distribution.  Uses the emissivity fitting formula,
- *                        Planck function, and eq. 25 of [1].
+ *                        distribution.  Uses eq. 30, 31, 32 of [1].
  *
  *@params: struct of parameters params
  *@returns: fitting formula to the absorptivity, in Stokes I, for a Maxwell-
@@ -136,8 +135,7 @@ double maxwell_juettner_I_abs(struct parameters * params)
 
 /*maxwell_juettner_Q_abs: Fitting formula for the absorptivity, polarized in
  *                        Stokes Q, for a Maxwell-Juettner electron momentum 
- *                        distribution.  Uses the emissivity fitting formula,
- *                        Planck function, and eq. 25 of [1].
+ *                        distribution.  Uses eq. 30, 31, 32 of [1].
  *
  *@params: struct of parameters params
  *@returns: fitting formula to the absorptivity, in Stokes Q, for a Maxwell-
@@ -151,8 +149,7 @@ double maxwell_juettner_Q_abs(struct parameters * params)
 
 /*maxwell_juettner_V_abs: Fitting formula for the absorptivity, polarized in
  *                        Stokes V, for a Maxwell-Juettner electron momentum 
- *                        distribution.  Uses the emissivity fitting formula,
- *                        Planck function, and eq. 25 of [1].
+ *                        distribution.  Uses eq. 30, 31, 32 of [1].
  *
  *@params: struct of parameters params
  *@returns: fitting formula to the absorptivity, in Stokes V, for a Maxwell-

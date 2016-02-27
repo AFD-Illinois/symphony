@@ -1,6 +1,6 @@
 #include "maxwell_juettner.h"
 
-/*maxwell_juettner_f: Relativistic thermal (Maxwell-Juettner) disribution
+/*maxwell_juettner_f: Relativistic thermal (Maxwell-Juettner) distribution
  *                    function (eq. 14 and 15 of [1]).
  *
  *@params: Lorentz factor gamma, struct of parameters params
