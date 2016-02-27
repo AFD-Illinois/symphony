@@ -1,9 +1,13 @@
 #include "maxwell_juettner.h"
 
-/*maxwell_juettner_f: Maxwell-Juettner distribution function in terms of Lorentz 
- * factor gamma; uses eq. 47, 49, 50 of [1]
- *@param gamma: Input, Lorentz factor
- *@returns: THERMAL distribution function, which goes into the gamma integrand 
+/*maxwell_juettner_f: Relativistic thermal (Maxwell-Juettner) disribution
+ *                    function (eq. 14 and 15 of [1]).
+ *
+ *@params: Lorentz factor gamma, struct of parameters params
+ *@returns: the Maxwell-Juttner distribution function evaluated at the
+ *          input Lorentz factor gamma and for provided parameters in
+ *          struct params (such as dimensionless electron temperature
+ *          theta_e). 
  */
 double maxwell_juettner_f(double gamma, struct parameters * params) 
 {
@@ -25,6 +29,20 @@ double maxwell_juettner_f(double gamma, struct parameters * params)
   return ans;
 }
 
+/*differential_of_maxwell_juettner: The integrand for the absorptivity
+ *                                  calculation ([1] eq. 12) depends on
+ *                                  a differential of the distribution 
+ *                                  function ([1] eq. 13).  For the Maxwell-
+ *                                  Juettner distribution, this is evaluated
+ *                                  analytically for speed and accuracy. 
+ *                                  TODO: numerical derivative calculator
+ *                                  for any gyrotropic distribution function.
+ *
+ *@params: Lorentz factor gamma, struct of parameters params
+ *@returns: the differential of the Maxwell-Juettner distribution function
+ *          ([1] eq. 12 and 13) for the alpha_nu() calculation.
+ *
+ */
 double differential_of_maxwell_juettner(double gamma, struct parameters * params)
 {
   double Df = 0.;

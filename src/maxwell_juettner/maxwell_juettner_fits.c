@@ -1,5 +1,13 @@
 #include "maxwell_juettner.h"
 
+/*maxwell_juettner_I: fitting formula for the emissivity (polarized in Stokes I)
+ *                    produced by a Maxwell-Juettner (relativistic thermal) 
+ *                    distribution of electrons.
+ *
+ *@params: struct of parameters params
+ *@returns: fit to the emissivity, polarized in Stokes I, for the given 
+ *          parameters for a Maxwell-Juettner distribution.
+ */
 double maxwell_juettner_I(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -24,6 +32,14 @@ double maxwell_juettner_I(struct parameters * params)
   return ans;
 }
 
+/*maxwell_juettner_Q: fitting formula for the emissivity (polarized in Stokes Q)
+ *                    produced by a Maxwell-Juettner (relativistic thermal) 
+ *                    distribution of electrons.
+ *
+ *@params: struct of parameters params
+ *@returns: fit to the emissivity, polarized in Stokes Q, for the given 
+ *          parameters for a Maxwell-Juettner distribution.
+ */
 double maxwell_juettner_Q(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -49,6 +65,14 @@ double maxwell_juettner_Q(struct parameters * params)
   return -ans;
 }
 
+/*maxwell_juettner_V: fitting formula for the emissivity (polarized in Stokes V)
+ *                    produced by a Maxwell-Juettner (relativistic thermal) 
+ *                    distribution of electrons.
+ *
+ *@params: struct of parameters params
+ *@returns: fit to the emissivity, polarized in Stokes V, for the given 
+ *          parameters for a Maxwell-Juettner distribution.
+ */
 double maxwell_juettner_V(struct parameters * params)
 {
   double nu_c = get_nu_c(*params);
@@ -73,6 +97,14 @@ double maxwell_juettner_V(struct parameters * params)
   return -ans;
 }
 
+/*planck_func: The Planck function (used in eq. 25 of [1]) can be used to
+ *             obtain alpha_nu() fitting formulae from the j_nu() fitting 
+ *             formulae for the Maxwell-Juettner (relativistic thermal)
+ *             distribution.
+ *
+ *@params: struct of parameters params
+ *@returns: Planck function evaluated for the supplied parameters
+ */
 double planck_func(struct parameters * params)
 {
   double term1 = (2.*params->plancks_constant*pow(params->nu, 3.))
@@ -87,18 +119,45 @@ double planck_func(struct parameters * params)
   return ans;
 }
 
+/*maxwell_juettner_I_abs: Fitting formula for the absorptivity, polarized in
+ *                        Stokes I, for a Maxwell-Juettner electron momentum 
+ *                        distribution.  Uses the emissivity fitting formula,
+ *                        Planck function, and eq. 25 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to the absorptivity, in Stokes I, for a Maxwell-
+ *          Juettner distribution of electrons.
+ */
 double maxwell_juettner_I_abs(struct parameters * params)
 {
   double ans = maxwell_juettner_I(params)/planck_func(params);
   return ans;
 }
 
+/*maxwell_juettner_Q_abs: Fitting formula for the absorptivity, polarized in
+ *                        Stokes Q, for a Maxwell-Juettner electron momentum 
+ *                        distribution.  Uses the emissivity fitting formula,
+ *                        Planck function, and eq. 25 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to the absorptivity, in Stokes Q, for a Maxwell-
+ *          Juettner distribution of electrons.
+ */
 double maxwell_juettner_Q_abs(struct parameters * params)
 {
   double ans = maxwell_juettner_Q(params)/planck_func(params);
   return ans;
 }
 
+/*maxwell_juettner_V_abs: Fitting formula for the absorptivity, polarized in
+ *                        Stokes V, for a Maxwell-Juettner electron momentum 
+ *                        distribution.  Uses the emissivity fitting formula,
+ *                        Planck function, and eq. 25 of [1].
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to the absorptivity, in Stokes V, for a Maxwell-
+ *          Juettner distribution of electrons.
+ */
 double maxwell_juettner_V_abs(struct parameters * params)
 {
   double ans = maxwell_juettner_V(params)/planck_func(params);

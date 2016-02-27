@@ -1,14 +1,20 @@
 #include "power_law.h"
 
-/*power_law_to_be_normalized: the power-law distribution is normalized as-is, 
- * but we have added an exponential cutoff e^(-gamma/gamma_cutoff), so it must 
- * be normalized again.  The normalization constant is given by 1 over
- * the integral of power_law_to_be_normalized from 1 to infinity.
- * uses eq. 50 of [1]
- *@param gamma: Input, Lorentz factor
- *@param *params: void pointer to struct parameters, which contains
- * n (harmonic number) and nu (frequency of emission/absorption)
- *@returns: Output, power-law distribution to be normalized via normalize_f()
+/*power_law_to_be_normalized: Unnormalized power-law distribution function
+ *                            (eq. 14 and 17 of [1]).  Analytical normalization
+ *                            for this distribution function is used here, but
+ *                            it is often useful to append an exponential
+ *                            cutoff to the distribution at some Lorentz factor
+ *                            gamma.  Because of this exponential cutoff, the 
+ *                            power-law must still be normalized (done
+ *                            numerically by normalize_f()).  One can 
+ *                            "turn off" the exponential cutoff by setting the
+ *                            parameter gamma_cutoff to be very large, in which
+ *                            case the cutoff is approximately 1.
+ *
+ *@params: Lorentz factor gamma, void pointer to struct of parameters
+ *@returns: unnormalized power-law distribution function with exponential
+ *          cutoff.
  */
 double power_law_to_be_normalized(double gamma, void * paramsInput) 
 {
@@ -29,10 +35,13 @@ double power_law_to_be_normalized(double gamma, void * paramsInput)
   return ans;
 }
 
-/*power_law_f: power-law distribution function, normalized via call to the 
- * normalize_f() function. Uses eq. 50 of [1].
- *@param gamma: Input, Lorentz factor
- *@returns: Ouput, a normalized power-law distribution for the gamma integrand
+/*power_law_f: normalized power-law distribution function with exponential
+ *             cutoff.  This is normalized by calling normalize_f(), in the
+ *             file integrate.c, which uses GSL's QAGIU integrator.
+ *
+ *@params: Lorentz factor gamma, struct of parameters params
+ *@returns: normalized power-law disribution function with
+ *          exponential cutoff.
  */
 double power_law_f(double gamma, struct parameters * params) 
 {
@@ -60,6 +69,20 @@ double power_law_f(double gamma, struct parameters * params)
    * return power_law_unnormalized/normalize_f(power_law_to_be_normalized);
    */
 }
+
+/*differential_of_power_law: The integrand for the absorptivity calculation 
+ *                           ([1] eq. 12) depends on a differential of the 
+ *                           distribution function ([1] eq. 13).  For the 
+ *                           power-law distribution, this is evaluated
+ *                           analytically for speed and accuracy. 
+ *                           TODO: numerical derivative calculator
+ *                           for any gyrotropic distribution function.
+ *
+ *@params: Lorentz factor gamma, struct of parameters params
+ *@returns: the differential of the power-law distribution function
+ *          ([1] eq. 12 and 13) for the alpha_nu() calculation.
+ *
+ */
 
 double differential_of_power_law(double gamma, struct parameters * params)
 {
