@@ -1,7 +1,5 @@
 #include "symphony.h"
 
-//TODO: fix all descriptions of functions
-
 /*j_nu: wrapper for the emissivity calculation; takes in values of all
  *      necessary paramters and sets a struct of parameters using the input
  *      values.  It then passes this struct to n_summation(), which begins

@@ -50,7 +50,7 @@ double j_nu_fit(double nu,
   params.kappa_width        = kappa_width;
 
 
-//  check_for_errors(params); TODO: fix this
+  check_for_errors(&params); //TODO: fix this
   
  if(params.distribution == params.MAXWELL_JUETTNER)
   {
@@ -127,7 +127,7 @@ double alpha_nu_fit(double nu,
   params.kappa              = kappa;
   params.kappa_width        = kappa_width;
 
-//  check_for_errors(nu, B, n_e, obs_angle);
+  check_for_errors(&params);
 
   if(params.distribution == params.MAXWELL_JUETTNER)
   {
@@ -173,28 +173,28 @@ double check_for_errors(struct parameters * params)
   /* catch potential errors */
   if(params->nu/nu_c > 3e10)
   {
-    printf("\n ERROR: nu out of range\n");
+    printf("\n ERROR: nu too large\n");
     exit(0);
   }
   if(params->magnetic_field < 0)
   {
-    printf("\n ERROR: B out of range\n");
+    printf("\n ERROR: B magnitude cannot be negative\n");
     exit(0);
   }
   if(params->electron_density < 0)
   {
-    printf("\n ERROR: electron density out of range\n");
+    printf("\n ERROR: cannot have negative electron number density\n");
     exit(0);
   }
   if(params->kappa < 2.5 || params->kappa > 7.5)
   {
     printf("\n ERROR: kappa out of range of fitting formula\n");
-    exit(0);
+    //exit(0);
   }
   if(params->kappa_width < 3 || params->kappa_width > 200)
   {
     printf("\n WARNING: w out of range; fitting formula may be inaccurate\n");
-    exit(0);
+    //exit(0);
   }
   if(params->gamma_min < 1)
   {
