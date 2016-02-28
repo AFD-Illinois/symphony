@@ -30,3 +30,10 @@
  * The arguments are also all the same for the four `C` functions the above `Python` functions call.
 * Sample call to `j_nu_py()`: `j_nu_py(230e9, 30, 1, 1.047, symphonyPy.MAXWELL_JUETTNER, symphonyPy.STOKES_I, 10, 2.5, 1, 1000, 1e10, 3.5, 10)`
  * Note: All parameters with units are in CGS.
+
+3. To add a new gyrotropic distribution function:
+ 1. Navigate into the "src/" folder within *symphony*.  Create a folder with the name of the new distribution function.  Enter that folder.
+  *Note: there are three existing examples to follow for this procedure: "maxwell_juettner/", "power_law/", and "kappa/".
+ 2. Make a file named distribution_function.c (where distribution_function is the name of the new distribution function).
+ 3. Inside, write the function for the new distribution function.  It should return a `double` and take input parameters `double gamma` (the electron Lorentz factor) and `struct parameters * params`.  This struct contains all parameters for the calculation; additional parameters can be added as necessary in the files "params.c" and "params.h" in the src/ folder.
+ 4. 
