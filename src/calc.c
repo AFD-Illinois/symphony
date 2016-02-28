@@ -278,6 +278,37 @@ double differential_of_f(double gamma, struct parameters * params)
   return Df;
 }
 
+double num_differential_of_f(double gamma, struct parameters * params)
+{
+  double Df = 0.;
+  double epsilon = 0.0001;
+  double prefactor = (params->pi * params->nu
+                      / (params->mass_electron
+                         *params->speed_light*params->speed_light))
+                   * (params->electron_density); //TODO: check this
+
+  if(params->distribution == params->MAXWELL_JUETTNER)
+  {
+    Df =  maxwell_juettner_f(gamma+epsilon, params)
+        - maxwell_juettner_f(gamma+epsilon, params)
+         / epsilon;
+  }
+  else if(params->distribution == params->POWER_LAW)
+  {
+    Df =  power_law_f(gamma+epsilon, params)
+        - power_law_f(gamma+epsilon, params)
+         / epsilon;
+  }
+  else if(params->distribution == params->KAPPA_DIST)
+  {
+    Df =  kappa_f(gamma+epsilon, params)
+        - kappa_f(gamma+epsilon, params)
+         / epsilon;
+  }
+
+  return prefactor * Df;
+}
+
 /*gamma_integrand: full gamma integrand (eq. 3, 12 of [1]) with the summation
  *                 moved outside the integral and the delta function evaluated
  *                 by setting eq. 10 of [1] to zero. Also, d^3p is converted
