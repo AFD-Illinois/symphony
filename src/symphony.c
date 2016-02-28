@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
   paramsM.magnetic_field     = 30.;
   paramsM.electron_density   = 1.;
   paramsM.observer_angle     = paramsM.pi/3.;
-  paramsM.distribution       = paramsM.KAPPA_DIST;
+  paramsM.distribution       = paramsM.MAXWELL_JUETTNER;
   paramsM.polarization       = paramsM.STOKES_I;
   paramsM.theta_e            = 10.;
   paramsM.power_law_p        = 3.5;
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
   int points_per_pow_10 = 1;
   int max_index = (int) log10(max_nuratio)*points_per_pow_10;
 
-  printf("\nnu/nu_c         ans             fit");
+  printf("\nnu/nu_c         j_nu()          j_nu_fit()");
 
   for (int index=0; index <= max_index; index++) 
   {
