@@ -31,6 +31,7 @@
  * The arguments are also all the same for the four `C` functions the above `Python` functions call.
 * Sample call to `j_nu_py()`: `j_nu_py(230e9, 30, 1, 1.047, symphonyPy.MAXWELL_JUETTNER, symphonyPy.STOKES_I, 10, 2.5, 1, 1000, 1e10, 3.5, 10)`
  * Note: All parameters with units are in CGS.
+ * Note: In `C`, the keys "symphonyPy.MAXWELL_JUETTNER" and "symphonyPy.STOKES_I" become "params->MAXWELL_JUETTNER" and "params->STOKES_I", where params is a struct of parameters used throughout the calculation.
 
 ###To add a new gyrotropic distribution function:
 1. Navigate into the "src/" folder within *symphony*.  Enter "params.c" and go to the comment that says "Keys for the distributions"; add a new key equal to an integer that is not used for the existing three distribution functions (for example, 4).  Altogether, this should look like: "params->NEW_DIST = 4".
