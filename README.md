@@ -22,10 +22,11 @@
 
 2. To use *symphony*'s `Python` interface:
   1. Navigate to the "build/" folder created in step 1., above.  Open `Python` in the command line or by writing a ".py" file.
-  2. Import `symphony` by typing "import symphonyPy".  This allows one to call 3 functions: `j_nu_py()`, `alpha_nu_py()`, `j_nu_fit_py()`, and `alpha_nu_fit_py()`.  The first two provide calculated values of the emissivity and absorptivity for the input parameters, and the latter two provide the corresponding approximate fitting formula results.
-  3. To find the arguments of these functions, open up the docstring for the function you wish to use.  To do this (for example, for the function `j_nu_py()`), open up python in the command line, type "import symphonyPy", hit enter, and type "symphonyPy.j_nu_py?".  This should display the docstring for `j_nu_py()`.  The arguments for these four functions are all the same.
+  2. Import `symphony` by typing "import symphonyPy".  This allows one to call 4 functions: `j_nu_py()`, `alpha_nu_py()`, `j_nu_fit_py()`, and `alpha_nu_fit_py()`.  The first two provide calculated values of the emissivity and absorptivity for the input parameters, and the latter two provide the corresponding approximate fitting formula results.
+  3. To find the arguments of these functions, open up the docstring for the function you wish to use.  To do this (for example, for the function `j_nu_py()`), open up `Python` in the command line, type "import symphonyPy", hit enter, and type "symphonyPy.j_nu_py?".  This should display the docstring for `j_nu_py()`.  
 
-* Arguments for `j_nu_py()`: `j_nu(nu, magnetic_field, electron_density, observer_angle, distribution, polarization, theta_e, power_law_p, gamma_min, gamma_max, gamma_cutoff, kappa, kappa_width)`.
+* Arguments for `j_nu()` (in `C`) and `j_nu_py()` (`Python`): `j_nu(nu, magnetic_field, electron_density, observer_angle, distribution, polarization, theta_e, power_law_p, gamma_min, gamma_max, gamma_cutoff, kappa, kappa_width)`.
  * Note: the arguments for `j_nu_py()`, `alpha_nu_py()`, `j_nu_fit_py()`, and `alpha_nu_fit_py()` are all identical.
-* Sample call to `j_nu_py()`: `j_nu(230e9, 30, 1, 1.047, symphonyPy.MAXWELL_JUETTNER, symphonyPy.STOKES_I, 10, 2.5, 1, 1000, 1e10, 3.5, 10)`
+ * The arguments are also all the same for the four `C` functions the above `Python` functions call.
+* Sample call to `j_nu_py()`: `j_nu_py(230e9, 30, 1, 1.047, symphonyPy.MAXWELL_JUETTNER, symphonyPy.STOKES_I, 10, 2.5, 1, 1000, 1e10, 3.5, 10)`
  * Note: All parameters with units are in CGS.
