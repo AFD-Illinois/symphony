@@ -43,19 +43,19 @@ double maxwell_juettner_f(double gamma, struct parameters * params)
  *          ([1] eq. 12 and 13) for the alpha_nu() calculation.
  *
  */
-double differential_of_maxwell_juettner(double gamma, struct parameters * params)
-{
-  double Df = 0.;
-
-  double prefactor = (params->pi * params->nu 
-                   / (params->mass_electron
-                      *params->speed_light*params->speed_light)) 
-	     * (params->electron_density
-                /(params->theta_e * gsl_sf_bessel_Kn(2, 1./params->theta_e)));
-
-  double body = (-1./params->theta_e) * exp(-gamma/params->theta_e);
-
-  Df = prefactor * body;
-
-  return Df;
-}
+//double differential_of_maxwell_juettner(double gamma, struct parameters * params)
+//{
+//  double Df = 0.;
+//
+//  double prefactor = (params->pi * params->nu 
+//                   / (params->mass_electron
+//                      *params->speed_light*params->speed_light)) 
+//	     * (params->electron_density
+//                /(params->theta_e * gsl_sf_bessel_Kn(2, 1./params->theta_e)));
+//
+//  double body = (-1./params->theta_e) * exp(-gamma/params->theta_e);
+//
+//  Df = prefactor * body;
+//
+//  return Df;
+//}

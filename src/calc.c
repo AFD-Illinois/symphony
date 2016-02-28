@@ -117,7 +117,7 @@ double get_nu_c(struct parameters params)
  *                       function.  The value of params->distribution 
  *                       determines which distribution function is called.
  *                       The procedure to add a new gyrotropic distribution
- *                       function is outlined in the README. TODO: README
+ *                       function is outlined in the README.
  *
  *@params: electron Lorentz factor gamma, struct parameters * params
  *         described above
@@ -250,60 +250,61 @@ double polarization_term(double gamma, double n,
  *                   These are evaluated analytically for speed, but
  *                   a calculator to evaluate this differential without
  *                   the analytic result is also provided. This calculator
- *                   works with any gyrotropic distribution function. TODO: add this.
+ *                   works with any gyrotropic distribution function.
  * 
  *@params: Lorentz factor gamma, struct of parameters params
  *@returns: differential of the distribution function term in the gamma
  *          integrand.  
  */
-double differential_of_f(double gamma, struct parameters * params) 
-{
-  /*described in Section 2 of [1] */
-
-  double Df = 0.;
-
-  if(params->distribution == params->MAXWELL_JUETTNER)
-  {
-    Df = differential_of_maxwell_juettner(gamma, params);
-  }
-  else if(params->distribution == params->POWER_LAW)
-  {
-    Df = differential_of_power_law(gamma, params);
-  }
-  else if(params->distribution == params->KAPPA_DIST)
-  {
-    Df = differential_of_kappa(gamma, params);
-  }
-
-  return Df;
-}
+//double differential_of_f(double gamma, struct parameters * params) 
+//{
+//  /*described in Section 2 of [1] */
+//
+//  double Df = 0.;
+//
+//  if(params->distribution == params->MAXWELL_JUETTNER)
+//  {
+//    Df = differential_of_maxwell_juettner(gamma, params);
+//  }
+//  else if(params->distribution == params->POWER_LAW)
+//  {
+//    Df = differential_of_power_law(gamma, params);
+//  }
+//  else if(params->distribution == params->KAPPA_DIST)
+//  {
+//    Df = differential_of_kappa(gamma, params);
+//  }
+//
+//  return Df;
+//}
 
 double num_differential_of_f(double gamma, struct parameters * params)
 {
   double Df = 0.;
-  double epsilon = 0.0001;
-  double prefactor = (params->pi * params->nu
+  double epsilon = 0.0000001;
+  double prefactor = (2. * params->pi * params->nu
                       / (params->mass_electron
                          *params->speed_light*params->speed_light))
-                   * (params->electron_density); //TODO: check this
+                     * params->pi * pow(params->mass_electron, 3.) 
+                     * pow(params->speed_light, 3);
 
   if(params->distribution == params->MAXWELL_JUETTNER)
   {
-    Df =  maxwell_juettner_f(gamma+epsilon, params)
-        - maxwell_juettner_f(gamma+epsilon, params)
-         / epsilon;
+    Df =  (maxwell_juettner_f(gamma+epsilon, params)
+           - maxwell_juettner_f(gamma-epsilon, params))
+          / epsilon;
   }
   else if(params->distribution == params->POWER_LAW)
   {
-    Df =  power_law_f(gamma+epsilon, params)
-        - power_law_f(gamma+epsilon, params)
-         / epsilon;
+    Df =  (power_law_f(gamma+epsilon, params)
+           - power_law_f(gamma-epsilon, params))
+          / epsilon;
   }
   else if(params->distribution == params->KAPPA_DIST)
   {
-    Df =  kappa_f(gamma+epsilon, params)
-        - kappa_f(gamma+epsilon, params)
-         / epsilon;
+    Df =  (kappa_f(gamma+epsilon, params)
+           - kappa_f(gamma-epsilon, params))
+          / epsilon;
   }
 
   return prefactor * Df;
@@ -354,7 +355,7 @@ double gamma_integrand(double gamma, void * paramsGSLInput)
                         * params->electron_charge 
                         / (2. * params->nu);
 
-    ans = prefactor*gamma*gamma*beta*differential_of_f(gamma, params)
+    ans = prefactor*gamma*gamma*beta*num_differential_of_f(gamma, params)
                    *polarization_term(gamma, paramsGSL->n, params)
                    *(1./(params->nu*beta*fabs(cos(params->observer_angle))));
   }

@@ -39,5 +39,7 @@ double alpha_nu(double nu,
                 double kappa,
                 double kappa_width);
 double gamma_integration_result(double n, void * paramsInput);
+double differential_of_f(double gamma, struct parameters * params);
+double num_differential_of_f(double gamma, struct parameters * params);
 
 #endif /* SYMPHONY_CALC_H_ */
