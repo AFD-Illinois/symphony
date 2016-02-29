@@ -1,3 +1,13 @@
+/*bessel_mod.c: A fast bessel function calculator, useful for evaluating
+ *              bessel functions J(n, z) and J'(n, z) for large n. Adapted
+ *              with permission from Leung, Gammie, and Noble (2011).
+ *
+ * References:
+ * [1] Pandya, Zhang, Chandra, Gammie (Accepted to ApJ 2016)
+ * [2] Leung, Gammie, and Noble (2011)
+ * [3] Xiao (2006)
+ */
+
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_sf_gamma.h>
@@ -235,7 +245,7 @@ void  set_At( double At[BESSEL_EPSILON_ORDER] )
 double BesselJ_Meissel_First( double n, double x ) 
 {
   double U, Z, eps, ninv, fn, z, Vsum1, Vsum2, exp_val, factor, exp2, invZp1; 
-  double t1, t2, t3, retval, loggamma_exp, sqrt_2;
+  double t1, t2, t3, retval, loggamma_exp;
 
   fn =  n ; 
   z = x/fn;
