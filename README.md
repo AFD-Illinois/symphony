@@ -18,7 +18,6 @@
  1. Clone *symphony* from github.  Navigate into the *symphony* folder, and note that it contains a folder named "src/"; create a folder named "build" and navigate into it.
  2. Type "cmake" followed by the location of the "src/" folder.  Altogether, this line should look something like: "cmake /location/to/symphony/src"
  3. Type "make"
- 4. Try to run the *symphony* demo by typing "./symphony".  This should output three columns: "nu/nu_c", "j_nu()", and "j_nu_fit()".  Each column should have 8 rows, including the column titles mentioned above.  The three columns correspond to the frequency of emission divided by the cyclotron frequency, the calculated emissivity for some sample parameters, and the value of the fitting formula for those parameters.
 
 ###To use *symphony*'s `Python` interface:
  1. Navigate to the "build/" folder created in step 1., above.  Open `Python` in the command line or by writing a ".py" file.
@@ -44,4 +43,6 @@
   * Go back into the "src/" folder and enter "integrate.c".  In the function `normalize_f()`, there is an `if` statement which chooses the function to be normalized.  Following the pattern set for the other two distributions, add new_dist using the key set in 1.
 5. Back in the folder "new_dist/", add a file named "new_dist.h" (where "new_dist" is the name of the distribution function).  Inside this file, copy the format of "power_law.h" or "kappa.h".
 6. Return to the folder "new_dist/" and make a file called "CMakeLists.txt".  Inside this file, write one line: `add_library(new_dist new_dist.c new_dist.h)`; if there are additional files (for instance, if you provide fitting formulae in a file named "new_dist_fits.c") then include that as well.
-7. 
+7. Navigate back to "src/" and enter "CMakelists.txt".  Add "add_subdirectory(new_dist)" below "add_subdirectory(kappa)".  Find the two instances of "target_link_libraries()" and add "new_dist" as an argument to both of them.
+8. Add "#include "new_dist/new_dist.h"" to the file calc.h
+9. Add a line for new_dist in the function `distribution_function()` in the file calc.c
