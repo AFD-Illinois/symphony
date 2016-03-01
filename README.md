@@ -21,8 +21,14 @@
 
 ###To use *symphony*'s `Python` interface:
  1. Navigate to the "build/" folder created in step 1., above.  Open `Python` in the command line or by writing a ".py" file.
- 2. Import `symphony` by typing "import symphonyPy".  This allows one to call 4 functions: `j_nu_py()`, `alpha_nu_py()`, `j_nu_fit_py()`, and `alpha_nu_fit_py()`.  The first two provide calculated values of the emissivity and absorptivity for the input parameters, and the latter two provide the corresponding approximate fitting formula results.
- 3. To find the arguments of these functions, open up the docstring for the function you wish to use.  To do this (for example, for the function `j_nu_py()`), open up `Python` in the command line, type "import symphonyPy", hit enter, and type "symphonyPy.j_nu_py?".  This should display the docstring for `j_nu_py()`.  
+ 2. Import *symphony* by typing `import symphonyPy`.  
+  * This allows one to call 4 functions: `j_nu_py()`, `alpha_nu_py()`, `j_nu_fit_py()`, and `alpha_nu_fit_py()`.  
+  * The first two provide calculated values of the emissivity and absorptivity for the input parameters, and the latter two provide the corresponding approximate fitting formula results.
+ 3. The arguments of these functions can be found by accessing the associated docstrings.  This can be done in the `Python` command line using the following: 
+```
+import symphonyPy
+symphonyPy.j_nu_py?
+```
 
 ###Arguments for Emissivity and Absorptivity Functions
 * Arguments for all emissivity and absorptivity functions in both `C` and `Python` take the same arguments and ouput a double.  The arguments are: 
@@ -51,4 +57,4 @@ j_nu_py(): j_nu_py(230e9, 30, 1, 1.047, symphonyPy.MAXWELL_JUETTNER, symphonyPy.
 6. Return to the folder "new_dist/" and make a file called "CMakeLists.txt".  Inside this file, write one line: `add_library(new_dist new_dist.c new_dist.h)`; if there are additional files (for instance, if you provide fitting formulae in a file named "new_dist_fits.c") then include that as well.
 7. Navigate back to "src/" and enter "CMakelists.txt".  Add `add_subdirectory(new_dist)` below `add_subdirectory(kappa)`.  Find the two instances of `target_link_libraries()` and add `new_dist` as an argument to both of them.
 8. Add "#include "new_dist/new_dist.h"" to the file calc.h
-9. Add a line for new_dist in the function `distribution_function()` in the file calc.c
+9. Add a line for new_dist in the function `distribution_function()` in the file calc.c following the pattern set for the other three distribution functions.
