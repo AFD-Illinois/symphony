@@ -32,8 +32,8 @@ j_nu(nu, magnetic_field, electron_density, observer_angle, distribution, polariz
 ```
 Sample values:
 ```
-j_nu_py()`: `j_nu_py(230e9, 30, 1, 1.047, symphonyPy.MAXWELL_JUETTNER, symphonyPy.STOKES_I,
-                     10, 2.5, 1, 1000, 1e10, 3.5, 10)
+j_nu_py(): j_nu_py(230e9, 30, 1, 1.047, symphonyPy.MAXWELL_JUETTNER, symphonyPy.STOKES_I,
+                   10, 2.5, 1, 1000, 1e10, 3.5, 10)
 ```
 * Note: All parameters with units are in CGS.
 * Note: In `C`, the keys `symphonyPy.MAXWELL_JUETTNER` and `symphonyPy.STOKES_I` are members of a struct called `params`.  They can be used with: `params->MAXWELL_JUETTNER` and `params->STOKES_I`.
