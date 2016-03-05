@@ -1,7 +1,7 @@
 #ifndef SYMPHONY_KAPPA_H_
 #define SYMPHONY_KAPPA_H_
 #include "../params.h"
-#include "../symphony.h"
+#include "../distribution_function_common_routines.h"
 
 double kappa_to_be_normalized(double gamma, void * paramsInput);
 double kappa_f(double gamma, struct parameters * params);

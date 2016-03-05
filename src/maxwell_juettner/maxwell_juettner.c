@@ -59,3 +59,39 @@ double maxwell_juettner_f(double gamma, struct parameters * params)
 //
 //  return Df;
 //}
+
+
+/*n_peak: Calculates and returns the location of the peak of the n integrand for 
+ *        the MAXWELL_JUETTNER distribution; uses Eq. 68 in [2] to do this. 
+ *        This analytic estimate of peak location in n-space speeds up the 
+ *        evaluation of j_nu() and alpha_nu() for the MAXWELL_JUETTNER 
+ *        distribution.  Analytic locations of the peak in n-space for
+ *        other distributions are not known, so peak locations are found
+ *        adaptively in n_integration().
+ *
+ *@params: struct of parameters params
+ *@returns: location of the peak of the n integrand for the 
+ *          MAXWELL_JUETTNER distribution 
+ */
+double maxwell_juettner_n_peak(struct parameters * params)
+{
+  double nu_c = get_nu_c(*params);
+
+  double beta = 0.;
+
+  if (   params->nu <= nu_c * params->theta_e * params->theta_e 
+      || params->theta_e < 1.
+     ) /*beta low nu limit*/
+  {
+    beta = sqrt((1. - 1./pow((1. + params->theta_e),2.)));
+  }
+  else /*beta high nu limit */
+  {
+    beta = sqrt(1. - pow((2. * params->theta_e * params->nu / nu_c), -2./3.));
+  }
+  
+  double n_peak =  (params->theta_e + 1. + pow((2. * params->theta_e * params->nu / nu_c),1./3.))
+                 * (params->nu/nu_c) * (1. - beta*beta * pow(cos(params->observer_angle),2.));
+
+  return n_peak;
+}

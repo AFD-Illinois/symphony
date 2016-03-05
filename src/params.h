@@ -59,5 +59,6 @@ struct parametersGSL
 };
 
 void setConstParams(struct parameters *params);
+double get_nu_c(struct parameters params);
 
 #endif /* SYMPHONY_PARAMS_H_ */
