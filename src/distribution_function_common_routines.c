@@ -1,13 +1,12 @@
 #include "distribution_function_common_routines.h"
 
 /*normalize_f: normalizes the distribution function using GSL's 
- *             QAGIU integrator.  TODO: modify this to take a function 
- *             pointer to the supplied distribution function.
+ *             QAGIU integrator.   
  *
  *@params: struct of parameters to pass to distribution function
  *@returns: 1 over the normalization constant for the chosen distribution
  */
-double normalize_f(double (*distribution)(double, struct parameters *),
+double normalize_f(double (*distribution)(double, void *),
                    struct parameters * params
                   )
 {
@@ -17,7 +16,7 @@ double normalize_f(double (*distribution)(double, struct parameters *),
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
   double result, error;
   gsl_function F;
-  
+
   F.function = distribution;
 
   F.params = params;
@@ -27,8 +26,6 @@ double normalize_f(double (*distribution)(double, struct parameters *),
                        );
   gsl_integration_workspace_free (w);
   ans = result;
-  //TODO: Debug mode 
-  //printf("\nRESULT of NORM = %e\n", result);
   return result;
 }
 

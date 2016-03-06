@@ -2,21 +2,22 @@
 #define SYMPHONY_H_
 
 /*GSL libraries*/
-#include <gsl/gsl_spline.h>
-#include <gsl/gsl_sf_gamma.h>
-#include <gsl/gsl_sf_bessel.h>
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_sf.h>
+//#include <gsl/gsl_spline.h>
+//#include <gsl/gsl_sf_gamma.h>
+//#include <gsl/gsl_sf_bessel.h>
+//#include <gsl/gsl_errno.h>
+//#include <gsl/gsl_sf.h>
 
 /*other C header files*/
 #include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <float.h>
-#include <ctype.h>
+//#include <stdlib.h>
+//#include <math.h>
+//#include <float.h>
+//#include <ctype.h>
 
 #include "params.h"
-#include "fits.h"
+//#include "fits.h"
+#include "integrator/integrate.h"
 
 double j_nu(double nu,
             double magnetic_field,

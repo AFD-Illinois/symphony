@@ -1,4 +1,4 @@
-#include "symphony.h"
+#include "fits.h"
 
 /*Wrappers for the fitting formulae*/
 
@@ -50,7 +50,7 @@ double j_nu_fit(double nu,
   params.kappa_width        = kappa_width;
 
 
-  check_for_errors(&params); //TODO: fix this
+//  check_for_errors(&params); //TODO: fix this
   
  if(params.distribution == params.MAXWELL_JUETTNER)
   {

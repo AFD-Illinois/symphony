@@ -54,7 +54,8 @@ double power_law_f(double gamma, struct parameters * params)
   double body = pow(gamma, -params->power_law_p) 
                 * exp(- gamma / params->gamma_cutoff);
 
-  double ans = 1./normalize_f(params) * prefactor * body 
+  double ans = 1./normalize_f(&power_law_to_be_normalized, params) * prefactor 
+                              * body 
                               * 1./(pow(params->mass_electron, 3.) 
                               * pow(params->speed_light, 3.) 
                               * gamma*gamma * beta);

@@ -9,6 +9,9 @@
  */
 
 #include "symphony.h"
+#include "fits.h"
+#include "params.h"
+#include "distribution_function_common_routines.h"
 
 /* main: runs through a demo of symphony's capabilities; currently
  * sets parameters to sample values and outputs nu/nu_c 

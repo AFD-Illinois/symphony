@@ -1,6 +1,8 @@
 #ifndef SYMPHONY_FITS_H_
 #define SYMPHONY_FITS_H_
 
+#include "symphony.h"
+
 double thermal_I(struct parameters * params);
 double thermal_Q(struct parameters * params);
 double thermal_V(struct parameters * params);

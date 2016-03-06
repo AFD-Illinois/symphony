@@ -3,7 +3,7 @@
 
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_deriv.h>
-#include "../params.h"
+//#include "../params.h"
 #include "integrands.h"
 
 double gamma_integral(double min, double max, double n,
