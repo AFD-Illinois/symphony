@@ -45,14 +45,10 @@ double kappa_to_be_normalized(double gamma, void * paramsInput)
 double kappa_f(double gamma, struct parameters * params)
 {
 
-  //double (*kappa_unnormalized)(double, struct parameters *);
-  //kappa_unnormalized = &kappa_to_be_normalized;
+  /*no analytic estimate for where n-space peak is; must find it adaptively*/
+  if(params->use_n_peak != 0) params->use_n_peak = 0;
 
   double norm = 1./normalize_f(&kappa_to_be_normalized, params);
-
-//double normalize_f(double (*distribution)(double, struct parameters *),
-//                   struct parameters * params
-//                  )
 
   double kappa_body = params->electron_density * pow((1. + (gamma - 1.)
                      /(params->kappa * params->kappa_width)), -params->kappa-1);

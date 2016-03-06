@@ -52,7 +52,7 @@ add_subdirectory(kappa)
 add_subdirectory(integrator)
 
 add_library(symphony symphony.c symphony.h fits.c fits.h)
-target_link_libraries(symphony maxwell_juettner power_law kappa
+target_link_libraries(symphony maxwell_juettner power_law kappa integrator
                       ${MATH_LIBRARIES}
                       ${GSL_LIBRARIES}
                       ${CBLAS_LIBRARIES})

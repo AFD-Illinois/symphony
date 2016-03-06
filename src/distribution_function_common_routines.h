@@ -2,7 +2,7 @@
 //#define SYMPHONY_DISTRIBUTION_FUNCTION_COMMON_ROUTINES_H_
 
 #include <gsl/gsl_integration.h>
-//#include "params.h"
+#include "params.h"
 
 double normalize_f(double (*distribution)(double, void *),
                    struct parameters * params

@@ -172,7 +172,7 @@ double n_summation(struct parameters *params)
 
   /*add result of n sum from 1 to n_max to an integral over n from n_max to
     the point where the integral no longer gives appreciable contributions*/
-  ans += n_integration(n_minus, params);
+  ans += n_integration(n_minus, params->n_peak, params);
 
   /*if doing Stokes V, must perform two n integrals: one over the positive
     part of gamma integrand and one over the negative part; this helps GSL QAG
@@ -180,7 +180,7 @@ double n_summation(struct parameters *params)
   if(params->polarization == params->STOKES_V)
   {
     params->stokes_v_switch = 1;
-    ans += n_integration(n_minus, params);
+    ans += n_integration(n_minus, params->n_peak, params);
   }
   
   return ans;

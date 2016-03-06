@@ -30,6 +30,8 @@ void setConstParams(struct parameters *params)
   /* Keys for the mode: absorptivity or emissivity */
   params->ABSORPTIVITY     = 10;
   params->EMISSIVITY       = 11;
+  /*Default: find n-space peak adaptively */
+  params->use_n_peak       = 0;
 
 }
 

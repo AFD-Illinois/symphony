@@ -45,6 +45,9 @@ double power_law_to_be_normalized(double gamma, void * paramsInput)
  */
 double power_law_f(double gamma, struct parameters * params) 
 {
+  /*no analytic estimate for where n-space peak is; must find it adaptively*/
+  if(params->use_n_peak != 0) params->use_n_peak = 0;  
+
   double beta = sqrt(1. - 1./(gamma*gamma));
 
   double prefactor = params->electron_density * (params->power_law_p - 1.) 
