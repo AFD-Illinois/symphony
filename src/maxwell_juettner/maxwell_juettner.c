@@ -48,12 +48,12 @@ double maxwell_juettner_n_peak(struct parameters * params)
 double maxwell_juettner_f(double gamma, struct parameters * params) 
 {
   /*we have an analytic estimate for where the n-space peak is*/
-  if(params->use_n_peak != 1)
-  {
-    params->use_n_peak = 1;
-    double (*MJ_n_peak)(struct parameters *) = &maxwell_juettner_n_peak;
-    params->n_peak     = MJ_n_peak;
-  }
+//  if(params->use_n_peak != 1)
+//  {
+//    params->use_n_peak = 1;
+//    double (*MJ_n_peak)(struct parameters *) = &maxwell_juettner_n_peak;
+//    params->n_peak     = MJ_n_peak;
+//  }
 
   double beta = sqrt(1. - 1./(gamma*gamma));
 

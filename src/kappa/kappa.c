@@ -46,7 +46,7 @@ double kappa_f(double gamma, struct parameters * params)
 {
 
   /*no analytic estimate for where n-space peak is; must find it adaptively*/
-  if(params->use_n_peak != 0) params->use_n_peak = 0;
+//  if(params->use_n_peak != 0) params->use_n_peak = 0;
 
   double norm = 1./normalize_f(&kappa_to_be_normalized, params);
 

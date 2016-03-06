@@ -98,6 +98,7 @@ double n_integration(double n_minus,
   double nu_c = get_nu_c(*params);
 
   double n_start = (int)(params->n_max + n_minus + 1.);
+
   /*For the MAXWELL_JUETTNER distribution, the n-space peak location is known
     analytically; this speeds up evaluation of MAXWELL_JUETTNER until
     nu/nu_c = 1e6, where the approximation breaks down and the adaptive 
@@ -226,6 +227,8 @@ double gamma_integral(double min,
   struct parametersGSL paramsGSL;
   paramsGSL.params = *params;
   paramsGSL.n      = n;
+
+//  set_distribution_function(&paramsGSL);  //TODO: move this?
 
   //TODO: describe why this is necessary
   if(params->nu/nu_c >= 1.e6)

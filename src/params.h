@@ -53,6 +53,9 @@ struct parameters
   int use_n_peak;
   double (*n_peak)(struct parameters *);
 
+  /*Set distribution_function */
+  double (*distribution_function)(double gamma, struct parameters *);
+
   int stokes_v_switch;
 };
 
@@ -60,7 +63,7 @@ struct parametersGSL
 {
   struct parameters params;
   double n;
-  double (*distribution_function)(double gamma, struct parameters *);
+//  double (*distribution_function)(double gamma, struct parameters *);
 };
 
 void setConstParams(struct parameters *params);

@@ -6,6 +6,7 @@
 
 double maxwell_juettner_f(double gamma, struct parameters * params);
 double differential_of_maxwell_juettner(double gamma, struct parameters * params);
+double maxwell_juettner_n_peak(struct parameters * params);
 
 /* Fits */
 

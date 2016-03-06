@@ -66,7 +66,9 @@ double normalize_f(double (*distribution)(double, void *),
 //  return Df;
 //}
 
-double num_differential_of_f(double gamma, struct parameters * params)
+double num_differential_of_f(double gamma, 
+                double (*distribution_function)(double gamma, struct parameters * params),
+                             struct parameters * params)
 {
   double Df = 0.;
   double epsilon = 0.0000001;
@@ -76,24 +78,29 @@ double num_differential_of_f(double gamma, struct parameters * params)
                      * params->pi * pow(params->mass_electron, 3.) 
                      * pow(params->speed_light, 3);
 
-  if(params->distribution == params->MAXWELL_JUETTNER)
-  {
-    Df =  (maxwell_juettner_f(gamma+epsilon, params)
-           - maxwell_juettner_f(gamma-epsilon, params))
+  Df =  (distribution_function(gamma+epsilon, params)
+         - distribution_function(gamma-epsilon, params))
           / epsilon;
-  }
-  else if(params->distribution == params->POWER_LAW)
-  {
-    Df =  (power_law_f(gamma+epsilon, params)
-           - power_law_f(gamma-epsilon, params))
-          / epsilon;
-  }
-  else if(params->distribution == params->KAPPA_DIST)
-  {
-    Df =  (kappa_f(gamma+epsilon, params)
-           - kappa_f(gamma-epsilon, params))
-          / epsilon;
-  }
+
+
+//  if(params->distribution == params->MAXWELL_JUETTNER)
+//  {
+//    Df =  (maxwell_juettner_f(gamma+epsilon, params)
+//           - maxwell_juettner_f(gamma-epsilon, params))
+//          / epsilon;
+//  }
+//  else if(params->distribution == params->POWER_LAW)
+//  {
+//    Df =  (power_law_f(gamma+epsilon, params)
+//           - power_law_f(gamma-epsilon, params))
+//          / epsilon;
+//  }
+//  else if(params->distribution == params->KAPPA_DIST)
+//  {
+//    Df =  (kappa_f(gamma+epsilon, params)
+//           - kappa_f(gamma-epsilon, params))
+//          / epsilon;
+//  }
 
   return prefactor * Df;
 }

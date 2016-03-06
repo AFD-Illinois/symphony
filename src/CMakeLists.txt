@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 2.8)
 project(symphony)
 
 # ------------------------------USER OPTIONS----------------------------------#
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -O3")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -O3 -g")
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -DDEBUG")
 
 # Custon GSL install directory
@@ -51,7 +51,7 @@ add_subdirectory(power_law)
 add_subdirectory(kappa)
 add_subdirectory(integrator)
 
-add_library(symphony symphony.c symphony.h fits.c fits.h)
+add_library(symphony symphony.c symphony.h fits.c fits.h bessel_mod.c)
 target_link_libraries(symphony maxwell_juettner power_law kappa integrator
                       ${MATH_LIBRARIES}
                       ${GSL_LIBRARIES}

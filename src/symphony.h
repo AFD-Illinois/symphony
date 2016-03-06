@@ -45,5 +45,4 @@ double alpha_nu(double nu,
                 double gamma_cutoff,
                 double kappa,
                 double kappa_width);
-
 #endif /* SYMPHONY_H_ */

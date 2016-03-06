@@ -44,7 +44,7 @@ void setConstParams(struct parameters *params)
 double get_nu_c(struct parameters params)
 {
   return  (params.electron_charge * params.magnetic_field)
-        / (2. * M_PI * params.mass_electron * params.speed_light);
+        / (2. * params.pi * params.mass_electron * params.speed_light);
 }
 
 
