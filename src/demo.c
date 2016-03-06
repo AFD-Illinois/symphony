@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     paramsM.nu = pow(10., (double)index/(double)points_per_pow_10) * nu_c;
 
     printf("\n%e	%e	%e", paramsM.nu/nu_c, 
-                                     j_nu(paramsM.nu, 
+                                     alpha_nu(paramsM.nu, 
                                           paramsM.magnetic_field, 
                                           paramsM.electron_density, 
                                           paramsM.observer_angle, 
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
                                           paramsM.kappa,              
                                           paramsM.kappa_width        
                                           ), 
-                                 j_nu_fit(paramsM.nu,
+                                 alpha_nu_fit(paramsM.nu,
                                           paramsM.magnetic_field,
                                           paramsM.electron_density,
                                           paramsM.observer_angle,

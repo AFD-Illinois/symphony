@@ -228,8 +228,6 @@ double gamma_integral(double min,
   paramsGSL.params = *params;
   paramsGSL.n      = n;
 
-//  set_distribution_function(&paramsGSL);  //TODO: move this?
-
   //TODO: describe why this is necessary
   if(params->nu/nu_c >= 1.e6)
   {
@@ -246,7 +244,7 @@ double gamma_integral(double min,
 
   // TODO: Remove hard coded limits
   gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
-                         3,  w, &result, &error); 
+                      3,  w, &result, &error); 
 
   gsl_integration_workspace_free (w);
 

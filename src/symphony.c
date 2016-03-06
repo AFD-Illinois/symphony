@@ -48,7 +48,6 @@ double j_nu(double nu,
   params.kappa_width        = kappa_width;
   set_distribution_function(&params);
 
-
   return n_summation(&params);
 }
 
@@ -99,6 +98,7 @@ double alpha_nu(double nu,
   params.gamma_cutoff       = gamma_cutoff;
   params.kappa              = kappa;
   params.kappa_width        = kappa_width;
+  set_distribution_function(&params);
 
   return n_summation(&params);
 }

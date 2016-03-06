@@ -71,24 +71,24 @@ double kappa_f(double gamma, struct parameters * params)
  *          ([1] eq. 12, 13, and 18) for the alpha_nu() calculation.
  *
  */
-//double differential_of_kappa(double gamma, struct parameters * params) 
-//{
-//  double prefactor = params->electron_density * (1./normalize_f(params)) 
-//                     * 4. * params->pi*params->pi * params->nu 
-//                     * params->mass_electron * params->mass_electron 
-//                     * params->speed_light;
-//
-//  double term1 = ((- params->kappa - 1.) 
-//                  / (params->kappa * params->kappa_width)) 
-//                * pow((1. + (gamma - 1.) 
-//                      / (params->kappa * params->kappa_width)), 
-//                      -params->kappa-2.);
-//
-//  double term2 = pow((1. + (gamma - 1.)
-//                     /(params->kappa * params->kappa_width)), 
-//                     (- params->kappa - 1.)) * (- 1./params->gamma_cutoff);
-//
-//  double Df = prefactor * (term1 + term2) * exp(-gamma/params->gamma_cutoff);
-//
-//  return Df;
-//}
+double differential_of_kappa(double gamma, struct parameters * params) 
+{
+  double prefactor = params->electron_density * (1./normalize_f(&kappa_to_be_normalized, params)) 
+                     * 4. * params->pi*params->pi * params->nu 
+                     * params->mass_electron * params->mass_electron 
+                     * params->speed_light;
+
+  double term1 = ((- params->kappa - 1.) 
+                  / (params->kappa * params->kappa_width)) 
+                * pow((1. + (gamma - 1.) 
+                      / (params->kappa * params->kappa_width)), 
+                      -params->kappa-2.);
+
+  double term2 = pow((1. + (gamma - 1.)
+                     /(params->kappa * params->kappa_width)), 
+                     (- params->kappa - 1.)) * (- 1./params->gamma_cutoff);
+
+  double Df = prefactor * (term1 + term2) * exp(-gamma/params->gamma_cutoff);
+
+  return Df;
+}

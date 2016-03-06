@@ -60,8 +60,8 @@ double power_law_f(double gamma, struct parameters * params)
   double ans = 1./normalize_f(&power_law_to_be_normalized, params) * prefactor 
                               * body 
                               * 1./(pow(params->mass_electron, 3.) 
-                              * pow(params->speed_light, 3.) 
-                              * gamma*gamma * beta);
+                                    * pow(params->speed_light, 3.) 
+                                    * gamma*gamma * beta);
 
   return ans;
 
@@ -88,31 +88,31 @@ double power_law_f(double gamma, struct parameters * params)
  *
  */
 
-//double differential_of_power_law(double gamma, struct parameters * params)
-//{
-//  double pl_norm = 4.* params->pi/(normalize_f(params));
-//
-//  double prefactor = (  params->pi * params->nu 
-//                      / (params->mass_electron * pow(params->speed_light, 2.))
-//                     )
-//                     * (params->electron_density*(params->power_law_p-1.))
-//                     / ( (  pow(params->gamma_min, 1.-params->power_law_p) 
-//                          - pow(params->gamma_max, 1.-params->power_law_p)
-//                         )
-//                       );
-//
-//  double term1 = ((-params->power_law_p-1.)*exp(-gamma/params->gamma_cutoff)
-//             *pow(gamma,-params->power_law_p-2.)/(sqrt(gamma*gamma - 1.)));
-//
-//  double term2 = (exp(-gamma/params->gamma_cutoff) 
-//                  * pow(gamma,(-params->power_law_p-1.))
-//                  /(params->gamma_cutoff * sqrt(gamma*gamma - 1.)));
-//
-//  double term3 = (exp(-gamma/params->gamma_cutoff) 
-//                  * pow(gamma,-params->power_law_p))
-//                 /pow((gamma*gamma - 1.), (3./2.));
-//
-//  double Df = pl_norm * prefactor * (term1 - term2 - term3);
-//
-//  return Df;
-//}
+double differential_of_power_law(double gamma, struct parameters * params)
+{
+  double pl_norm = 4.* params->pi/(normalize_f(&power_law_to_be_normalized, params));
+
+  double prefactor = (  params->pi * params->nu 
+                      / (params->mass_electron * pow(params->speed_light, 2.))
+                     )
+                     * (params->electron_density*(params->power_law_p-1.))
+                     / ( (  pow(params->gamma_min, 1.-params->power_law_p) 
+                          - pow(params->gamma_max, 1.-params->power_law_p)
+                         )
+                       );
+
+  double term1 = ((-params->power_law_p-1.)*exp(-gamma/params->gamma_cutoff)
+             *pow(gamma,-params->power_law_p-2.)/(sqrt(gamma*gamma - 1.)));
+
+  double term2 = (exp(-gamma/params->gamma_cutoff) 
+                  * pow(gamma,(-params->power_law_p-1.))
+                  /(params->gamma_cutoff * sqrt(gamma*gamma - 1.)));
+
+  double term3 = (exp(-gamma/params->gamma_cutoff) 
+                  * pow(gamma,-params->power_law_p))
+                 /pow((gamma*gamma - 1.), (3./2.));
+
+  double Df = pl_norm * prefactor * (term1 - term2 - term3);
+
+  return Df;
+}
