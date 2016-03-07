@@ -16,7 +16,7 @@
 //#include <ctype.h>
 
 #include "params.h"
-//#include "fits.h"
+#include "fits.h"
 #include "integrator/integrate.h"
 
 double j_nu(double nu,
