@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 2.8)
 project(symphony)
 
 # ------------------------------USER OPTIONS----------------------------------#
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -O3")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -O3 -g")
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -DDEBUG")
 
 # Custon GSL install directory
@@ -49,18 +49,19 @@ include_directories(${GSL_INCLUDE_DIRS}  ${PYTHON_NUMPY_INCLUDE_DIR} .)
 add_subdirectory(maxwell_juettner)
 add_subdirectory(power_law)
 add_subdirectory(kappa)
+add_subdirectory(integrator)
 
-add_executable(symphony symphony.c symphony.h bessel_mod.c  calc.c  calc.h
-               fits.c  fits.h  integrate.c  integrate.h params.c  params.h)
-
-target_link_libraries(symphony maxwell_juettner power_law kappa
+add_library(symphony symphony.c symphony.h fits.c fits.h bessel_mod.c)
+target_link_libraries(symphony maxwell_juettner power_law kappa integrator
                       ${MATH_LIBRARIES}
                       ${GSL_LIBRARIES}
                       ${CBLAS_LIBRARIES})
 
-cython_add_module(symphonyPy symphonyPy.pyx calc.c integrate.c bessel_mod.c
-  params.c params.h fits.c fits.h)
-target_link_libraries(symphonyPy kappa power_law maxwell_juettner
+add_executable(demo demo.c)
+target_link_libraries(demo symphony)
+
+cython_add_module(symphonyPy symphonyPy.pyx fits.c fits.h)
+target_link_libraries(symphonyPy symphony kappa power_law maxwell_juettner
   ${GSL_LIBRARIES} ${CBLAS_LIBRARIES})
 
 message("")

@@ -49,6 +49,13 @@ struct parameters
   double kappa;
   double kappa_width;
 
+  /*Choose if n-space peak is known, or if it must be found adaptively */
+  int use_n_peak;
+  double (*n_peak)(struct parameters *);
+
+  /*Set distribution_function */
+  double (*distribution_function)(double gamma, struct parameters *);
+
   int stokes_v_switch;
 };
 
@@ -56,8 +63,10 @@ struct parametersGSL
 {
   struct parameters params;
   double n;
+//  double (*distribution_function)(double gamma, struct parameters *);
 };
 
 void setConstParams(struct parameters *params);
+double get_nu_c(struct parameters params);
 
 #endif /* SYMPHONY_PARAMS_H_ */

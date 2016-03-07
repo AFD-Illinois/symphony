@@ -1,10 +1,12 @@
 #ifndef SYMPHONY_MAXWELL_JUETTNER_H_
 #define SYMPHONY_MAXWELL_JUETTNER_H_
 #include "../params.h"
-#include "../symphony.h"
+#include "../distribution_function_common_routines.h"
+#include <gsl/gsl_sf_bessel.h>
 
 double maxwell_juettner_f(double gamma, struct parameters * params);
 double differential_of_maxwell_juettner(double gamma, struct parameters * params);
+double maxwell_juettner_n_peak(struct parameters * params);
 
 /* Fits */
 
