@@ -17,6 +17,7 @@ name = MPI.Get_processor_name()
 #set constant parameters for the calculation
 m = 9.1093826e-28
 c = 2.99792458e10
+electron_charge = 4.80320680e-10
 theta_e = 10. #Do we need to do anything about electron temp?
 e = 4.80320680e-10
 h = 6.6260693e-27
@@ -74,10 +75,12 @@ MJ_I_exact = np.zeros([N2, N1])
 jIndexStart =  rank    * N2 / size
 jIndexEnd   = (rank+1) * N2 / size
 
+nu_c = electron_charge * (B_mag * 30) / (2. * np.pi * m * c)
+
 for j in range(jIndexStart, jIndexEnd):
     print "j = ", j, ", rank = ", rank
     for i in range(0, N1):
-        MJ_I_exact[j][i] = sp.j_nu_fit_py(nuratio,
+        MJ_I_exact[j][i] = sp.j_nu_py(nuratio * nu_c[j][i],
                                           B_mag[j][i],
                                           n_e[j][i], 
                                           obs_angle[j][i],
@@ -87,11 +90,14 @@ for j in range(jIndexStart, jIndexEnd):
                                           kappa, kappa_width
                                          )
 
+comm.barrier()
 comm.Allgather([MJ_I_exact[jIndexStart:jIndexEnd, :], MPI.DOUBLE],
                [MJ_I_exact, MPI.DOUBLE]
               )
 if (rank==0):
+    np.savetxt("MJ_I_using_symphony_integrator.txt", MJ_I_exact)
     pl.contourf(MJ_I_exact, 100)
+    pl.colorbar()
     pl.show()
 
 #MJ_I_avgs  = sp.j_nu_fit_py(nuratio, B_mag_avg, n_e_avg,
