@@ -1,18 +1,19 @@
 #file to calculate <j_nu()> vs. j_nu(<avgs>)
 import sys
 
-symphony_build_path = '/home/mani/work/symphony/build'
+#symphony_build_path = '/home/mani/work/symphony/build'
+symphony_build_path = '/home/alex/Documents/Spring_2016/1symphony/symphony/build'
 sys.path.append(symphony_build_path)
 
 import symphonyPy as sp
 import numpy as np
 import pylab as pl
-from mpi4py import MPI
+#from mpi4py import MPI
 
-comm = MPI.COMM_WORLD
-rank = MPI.COMM_WORLD.Get_rank()
-size = MPI.COMM_WORLD.Get_size()
-name = MPI.Get_processor_name()
+#comm = MPI.COMM_WORLD
+#rank = MPI.COMM_WORLD.Get_rank()
+#size = MPI.COMM_WORLD.Get_size()
+#name = MPI.Get_processor_name()
 
 #set constant parameters for the calculation
 m = 9.1093826e-28
@@ -33,9 +34,14 @@ B_scale = 30. #TODO: check if sim data is actually normalized to init. val.
 #import data from Dr. Kunz's simulation
 N2 = 1152
 N1 = 1152
-comm.Barrier()
+
+rank = 0
+size = 1
+
+#comm.Barrier()
 if (rank==0):
-    datafiles_path = '/home/mani/work/kunz_data/'
+#    datafiles_path = '/home/mani/work/kunz_data/'
+    datafiles_path = '/home/alex/Documents/Spring_2016/'
     B_x = np.loadtxt(datafiles_path + 'mirror_bx.out') * B_scale
     B_y = np.loadtxt(datafiles_path + 'mirror_by.out') * B_scale
     B_z = np.loadtxt(datafiles_path + 'mirror_bz.out') * B_scale
@@ -51,11 +57,11 @@ else:
     B_mag = np.zeros([N2, N1])
     n_e = np.zeros([N2, N1])
 
-comm.Bcast([B_x, MPI.DOUBLE])
-comm.Bcast([B_y, MPI.DOUBLE])
-comm.Bcast([B_z, MPI.DOUBLE])
-comm.Bcast([B_mag, MPI.DOUBLE])
-comm.Bcast([n_e, MPI.DOUBLE])
+#comm.Bcast([B_x, MPI.DOUBLE])
+#comm.Bcast([B_y, MPI.DOUBLE])
+#comm.Bcast([B_z, MPI.DOUBLE])
+#comm.Bcast([B_mag, MPI.DOUBLE])
+#comm.Bcast([n_e, MPI.DOUBLE])
 
 #still thinking about how to do observer_angle.  Is there a better way than this?
 obs_angle = np.arccos(1./(1.) * (0.*B_x + -1.*B_y + 0.*B_z)/B_mag)
@@ -80,7 +86,7 @@ nu_c = electron_charge * (B_mag * 30) / (2. * np.pi * m * c)
 for j in range(jIndexStart, jIndexEnd):
     print "j = ", j, ", rank = ", rank
     for i in range(0, N1):
-        MJ_I_exact[j][i] = sp.j_nu_py(nuratio * nu_c[j][i],
+        MJ_I_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
                                           B_mag[j][i],
                                           n_e[j][i], 
                                           obs_angle[j][i],
@@ -90,12 +96,12 @@ for j in range(jIndexStart, jIndexEnd):
                                           kappa, kappa_width
                                          )
 
-comm.barrier()
-comm.Allgather([MJ_I_exact[jIndexStart:jIndexEnd, :], MPI.DOUBLE],
-               [MJ_I_exact, MPI.DOUBLE]
-              )
+#comm.barrier()
+#comm.Allgather([MJ_I_exact[jIndexStart:jIndexEnd, :], MPI.DOUBLE],
+#               [MJ_I_exact, MPI.DOUBLE]
+#              )
 if (rank==0):
-    np.savetxt("MJ_I_using_symphony_integrator.txt", MJ_I_exact)
+    np.savetxt("MJ_I_using_symphony_fits.txt", MJ_I_exact)
     pl.contourf(MJ_I_exact, 100)
     pl.colorbar()
     pl.show()
