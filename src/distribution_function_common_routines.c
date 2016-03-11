@@ -66,21 +66,41 @@ double differential_of_f(double gamma, struct parameters * params)
   return Df;
 }
 
-//double num_differential_of_f(double gamma, struct parameters * params)
-//{
-//  double Df = 0.;
-//  double epsilon = 0.0000001;
-//
-//  double prefactor = (2. * params->pi * params->nu
-//                      / (params->mass_electron
-//                         *params->speed_light*params->speed_light))
-//                     * params->pi * pow(params->mass_electron, 3.) 
-//                     * pow(params->speed_light, 3.);
-//
-//  Df =  (params->distribution_function(gamma+epsilon, params)
-//         - params->distribution_function(gamma-epsilon, params))
-//          / (2. * epsilon);
-//
-//  return prefactor * Df;
-//}
+double numerical_differential_of_f(double gamma, struct parameters * params)
+{
+  double Df = 0.;
+  double epsilon = 2e-4;
+
+  double prefactor = (2. * params->pi * params->nu
+                      / (params->mass_electron
+                         *params->speed_light*params->speed_light))
+                     * params->pi * pow(params->mass_electron, 3.) 
+                     * pow(params->speed_light, 3.);
+
+  /*The if statements below are necessary because for some values of
+    gamma, the quantity distribution_function(gamma+epsilon) or
+    distribution_function(gamma-epsilon) is complex, and returns
+    NaN.  The if statements use a one-sided approximation to avoid
+    these regions. */
+  if(isnan(params->distribution_function(gamma+epsilon, params)) != 0)
+  {
+    Df =  (params->distribution_function(gamma, params)
+           - params->distribution_function(gamma-epsilon, params))
+          / (epsilon);
+  }
+  else if(isnan(params->distribution_function(gamma-epsilon, params)) != 0)
+  {
+    Df =  (params->distribution_function(gamma+epsilon, params)
+           - params->distribution_function(gamma, params))
+          / (epsilon);
+  }
+  else
+  {
+    Df =  (params->distribution_function(gamma+epsilon, params)
+           - params->distribution_function(gamma-epsilon, params))
+          / (epsilon);
+  }
+
+  return prefactor * Df;
+}
 

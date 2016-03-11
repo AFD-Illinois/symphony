@@ -120,7 +120,7 @@ double gamma_integrand(double gamma, void * paramsGSLInput)
                         / (2. * params->nu);
 
     ans = prefactor * gamma * gamma * beta
-         * differential_of_f(gamma,  params)
+         * numerical_differential_of_f(gamma,  params)
          * polarization_term(gamma, paramsGSL->n, params)
          * (1./(params->nu*beta*fabs(cos(params->observer_angle))));
 
