@@ -412,9 +412,9 @@ for j in range(jIndexStart, jIndexEnd):
 
 
 #np.savetxt("MJ_I_using_symphony_fits.txt", MJ_I_exact)
-#pl.contourf(MJ_I_exact, 100)
-#pl.colorbar()
-#pl.show()
+pl.contourf(MJ_I_exact, 100)
+pl.colorbar()
+pl.show()
 
 MJ_I_exact_avg = np.mean(MJ_I_exact)
 

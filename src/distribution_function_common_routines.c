@@ -70,15 +70,17 @@ double differential_of_f(double gamma, struct parameters * params)
 //{
 //  double Df = 0.;
 //  double epsilon = 0.0000001;
+//
 //  double prefactor = (2. * params->pi * params->nu
 //                      / (params->mass_electron
 //                         *params->speed_light*params->speed_light))
 //                     * params->pi * pow(params->mass_electron, 3.) 
-//                     * pow(params->speed_light, 3);
+//                     * pow(params->speed_light, 3.);
 //
 //  Df =  (params->distribution_function(gamma+epsilon, params)
 //         - params->distribution_function(gamma-epsilon, params))
-//          / epsilon;
+//          / (2. * epsilon);
 //
 //  return prefactor * Df;
 //}
+
