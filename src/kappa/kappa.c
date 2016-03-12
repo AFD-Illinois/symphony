@@ -45,9 +45,6 @@ double kappa_to_be_normalized(double gamma, void * paramsInput)
 double kappa_f(double gamma, struct parameters * params)
 {
 
-  /*no analytic estimate for where n-space peak is; must find it adaptively*/
-//  if(params->use_n_peak != 0) params->use_n_peak = 0;
-
   double norm = 1./normalize_f(&kappa_to_be_normalized, params);
 
   double kappa_body = params->electron_density * pow((1. + (gamma - 1.)
@@ -73,10 +70,8 @@ double kappa_f(double gamma, struct parameters * params)
  */
 double differential_of_kappa(double gamma, struct parameters * params) 
 {
-  double prefactor = params->electron_density * (1./normalize_f(&kappa_to_be_normalized, params)) 
-                     * 4. * params->pi*params->pi * params->nu 
-                     * params->mass_electron * params->mass_electron 
-                     * params->speed_light;
+  double prefactor = params->electron_density 
+                    * (1./normalize_f(&kappa_to_be_normalized, params));
 
   double term1 = ((- params->kappa - 1.) 
                   / (params->kappa * params->kappa_width)) 

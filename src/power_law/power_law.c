@@ -45,9 +45,6 @@ double power_law_to_be_normalized(double gamma, void * paramsInput)
  */
 double power_law_f(double gamma, struct parameters * params) 
 {
-  /*no analytic estimate for where n-space peak is; must find it adaptively*/
-//  if(params->use_n_peak != 0) params->use_n_peak = 0;  
-
   double beta = sqrt(1. - 1./(gamma*gamma));
 
   double prefactor = params->electron_density * (params->power_law_p - 1.) 
@@ -65,13 +62,6 @@ double power_law_f(double gamma, struct parameters * params)
 
   return ans;
 
-  /* TODO: Can this be done using the following?
-   * \int f d^3p = m_e n_e c^2
-   * double power_law_unnormalized() 
-   * { return pow(gamma, -params->power_law_p) };
-   *
-   * return power_law_unnormalized/normalize_f(power_law_to_be_normalized);
-   */
 }
 
 /*differential_of_power_law: The integrand for the absorptivity calculation 
@@ -79,8 +69,6 @@ double power_law_f(double gamma, struct parameters * params)
  *                           distribution function ([1] eq. 13).  For the 
  *                           power-law distribution, this is evaluated
  *                           analytically for speed and accuracy. 
- *                           TODO: numerical derivative calculator
- *                           for any gyrotropic distribution function.
  *
  *@params: Lorentz factor gamma, struct of parameters params
  *@returns: the differential of the power-law distribution function
@@ -90,12 +78,13 @@ double power_law_f(double gamma, struct parameters * params)
 
 double differential_of_power_law(double gamma, struct parameters * params)
 {
-  double pl_norm = 4.* params->pi/(normalize_f(&power_law_to_be_normalized, params));
 
-  double prefactor = (  params->pi * params->nu 
-                      / (params->mass_electron * pow(params->speed_light, 2.))
-                     )
-                     * (params->electron_density*(params->power_law_p-1.))
+  double pl_norm = 1./(normalize_f(&power_law_to_be_normalized, params));
+
+  double d3p_to_dgamma = 1./( pow(params->mass_electron, 3.)
+                             * pow(params->speed_light, 3.));
+
+  double prefactor = (params->electron_density*(params->power_law_p-1.))
                      / ( (  pow(params->gamma_min, 1.-params->power_law_p) 
                           - pow(params->gamma_max, 1.-params->power_law_p)
                          )
@@ -112,7 +101,7 @@ double differential_of_power_law(double gamma, struct parameters * params)
                   * pow(gamma,-params->power_law_p))
                  /pow((gamma*gamma - 1.), (3./2.));
 
-  double Df = pl_norm * prefactor * (term1 - term2 - term3);
+  double Df = pl_norm * d3p_to_dgamma * prefactor * (term1 - term2 - term3);
 
   return Df;
 }
