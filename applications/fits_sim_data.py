@@ -412,9 +412,9 @@ for j in range(jIndexStart, jIndexEnd):
 
 
 #np.savetxt("MJ_I_using_symphony_fits.txt", MJ_I_exact)
-pl.contourf(MJ_I_exact, 100)
-pl.colorbar()
-pl.show()
+#pl.contourf(MJ_I_exact, 100)
+#pl.colorbar()
+#pl.show()
 
 MJ_I_exact_avg = np.mean(MJ_I_exact)
 
@@ -523,7 +523,7 @@ for j in range(jIndexStart, jIndexEnd):
                                          )
 
 
-#np.savetxt("PL_I_using_symphony_fits.txt", PL_I_exact)
+np.savetxt("PL_I_using_symphony_fits.txt", PL_I_exact)
 #pl.contourf(PL_I_exact, 100)
 #pl.colorbar()
 #pl.show()
@@ -560,7 +560,7 @@ for j in range(jIndexStart, jIndexEnd):
                                          )
 
 
-#np.savetxt("PL_Q_using_symphony_fits.txt", PL_Q_exact)
+np.savetxt("PL_Q_using_symphony_fits.txt", PL_Q_exact)
 #pl.contourf(PL_Q_exact, 100)
 #pl.colorbar()
 #pl.show()
@@ -597,7 +597,7 @@ for j in range(jIndexStart, jIndexEnd):
                                          )
 
 
-#np.savetxt("PL_V_using_symphony_fits.txt", PL_V_exact)
+np.savetxt("PL_V_using_symphony_fits.txt", PL_V_exact)
 #pl.contourf(PL_V_exact, 100)
 #pl.colorbar()
 #pl.show()

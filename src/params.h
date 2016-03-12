@@ -63,7 +63,6 @@ struct parametersGSL
 {
   struct parameters params;
   double n;
-//  double (*distribution_function)(double gamma, struct parameters *);
 };
 
 void setConstParams(struct parameters *params);
