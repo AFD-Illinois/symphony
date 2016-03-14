@@ -88,7 +88,7 @@ double numerical_differential_of_f(double gamma, struct parameters * params)
   /*this is "d^3p Df" from [1] eq. 12 and 13.*/ 
 
   double Df = 0.;
-  double epsilon = 2e-4;
+  double epsilon = 3e-4;
 
   /*all of the distribution functions used are independent of gyrophase
     phi, so integrate out dphi to get 2*pi */

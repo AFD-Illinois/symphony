@@ -37,8 +37,13 @@ B_z = np.loadtxt(datafiles_path + 'mirror_bz.out') * B_scale
 B_mag = np.sqrt(B_x**2. + B_y**2. + B_z**2.)
 n_e = np.loadtxt(datafiles_path + 'mirror_d.out')
 
-#still thinking about how to do observer_angle.  Is there a better way than this?
-obs_angle = np.arccos(1./(1.) * (0.*B_x + -1.*B_y + 0.*B_z)/B_mag)
+#determine observer angle by setting vector to observer
+obs_vector = [0, -1, 0]
+obs_vector = obs_vector / np.linalg.norm(obs_vector)
+
+obs_angle = np.arccos((obs_vector[0]*B_x 
+                       + obs_vector[1]*B_y 
+                       + obs_vector[2]*B_z)/B_mag)
 
 #Generate all averages
 B_x_avg        = np.mean(B_x)
@@ -50,6 +55,10 @@ B_mag_avg      = np.mean(B_mag)
 nu_c           = electron_charge * (B_mag * B_scale) / (2. * np.pi * m * c)
 nu_c_avg       = np.mean(nu_c)
 nu_avg         = nuratio * nu_c_avg
+
+print 'average nu/nu_c:                 ', nu_avg/nu_c_avg
+print 'obs_angle (deg) to mean B field: ', obs_angle_avg*180./np.pi
+print 'B field (G) scale factor:        ', B_scale
 
 #-------------------------------MJ_I-------------------------------------------#
 MJ_I_exact_avg = 0
@@ -523,7 +532,7 @@ for j in range(jIndexStart, jIndexEnd):
                                          )
 
 
-np.savetxt("PL_I_using_symphony_fits.txt", PL_I_exact)
+#np.savetxt("PL_I_using_symphony_fits.txt", PL_I_exact)
 #pl.contourf(PL_I_exact, 100)
 #pl.colorbar()
 #pl.show()
@@ -560,7 +569,7 @@ for j in range(jIndexStart, jIndexEnd):
                                          )
 
 
-np.savetxt("PL_Q_using_symphony_fits.txt", PL_Q_exact)
+#np.savetxt("PL_Q_using_symphony_fits.txt", PL_Q_exact)
 #pl.contourf(PL_Q_exact, 100)
 #pl.colorbar()
 #pl.show()
@@ -597,7 +606,7 @@ for j in range(jIndexStart, jIndexEnd):
                                          )
 
 
-np.savetxt("PL_V_using_symphony_fits.txt", PL_V_exact)
+#np.savetxt("PL_V_using_symphony_fits.txt", PL_V_exact)
 #pl.contourf(PL_V_exact, 100)
 #pl.colorbar()
 #pl.show()
