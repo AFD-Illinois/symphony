@@ -171,10 +171,12 @@ double check_for_errors(struct parameters * params)
   double nu_c = get_nu_c(*params);
 
   /* catch potential errors */
-  if(params->nu/nu_c > 3e10)
+  if(params->nu/nu_c > 3e10 && 
+     (params->polarization == params->STOKES_Q 
+      || params->polarization == params->STOKES_V))
   {
-    printf("\n ERROR: nu too large\n");
-    exit(0);
+    printf("\n WARNING: nu may be out of range for Stokes Q and V fits\n");
+    //exit(0);
   }
   if(params->magnetic_field < 0)
   {
@@ -188,7 +190,7 @@ double check_for_errors(struct parameters * params)
   }
   if(params->kappa < 2.5 || params->kappa > 7.5)
   {
-    printf("\n ERROR: kappa out of range of fitting formula\n");
+    printf("\n WARNING: kappa out of range of fitting formula\n");
     //exit(0);
   }
   if(params->kappa_width < 3 || params->kappa_width > 200)
@@ -204,8 +206,8 @@ double check_for_errors(struct parameters * params)
   if(params->observer_angle < 5.*(params->pi)/180. 
      || params->observer_angle == 90.*(params->pi)/180.)
   {
-    printf("\n ERROR: theta out of range; fitting formula may be inaccurate\n");
-    exit(0);
+    printf("\n WARNING: theta out of range; fitting formula may be inaccurate\n");
+    //exit(0);
   }
 
   return 0.;

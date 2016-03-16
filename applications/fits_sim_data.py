@@ -38,7 +38,7 @@ B_mag = np.sqrt(B_x**2. + B_y**2. + B_z**2.)
 n_e = np.loadtxt(datafiles_path + 'mirror_d.out')
 
 #determine observer angle by setting vector to observer
-obs_vector = [0, -1, 0]
+obs_vector = [1, -10, 0]
 obs_vector = obs_vector / np.linalg.norm(obs_vector)
 
 obs_angle = np.arccos((obs_vector[0]*B_x 
@@ -82,9 +82,9 @@ for j in range(jIndexStart, jIndexEnd):
 
 
 #np.savetxt("MJ_I_using_symphony_fits.txt", MJ_I_exact)
-#pl.contourf(MJ_I_exact, 100)
-#pl.colorbar()
-#pl.show()
+pl.contourf(MJ_I_exact, 100)
+pl.colorbar()
+pl.show()
 
 MJ_I_exact_avg = np.mean(MJ_I_exact)
 
@@ -97,640 +97,640 @@ MJ_I_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
 print 'MJ_I   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (MJ_I_exact_avg 
                                                   - MJ_I_avgs)/MJ_I_exact_avg
 
-#-------------------------------MJ_Q-------------------------------------------#
-MJ_Q_exact_avg = 0
-MJ_Q_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        MJ_Q_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
-                                          B_mag[j][i],
-                                          n_e[j][i], 
-                                          obs_angle[j][i],
-                                          sp.MAXWELL_JUETTNER, 
-                                          sp.STOKES_Q, theta_e, power_law_p, 
-                                          gamma_min, gamma_max, gamma_cutoff, 
-                                          kappa, kappa_width
-                                         )
-
-
-#np.savetxt("MJ_Q_using_symphony_fits.txt", MJ_Q_exact)
-#pl.contourf(MJ_Q_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-MJ_Q_exact_avg = np.mean(MJ_Q_exact)
-
-MJ_Q_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                            obs_angle_avg, sp.MAXWELL_JUETTNER,
-                            sp.STOKES_Q, theta_e, power_law_p,
-                            gamma_min, gamma_max, gamma_cutoff,
-                            kappa, kappa_width)
-
-print 'MJ_Q   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (MJ_Q_exact_avg 
-                                                  - MJ_Q_avgs)/MJ_Q_exact_avg
-
-#-------------------------------MJ_V-------------------------------------------#
-MJ_V_exact_avg = 0
-MJ_V_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        MJ_V_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
-                                          B_mag[j][i],
-                                          n_e[j][i], 
-                                          obs_angle[j][i],
-                                          sp.MAXWELL_JUETTNER, 
-                                          sp.STOKES_V, theta_e, power_law_p, 
-                                          gamma_min, gamma_max, gamma_cutoff, 
-                                          kappa, kappa_width
-                                         )
-
-
-#np.savetxt("MJ_V_using_symphony_fits.txt", MJ_V_exact)
-#pl.contourf(MJ_V_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-MJ_V_exact_avg = np.mean(MJ_V_exact)
-
-MJ_V_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                            obs_angle_avg, sp.MAXWELL_JUETTNER,
-                            sp.STOKES_V, theta_e, power_law_p,
-                            gamma_min, gamma_max, gamma_cutoff,
-                            kappa, kappa_width)
-
-print 'MJ_V   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (MJ_V_exact_avg 
-                                                  - MJ_V_avgs)/MJ_V_exact_avg
-
-
-#-------------------------------PL_I-------------------------------------------#
-PL_I_exact_avg = 0
-PL_I_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        PL_I_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
-                                          B_mag[j][i],
-                                          n_e[j][i], 
-                                          obs_angle[j][i],
-                                          sp.POWER_LAW, 
-                                          sp.STOKES_I, theta_e, power_law_p, 
-                                          gamma_min, gamma_max, gamma_cutoff, 
-                                          kappa, kappa_width
-                                         )
-
-
-#np.savetxt("PL_I_using_symphony_fits.txt", PL_I_exact)
-#pl.contourf(PL_I_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-PL_I_exact_avg = np.mean(PL_I_exact)
-
-PL_I_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                            obs_angle_avg, sp.POWER_LAW,
-                            sp.STOKES_I, theta_e, power_law_p,
-                            gamma_min, gamma_max, gamma_cutoff,
-                            kappa, kappa_width)
-
-print 'PL_I   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_I_exact_avg 
-                                                  - PL_I_avgs)/PL_I_exact_avg
-
-#-------------------------------PL_Q-------------------------------------------#
-PL_Q_exact_avg = 0
-PL_Q_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        PL_Q_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
-                                          B_mag[j][i],
-                                          n_e[j][i], 
-                                          obs_angle[j][i],
-                                          sp.POWER_LAW, 
-                                          sp.STOKES_Q, theta_e, power_law_p, 
-                                          gamma_min, gamma_max, gamma_cutoff, 
-                                          kappa, kappa_width
-                                         )
-
-
-#np.savetxt("PL_Q_using_symphony_fits.txt", PL_Q_exact)
-#pl.contourf(PL_Q_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-PL_Q_exact_avg = np.mean(PL_Q_exact)
-
-PL_Q_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                            obs_angle_avg, sp.POWER_LAW,
-                            sp.STOKES_Q, theta_e, power_law_p,
-                            gamma_min, gamma_max, gamma_cutoff,
-                            kappa, kappa_width)
-
-print 'PL_Q   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_Q_exact_avg 
-                                                  - PL_Q_avgs)/PL_Q_exact_avg
-
-#-------------------------------PL_V-------------------------------------------#
-PL_V_exact_avg = 0
-PL_V_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        PL_V_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
-                                          B_mag[j][i],
-                                          n_e[j][i], 
-                                          obs_angle[j][i],
-                                          sp.POWER_LAW, 
-                                          sp.STOKES_V, theta_e, power_law_p, 
-                                          gamma_min, gamma_max, gamma_cutoff, 
-                                          kappa, kappa_width
-                                         )
-
-
-#np.savetxt("PL_V_using_symphony_fits.txt", PL_V_exact)
-#pl.contourf(PL_V_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-PL_V_exact_avg = np.mean(PL_V_exact)
-
-PL_V_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                            obs_angle_avg, sp.POWER_LAW,
-                            sp.STOKES_V, theta_e, power_law_p,
-                            gamma_min, gamma_max, gamma_cutoff,
-                            kappa, kappa_width)
-
-print 'PL_V   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_V_exact_avg 
-                                                  - PL_V_avgs)/PL_V_exact_avg
-
-#-------------------------------kappa_I-------------------------------------------#
-kappa_I_exact_avg = 0
-kappa_I_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        kappa_I_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
-                                             B_mag[j][i],
-                                             n_e[j][i], 
-                                             obs_angle[j][i],
-                                             sp.KAPPA_DIST, 
-                                             sp.STOKES_I, theta_e, power_law_p, 
-                                             gamma_min, gamma_max, gamma_cutoff, 
-                                             kappa, kappa_width
-                                            )
-
-
-#np.savetxt("kappa_I_using_symphony_fits.txt", kappa_I_exact)
-#pl.contourf(kappa_I_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-kappa_I_exact_avg = np.mean(kappa_I_exact)
-
-kappa_I_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                               obs_angle_avg, sp.KAPPA_DIST,
-                               sp.STOKES_I, theta_e, power_law_p,
-                               gamma_min, gamma_max, gamma_cutoff,
-                               kappa, kappa_width)
-
-print 'kappa_I', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_I_exact_avg 
-                                                     - kappa_I_avgs)/kappa_I_exact_avg
-
-#-------------------------------kappa_Q-------------------------------------------#
-kappa_Q_exact_avg = 0
-kappa_Q_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        kappa_Q_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
-                                             B_mag[j][i],
-                                             n_e[j][i], 
-                                             obs_angle[j][i],
-                                             sp.KAPPA_DIST, 
-                                             sp.STOKES_Q, theta_e, power_law_p, 
-                                             gamma_min, gamma_max, gamma_cutoff, 
-                                             kappa, kappa_width
-                                            )
-
-
-#np.savetxt("kappa_Q_using_symphony_fits.txt", kappa_Q_exact)
-#pl.contourf(kappa_Q_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-kappa_Q_exact_avg = np.mean(kappa_Q_exact)
-
-kappa_Q_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                               obs_angle_avg, sp.KAPPA_DIST,
-                               sp.STOKES_Q, theta_e, power_law_p,
-                               gamma_min, gamma_max, gamma_cutoff,
-                               kappa, kappa_width)
-
-print 'kappa_Q', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_Q_exact_avg 
-                                                     - kappa_Q_avgs)/kappa_Q_exact_avg
-
-#-------------------------------kappa_V-------------------------------------------#
-kappa_V_exact_avg = 0
-kappa_V_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        kappa_V_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
-                                             B_mag[j][i],
-                                             n_e[j][i], 
-                                             obs_angle[j][i],
-                                             sp.KAPPA_DIST, 
-                                             sp.STOKES_V, theta_e, power_law_p, 
-                                             gamma_min, gamma_max, gamma_cutoff, 
-                                             kappa, kappa_width
-                                            )
-
-
-#np.savetxt("kappa_V_using_symphony_fits.txt", kappa_V_exact)
-#pl.contourf(kappa_V_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-kappa_V_exact_avg = np.mean(kappa_V_exact)
-
-kappa_V_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                               obs_angle_avg, sp.KAPPA_DIST,
-                               sp.STOKES_V, theta_e, power_law_p,
-                               gamma_min, gamma_max, gamma_cutoff,
-                               kappa, kappa_width)
-
-print 'kappa_V', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_V_exact_avg 
-                                                     - kappa_V_avgs)/kappa_V_exact_avg
-
-
-#---------------------------ABSORPTIVITY---------------------------------------#
-
-print ''
-
-#-------------------------------MJ_I-------------------------------------------#
-MJ_I_exact_avg = 0
-MJ_I_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        MJ_I_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
-                                          B_mag[j][i],
-                                          n_e[j][i], 
-                                          obs_angle[j][i],
-                                          sp.MAXWELL_JUETTNER, 
-                                          sp.STOKES_I, theta_e, power_law_p, 
-                                          gamma_min, gamma_max, gamma_cutoff, 
-                                          kappa, kappa_width
-                                         )
-
-
-#np.savetxt("MJ_I_using_symphony_fits.txt", MJ_I_exact)
+##-------------------------------MJ_Q-------------------------------------------#
+#MJ_Q_exact_avg = 0
+#MJ_Q_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        MJ_Q_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+#                                          B_mag[j][i],
+#                                          n_e[j][i], 
+#                                          obs_angle[j][i],
+#                                          sp.MAXWELL_JUETTNER, 
+#                                          sp.STOKES_Q, theta_e, power_law_p, 
+#                                          gamma_min, gamma_max, gamma_cutoff, 
+#                                          kappa, kappa_width
+#                                         )
+#
+#
+##np.savetxt("MJ_Q_using_symphony_fits.txt", MJ_Q_exact)
+##pl.contourf(MJ_Q_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#MJ_Q_exact_avg = np.mean(MJ_Q_exact)
+#
+#MJ_Q_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                            obs_angle_avg, sp.MAXWELL_JUETTNER,
+#                            sp.STOKES_Q, theta_e, power_law_p,
+#                            gamma_min, gamma_max, gamma_cutoff,
+#                            kappa, kappa_width)
+#
+#print 'MJ_Q   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (MJ_Q_exact_avg 
+#                                                  - MJ_Q_avgs)/MJ_Q_exact_avg
+#
+##-------------------------------MJ_V-------------------------------------------#
+#MJ_V_exact_avg = 0
+#MJ_V_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        MJ_V_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+#                                          B_mag[j][i],
+#                                          n_e[j][i], 
+#                                          obs_angle[j][i],
+#                                          sp.MAXWELL_JUETTNER, 
+#                                          sp.STOKES_V, theta_e, power_law_p, 
+#                                          gamma_min, gamma_max, gamma_cutoff, 
+#                                          kappa, kappa_width
+#                                         )
+#
+#
+##np.savetxt("MJ_V_using_symphony_fits.txt", MJ_V_exact)
+##pl.contourf(MJ_V_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#MJ_V_exact_avg = np.mean(MJ_V_exact)
+#
+#MJ_V_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                            obs_angle_avg, sp.MAXWELL_JUETTNER,
+#                            sp.STOKES_V, theta_e, power_law_p,
+#                            gamma_min, gamma_max, gamma_cutoff,
+#                            kappa, kappa_width)
+#
+#print 'MJ_V   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (MJ_V_exact_avg 
+#                                                  - MJ_V_avgs)/MJ_V_exact_avg
+#
+#
+##-------------------------------PL_I-------------------------------------------#
+#PL_I_exact_avg = 0
+#PL_I_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        PL_I_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+#                                          B_mag[j][i],
+#                                          n_e[j][i], 
+#                                          obs_angle[j][i],
+#                                          sp.POWER_LAW, 
+#                                          sp.STOKES_I, theta_e, power_law_p, 
+#                                          gamma_min, gamma_max, gamma_cutoff, 
+#                                          kappa, kappa_width
+#                                         )
+#
+#
+##np.savetxt("PL_I_using_symphony_fits.txt", PL_I_exact)
+##pl.contourf(PL_I_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#PL_I_exact_avg = np.mean(PL_I_exact)
+#
+#PL_I_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                            obs_angle_avg, sp.POWER_LAW,
+#                            sp.STOKES_I, theta_e, power_law_p,
+#                            gamma_min, gamma_max, gamma_cutoff,
+#                            kappa, kappa_width)
+#
+#print 'PL_I   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_I_exact_avg 
+#                                                  - PL_I_avgs)/PL_I_exact_avg
+#
+##-------------------------------PL_Q-------------------------------------------#
+#PL_Q_exact_avg = 0
+#PL_Q_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        PL_Q_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+#                                          B_mag[j][i],
+#                                          n_e[j][i], 
+#                                          obs_angle[j][i],
+#                                          sp.POWER_LAW, 
+#                                          sp.STOKES_Q, theta_e, power_law_p, 
+#                                          gamma_min, gamma_max, gamma_cutoff, 
+#                                          kappa, kappa_width
+#                                         )
+#
+#
+##np.savetxt("PL_Q_using_symphony_fits.txt", PL_Q_exact)
+##pl.contourf(PL_Q_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#PL_Q_exact_avg = np.mean(PL_Q_exact)
+#
+#PL_Q_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                            obs_angle_avg, sp.POWER_LAW,
+#                            sp.STOKES_Q, theta_e, power_law_p,
+#                            gamma_min, gamma_max, gamma_cutoff,
+#                            kappa, kappa_width)
+#
+#print 'PL_Q   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_Q_exact_avg 
+#                                                  - PL_Q_avgs)/PL_Q_exact_avg
+#
+##-------------------------------PL_V-------------------------------------------#
+#PL_V_exact_avg = 0
+#PL_V_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        PL_V_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+#                                          B_mag[j][i],
+#                                          n_e[j][i], 
+#                                          obs_angle[j][i],
+#                                          sp.POWER_LAW, 
+#                                          sp.STOKES_V, theta_e, power_law_p, 
+#                                          gamma_min, gamma_max, gamma_cutoff, 
+#                                          kappa, kappa_width
+#                                         )
+#
+#
+##np.savetxt("PL_V_using_symphony_fits.txt", PL_V_exact)
+##pl.contourf(PL_V_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#PL_V_exact_avg = np.mean(PL_V_exact)
+#
+#PL_V_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                            obs_angle_avg, sp.POWER_LAW,
+#                            sp.STOKES_V, theta_e, power_law_p,
+#                            gamma_min, gamma_max, gamma_cutoff,
+#                            kappa, kappa_width)
+#
+#print 'PL_V   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_V_exact_avg 
+#                                                  - PL_V_avgs)/PL_V_exact_avg
+#
+##-------------------------------kappa_I-------------------------------------------#
+#kappa_I_exact_avg = 0
+#kappa_I_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        kappa_I_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+#                                             B_mag[j][i],
+#                                             n_e[j][i], 
+#                                             obs_angle[j][i],
+#                                             sp.KAPPA_DIST, 
+#                                             sp.STOKES_I, theta_e, power_law_p, 
+#                                             gamma_min, gamma_max, gamma_cutoff, 
+#                                             kappa, kappa_width
+#                                            )
+#
+#
+##np.savetxt("kappa_I_using_symphony_fits.txt", kappa_I_exact)
+##pl.contourf(kappa_I_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#kappa_I_exact_avg = np.mean(kappa_I_exact)
+#
+#kappa_I_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                               obs_angle_avg, sp.KAPPA_DIST,
+#                               sp.STOKES_I, theta_e, power_law_p,
+#                               gamma_min, gamma_max, gamma_cutoff,
+#                               kappa, kappa_width)
+#
+#print 'kappa_I', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_I_exact_avg 
+#                                                     - kappa_I_avgs)/kappa_I_exact_avg
+#
+##-------------------------------kappa_Q-------------------------------------------#
+#kappa_Q_exact_avg = 0
+#kappa_Q_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        kappa_Q_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+#                                             B_mag[j][i],
+#                                             n_e[j][i], 
+#                                             obs_angle[j][i],
+#                                             sp.KAPPA_DIST, 
+#                                             sp.STOKES_Q, theta_e, power_law_p, 
+#                                             gamma_min, gamma_max, gamma_cutoff, 
+#                                             kappa, kappa_width
+#                                            )
+#
+#
+##np.savetxt("kappa_Q_using_symphony_fits.txt", kappa_Q_exact)
+##pl.contourf(kappa_Q_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#kappa_Q_exact_avg = np.mean(kappa_Q_exact)
+#
+#kappa_Q_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                               obs_angle_avg, sp.KAPPA_DIST,
+#                               sp.STOKES_Q, theta_e, power_law_p,
+#                               gamma_min, gamma_max, gamma_cutoff,
+#                               kappa, kappa_width)
+#
+#print 'kappa_Q', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_Q_exact_avg 
+#                                                     - kappa_Q_avgs)/kappa_Q_exact_avg
+#
+##-------------------------------kappa_V-------------------------------------------#
+#kappa_V_exact_avg = 0
+#kappa_V_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        kappa_V_exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+#                                             B_mag[j][i],
+#                                             n_e[j][i], 
+#                                             obs_angle[j][i],
+#                                             sp.KAPPA_DIST, 
+#                                             sp.STOKES_V, theta_e, power_law_p, 
+#                                             gamma_min, gamma_max, gamma_cutoff, 
+#                                             kappa, kappa_width
+#                                            )
+#
+#
+##np.savetxt("kappa_V_using_symphony_fits.txt", kappa_V_exact)
+##pl.contourf(kappa_V_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#kappa_V_exact_avg = np.mean(kappa_V_exact)
+#
+#kappa_V_avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                               obs_angle_avg, sp.KAPPA_DIST,
+#                               sp.STOKES_V, theta_e, power_law_p,
+#                               gamma_min, gamma_max, gamma_cutoff,
+#                               kappa, kappa_width)
+#
+#print 'kappa_V', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_V_exact_avg 
+#                                                     - kappa_V_avgs)/kappa_V_exact_avg
+#
+#
+##---------------------------ABSORPTIVITY---------------------------------------#
+#
+#print ''
+#
+##-------------------------------MJ_I-------------------------------------------#
+#MJ_I_exact_avg = 0
+#MJ_I_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        MJ_I_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
+#                                          B_mag[j][i],
+#                                          n_e[j][i], 
+#                                          obs_angle[j][i],
+#                                          sp.MAXWELL_JUETTNER, 
+#                                          sp.STOKES_I, theta_e, power_law_p, 
+#                                          gamma_min, gamma_max, gamma_cutoff, 
+#                                          kappa, kappa_width
+#                                         )
+#
+#
+##np.savetxt("MJ_I_using_symphony_fits.txt", MJ_I_exact)
 #pl.contourf(MJ_I_exact, 100)
 #pl.colorbar()
 #pl.show()
-
-MJ_I_exact_avg = np.mean(MJ_I_exact)
-
-MJ_I_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                            obs_angle_avg, sp.MAXWELL_JUETTNER,
-                            sp.STOKES_I, theta_e, power_law_p,
-                            gamma_min, gamma_max, gamma_cutoff,
-                            kappa, kappa_width)
-
-print 'MJ_I_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (MJ_I_exact_avg 
-                                                  - MJ_I_avgs)/MJ_I_exact_avg
-
-#-------------------------------MJ_Q-------------------------------------------#
-MJ_Q_exact_avg = 0
-MJ_Q_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        MJ_Q_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
-                                          B_mag[j][i],
-                                          n_e[j][i], 
-                                          obs_angle[j][i],
-                                          sp.MAXWELL_JUETTNER, 
-                                          sp.STOKES_Q, theta_e, power_law_p, 
-                                          gamma_min, gamma_max, gamma_cutoff, 
-                                          kappa, kappa_width
-                                         )
-
-
-#np.savetxt("MJ_Q_using_symphony_fits.txt", MJ_Q_exact)
-#pl.contourf(MJ_Q_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-MJ_Q_exact_avg = np.mean(MJ_Q_exact)
-
-MJ_Q_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                            obs_angle_avg, sp.MAXWELL_JUETTNER,
-                            sp.STOKES_Q, theta_e, power_law_p,
-                            gamma_min, gamma_max, gamma_cutoff,
-                            kappa, kappa_width)
-
-print 'MJ_Q_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (MJ_Q_exact_avg 
-                                                  - MJ_Q_avgs)/MJ_Q_exact_avg
-
-#-------------------------------MJ_V-------------------------------------------#
-MJ_V_exact_avg = 0
-MJ_V_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        MJ_V_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
-                                          B_mag[j][i],
-                                          n_e[j][i], 
-                                          obs_angle[j][i],
-                                          sp.MAXWELL_JUETTNER, 
-                                          sp.STOKES_V, theta_e, power_law_p, 
-                                          gamma_min, gamma_max, gamma_cutoff, 
-                                          kappa, kappa_width
-                                         )
-
-
-#np.savetxt("MJ_V_using_symphony_fits.txt", MJ_V_exact)
-#pl.contourf(MJ_V_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-MJ_V_exact_avg = np.mean(MJ_V_exact)
-
-MJ_V_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                            obs_angle_avg, sp.MAXWELL_JUETTNER,
-                            sp.STOKES_V, theta_e, power_law_p,
-                            gamma_min, gamma_max, gamma_cutoff,
-                            kappa, kappa_width)
-
-print 'MJ_V_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (MJ_V_exact_avg 
-                                                  - MJ_V_avgs)/MJ_V_exact_avg
-
-
-#-------------------------------PL_I-------------------------------------------#
-PL_I_exact_avg = 0
-PL_I_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        PL_I_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
-                                          B_mag[j][i],
-                                          n_e[j][i], 
-                                          obs_angle[j][i],
-                                          sp.POWER_LAW, 
-                                          sp.STOKES_I, theta_e, power_law_p, 
-                                          gamma_min, gamma_max, gamma_cutoff, 
-                                          kappa, kappa_width
-                                         )
-
-
-#np.savetxt("PL_I_using_symphony_fits.txt", PL_I_exact)
-#pl.contourf(PL_I_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-PL_I_exact_avg = np.mean(PL_I_exact)
-
-PL_I_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                            obs_angle_avg, sp.POWER_LAW,
-                            sp.STOKES_I, theta_e, power_law_p,
-                            gamma_min, gamma_max, gamma_cutoff,
-                            kappa, kappa_width)
-
-print 'PL_I_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_I_exact_avg 
-                                                  - PL_I_avgs)/PL_I_exact_avg
-
-#-------------------------------PL_Q-------------------------------------------#
-PL_Q_exact_avg = 0
-PL_Q_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        PL_Q_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
-                                          B_mag[j][i],
-                                          n_e[j][i], 
-                                          obs_angle[j][i],
-                                          sp.POWER_LAW, 
-                                          sp.STOKES_Q, theta_e, power_law_p, 
-                                          gamma_min, gamma_max, gamma_cutoff, 
-                                          kappa, kappa_width
-                                         )
-
-
-#np.savetxt("PL_Q_using_symphony_fits.txt", PL_Q_exact)
-#pl.contourf(PL_Q_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-PL_Q_exact_avg = np.mean(PL_Q_exact)
-
-PL_Q_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                            obs_angle_avg, sp.POWER_LAW,
-                            sp.STOKES_Q, theta_e, power_law_p,
-                            gamma_min, gamma_max, gamma_cutoff,
-                            kappa, kappa_width)
-
-print 'PL_Q_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_Q_exact_avg 
-                                                  - PL_Q_avgs)/PL_Q_exact_avg
-
-#-------------------------------PL_V-------------------------------------------#
-PL_V_exact_avg = 0
-PL_V_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        PL_V_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
-                                          B_mag[j][i],
-                                          n_e[j][i], 
-                                          obs_angle[j][i],
-                                          sp.POWER_LAW, 
-                                          sp.STOKES_V, theta_e, power_law_p, 
-                                          gamma_min, gamma_max, gamma_cutoff, 
-                                          kappa, kappa_width
-                                         )
-
-
-#np.savetxt("PL_V_using_symphony_fits.txt", PL_V_exact)
-#pl.contourf(PL_V_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-PL_V_exact_avg = np.mean(PL_V_exact)
-
-PL_V_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                            obs_angle_avg, sp.POWER_LAW,
-                            sp.STOKES_V, theta_e, power_law_p,
-                            gamma_min, gamma_max, gamma_cutoff,
-                            kappa, kappa_width)
-
-print 'PL_V_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_V_exact_avg 
-                                                  - PL_V_avgs)/PL_V_exact_avg
-
-#-------------------------------kappa_I-------------------------------------------#
-kappa_I_exact_avg = 0
-kappa_I_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        kappa_I_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
-                                             B_mag[j][i],
-                                             n_e[j][i], 
-                                             obs_angle[j][i],
-                                             sp.KAPPA_DIST, 
-                                             sp.STOKES_I, theta_e, power_law_p, 
-                                             gamma_min, gamma_max, gamma_cutoff, 
-                                             kappa, kappa_width
-                                            )
-
-
-#np.savetxt("kappa_I_using_symphony_fits.txt", kappa_I_exact)
-#pl.contourf(kappa_I_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-kappa_I_exact_avg = np.mean(kappa_I_exact)
-
-kappa_I_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                               obs_angle_avg, sp.KAPPA_DIST,
-                               sp.STOKES_I, theta_e, power_law_p,
-                               gamma_min, gamma_max, gamma_cutoff,
-                               kappa, kappa_width)
-
-print 'kappa_I_abs', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_I_exact_avg 
-                                                     - kappa_I_avgs)/kappa_I_exact_avg
-
-#-------------------------------kappa_Q-------------------------------------------#
-kappa_Q_exact_avg = 0
-kappa_Q_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        kappa_Q_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
-                                             B_mag[j][i],
-                                             n_e[j][i], 
-                                             obs_angle[j][i],
-                                             sp.KAPPA_DIST, 
-                                             sp.STOKES_Q, theta_e, power_law_p, 
-                                             gamma_min, gamma_max, gamma_cutoff, 
-                                             kappa, kappa_width
-                                            )
-
-
-#np.savetxt("kappa_Q_using_symphony_fits.txt", kappa_Q_exact)
-#pl.contourf(kappa_Q_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-kappa_Q_exact_avg = np.mean(kappa_Q_exact)
-
-kappa_Q_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                               obs_angle_avg, sp.KAPPA_DIST,
-                               sp.STOKES_Q, theta_e, power_law_p,
-                               gamma_min, gamma_max, gamma_cutoff,
-                               kappa, kappa_width)
-
-print 'kappa_Q_abs', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_Q_exact_avg 
-                                                     - kappa_Q_avgs)/kappa_Q_exact_avg
-
-#-------------------------------kappa_V-------------------------------------------#
-kappa_V_exact_avg = 0
-kappa_V_exact = np.zeros([N2, N1])
-
-jIndexStart =  rank    * N2 / size
-jIndexEnd   = (rank+1) * N2 / size
-
-for j in range(jIndexStart, jIndexEnd):
-#    print "j = ", j
-    for i in range(0, N1):
-        kappa_V_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
-                                             B_mag[j][i],
-                                             n_e[j][i], 
-                                             obs_angle[j][i],
-                                             sp.KAPPA_DIST, 
-                                             sp.STOKES_V, theta_e, power_law_p, 
-                                             gamma_min, gamma_max, gamma_cutoff, 
-                                             kappa, kappa_width
-                                            )
-
-
-#np.savetxt("kappa_V_using_symphony_fits.txt", kappa_V_exact)
-#pl.contourf(kappa_V_exact, 100)
-#pl.colorbar()
-#pl.show()
-
-kappa_V_exact_avg = np.mean(kappa_V_exact)
-
-kappa_V_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-                               obs_angle_avg, sp.KAPPA_DIST,
-                               sp.STOKES_V, theta_e, power_law_p,
-                               gamma_min, gamma_max, gamma_cutoff,
-                               kappa, kappa_width)
-
-print 'kappa_V_abs', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_V_exact_avg 
-                                                     - kappa_V_avgs)/kappa_V_exact_avg
-
+#
+#MJ_I_exact_avg = np.mean(MJ_I_exact)
+#
+#MJ_I_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                            obs_angle_avg, sp.MAXWELL_JUETTNER,
+#                            sp.STOKES_I, theta_e, power_law_p,
+#                            gamma_min, gamma_max, gamma_cutoff,
+#                            kappa, kappa_width)
+#
+#print 'MJ_I_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (MJ_I_exact_avg 
+#                                                  - MJ_I_avgs)/MJ_I_exact_avg
+#
+##-------------------------------MJ_Q-------------------------------------------#
+#MJ_Q_exact_avg = 0
+#MJ_Q_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        MJ_Q_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
+#                                          B_mag[j][i],
+#                                          n_e[j][i], 
+#                                          obs_angle[j][i],
+#                                          sp.MAXWELL_JUETTNER, 
+#                                          sp.STOKES_Q, theta_e, power_law_p, 
+#                                          gamma_min, gamma_max, gamma_cutoff, 
+#                                          kappa, kappa_width
+#                                         )
+#
+#
+##np.savetxt("MJ_Q_using_symphony_fits.txt", MJ_Q_exact)
+##pl.contourf(MJ_Q_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#MJ_Q_exact_avg = np.mean(MJ_Q_exact)
+#
+#MJ_Q_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                            obs_angle_avg, sp.MAXWELL_JUETTNER,
+#                            sp.STOKES_Q, theta_e, power_law_p,
+#                            gamma_min, gamma_max, gamma_cutoff,
+#                            kappa, kappa_width)
+#
+#print 'MJ_Q_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (MJ_Q_exact_avg 
+#                                                  - MJ_Q_avgs)/MJ_Q_exact_avg
+#
+##-------------------------------MJ_V-------------------------------------------#
+#MJ_V_exact_avg = 0
+#MJ_V_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        MJ_V_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
+#                                          B_mag[j][i],
+#                                          n_e[j][i], 
+#                                          obs_angle[j][i],
+#                                          sp.MAXWELL_JUETTNER, 
+#                                          sp.STOKES_V, theta_e, power_law_p, 
+#                                          gamma_min, gamma_max, gamma_cutoff, 
+#                                          kappa, kappa_width
+#                                         )
+#
+#
+##np.savetxt("MJ_V_using_symphony_fits.txt", MJ_V_exact)
+##pl.contourf(MJ_V_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#MJ_V_exact_avg = np.mean(MJ_V_exact)
+#
+#MJ_V_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                            obs_angle_avg, sp.MAXWELL_JUETTNER,
+#                            sp.STOKES_V, theta_e, power_law_p,
+#                            gamma_min, gamma_max, gamma_cutoff,
+#                            kappa, kappa_width)
+#
+#print 'MJ_V_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (MJ_V_exact_avg 
+#                                                  - MJ_V_avgs)/MJ_V_exact_avg
+#
+#
+##-------------------------------PL_I-------------------------------------------#
+#PL_I_exact_avg = 0
+#PL_I_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        PL_I_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
+#                                          B_mag[j][i],
+#                                          n_e[j][i], 
+#                                          obs_angle[j][i],
+#                                          sp.POWER_LAW, 
+#                                          sp.STOKES_I, theta_e, power_law_p, 
+#                                          gamma_min, gamma_max, gamma_cutoff, 
+#                                          kappa, kappa_width
+#                                         )
+#
+#
+##np.savetxt("PL_I_using_symphony_fits.txt", PL_I_exact)
+##pl.contourf(PL_I_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#PL_I_exact_avg = np.mean(PL_I_exact)
+#
+#PL_I_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                            obs_angle_avg, sp.POWER_LAW,
+#                            sp.STOKES_I, theta_e, power_law_p,
+#                            gamma_min, gamma_max, gamma_cutoff,
+#                            kappa, kappa_width)
+#
+#print 'PL_I_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_I_exact_avg 
+#                                                  - PL_I_avgs)/PL_I_exact_avg
+#
+##-------------------------------PL_Q-------------------------------------------#
+#PL_Q_exact_avg = 0
+#PL_Q_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        PL_Q_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
+#                                          B_mag[j][i],
+#                                          n_e[j][i], 
+#                                          obs_angle[j][i],
+#                                          sp.POWER_LAW, 
+#                                          sp.STOKES_Q, theta_e, power_law_p, 
+#                                          gamma_min, gamma_max, gamma_cutoff, 
+#                                          kappa, kappa_width
+#                                         )
+#
+#
+##np.savetxt("PL_Q_using_symphony_fits.txt", PL_Q_exact)
+##pl.contourf(PL_Q_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#PL_Q_exact_avg = np.mean(PL_Q_exact)
+#
+#PL_Q_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                            obs_angle_avg, sp.POWER_LAW,
+#                            sp.STOKES_Q, theta_e, power_law_p,
+#                            gamma_min, gamma_max, gamma_cutoff,
+#                            kappa, kappa_width)
+#
+#print 'PL_Q_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_Q_exact_avg 
+#                                                  - PL_Q_avgs)/PL_Q_exact_avg
+#
+##-------------------------------PL_V-------------------------------------------#
+#PL_V_exact_avg = 0
+#PL_V_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        PL_V_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
+#                                          B_mag[j][i],
+#                                          n_e[j][i], 
+#                                          obs_angle[j][i],
+#                                          sp.POWER_LAW, 
+#                                          sp.STOKES_V, theta_e, power_law_p, 
+#                                          gamma_min, gamma_max, gamma_cutoff, 
+#                                          kappa, kappa_width
+#                                         )
+#
+#
+##np.savetxt("PL_V_using_symphony_fits.txt", PL_V_exact)
+##pl.contourf(PL_V_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#PL_V_exact_avg = np.mean(PL_V_exact)
+#
+#PL_V_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                            obs_angle_avg, sp.POWER_LAW,
+#                            sp.STOKES_V, theta_e, power_law_p,
+#                            gamma_min, gamma_max, gamma_cutoff,
+#                            kappa, kappa_width)
+#
+#print 'PL_V_abs   ', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (PL_V_exact_avg 
+#                                                  - PL_V_avgs)/PL_V_exact_avg
+#
+##-------------------------------kappa_I-------------------------------------------#
+#kappa_I_exact_avg = 0
+#kappa_I_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        kappa_I_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
+#                                             B_mag[j][i],
+#                                             n_e[j][i], 
+#                                             obs_angle[j][i],
+#                                             sp.KAPPA_DIST, 
+#                                             sp.STOKES_I, theta_e, power_law_p, 
+#                                             gamma_min, gamma_max, gamma_cutoff, 
+#                                             kappa, kappa_width
+#                                            )
+#
+#
+##np.savetxt("kappa_I_using_symphony_fits.txt", kappa_I_exact)
+##pl.contourf(kappa_I_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#kappa_I_exact_avg = np.mean(kappa_I_exact)
+#
+#kappa_I_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                               obs_angle_avg, sp.KAPPA_DIST,
+#                               sp.STOKES_I, theta_e, power_law_p,
+#                               gamma_min, gamma_max, gamma_cutoff,
+#                               kappa, kappa_width)
+#
+#print 'kappa_I_abs', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_I_exact_avg 
+#                                                     - kappa_I_avgs)/kappa_I_exact_avg
+#
+##-------------------------------kappa_Q-------------------------------------------#
+#kappa_Q_exact_avg = 0
+#kappa_Q_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        kappa_Q_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
+#                                             B_mag[j][i],
+#                                             n_e[j][i], 
+#                                             obs_angle[j][i],
+#                                             sp.KAPPA_DIST, 
+#                                             sp.STOKES_Q, theta_e, power_law_p, 
+#                                             gamma_min, gamma_max, gamma_cutoff, 
+#                                             kappa, kappa_width
+#                                            )
+#
+#
+##np.savetxt("kappa_Q_using_symphony_fits.txt", kappa_Q_exact)
+##pl.contourf(kappa_Q_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#kappa_Q_exact_avg = np.mean(kappa_Q_exact)
+#
+#kappa_Q_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                               obs_angle_avg, sp.KAPPA_DIST,
+#                               sp.STOKES_Q, theta_e, power_law_p,
+#                               gamma_min, gamma_max, gamma_cutoff,
+#                               kappa, kappa_width)
+#
+#print 'kappa_Q_abs', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_Q_exact_avg 
+#                                                     - kappa_Q_avgs)/kappa_Q_exact_avg
+#
+##-------------------------------kappa_V-------------------------------------------#
+#kappa_V_exact_avg = 0
+#kappa_V_exact = np.zeros([N2, N1])
+#
+#jIndexStart =  rank    * N2 / size
+#jIndexEnd   = (rank+1) * N2 / size
+#
+#for j in range(jIndexStart, jIndexEnd):
+##    print "j = ", j
+#    for i in range(0, N1):
+#        kappa_V_exact[j][i] = sp.alpha_nu_fit_py(nuratio * nu_c[j][i],
+#                                             B_mag[j][i],
+#                                             n_e[j][i], 
+#                                             obs_angle[j][i],
+#                                             sp.KAPPA_DIST, 
+#                                             sp.STOKES_V, theta_e, power_law_p, 
+#                                             gamma_min, gamma_max, gamma_cutoff, 
+#                                             kappa, kappa_width
+#                                            )
+#
+#
+##np.savetxt("kappa_V_using_symphony_fits.txt", kappa_V_exact)
+##pl.contourf(kappa_V_exact, 100)
+##pl.colorbar()
+##pl.show()
+#
+#kappa_V_exact_avg = np.mean(kappa_V_exact)
+#
+#kappa_V_avgs  = sp.alpha_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+#                               obs_angle_avg, sp.KAPPA_DIST,
+#                               sp.STOKES_V, theta_e, power_law_p,
+#                               gamma_min, gamma_max, gamma_cutoff,
+#                               kappa, kappa_width)
+#
+#print 'kappa_V_abs', '(<j_nu()>-j_nu(<>))/<j_nu()> = ', (kappa_V_exact_avg 
+#                                                     - kappa_V_avgs)/kappa_V_exact_avg
+#
 
