@@ -21,7 +21,7 @@ gamma_cutoff = 1e10
 power_law_p = 3.5
 kappa = 3.5
 kappa_width = 10.
-nuratio = 1.e2
+nuratio = 1.e6
 B_scale = 30. #TODO: check if sim data is actually normalized to init. val.
 
 #import data from Dr. Kunz's simulation
@@ -38,7 +38,7 @@ B_mag = np.sqrt(B_x**2. + B_y**2. + B_z**2.)
 n_e = np.loadtxt(datafiles_path + 'mirror_d.out')
 
 #determine observer angle by setting vector to observer
-obs_vector = [1, -10, 0]
+obs_vector = [1, -1, 0]
 obs_vector = obs_vector / np.linalg.norm(obs_vector)
 
 obs_angle = np.arccos((obs_vector[0]*B_x 
