@@ -67,7 +67,7 @@ def rotation_matrix(axis, theta):
 
 
 #-------------------------set up nu-theta space scan--------------------------#
-number_of_points = 10  #size of grid
+number_of_points = 20  #size of grid
 points_skipped   = 256 #sample every nth point
 
 relative_difference = np.empty([number_of_points, number_of_points])
@@ -147,6 +147,6 @@ Z = relative_difference
 pl.contourf(np.log10(X), Y, Z)
 pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
 pl.ylabel('$\\theta$ (deg)')
-pl.title('$j_\\nu()$ Percent Error using Fits')
+#pl.title('$j_\\nu()$ Percent Error using Fits')
 pl.colorbar()
 pl.show()
