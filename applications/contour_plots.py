@@ -27,17 +27,21 @@ nuratio_used    = []
 obs_angle_used  = []
 
 #---------------------------import data from Dr. Kunz's simulation------------#
-N2 = 1152
-N1 = 1152
+num_skip = 64
 rank = 0
 size = 1
 
 datafiles_path = '/home/alex/Documents/Spring_2016/'
-B_x = np.loadtxt(datafiles_path + 'mirror_bx.out') * B_scale
-B_y = np.loadtxt(datafiles_path + 'mirror_by.out') * B_scale
-B_z = np.loadtxt(datafiles_path + 'mirror_bz.out') * B_scale
+B_x = np.loadtxt(datafiles_path + 'mirror_bx.out')[::num_skip, ::num_skip] * B_scale
+B_y = np.loadtxt(datafiles_path + 'mirror_by.out')[::num_skip, ::num_skip] * B_scale
+B_z = np.loadtxt(datafiles_path + 'mirror_bz.out')[::num_skip, ::num_skip] * B_scale
 B_mag = np.sqrt(B_x**2. + B_y**2. + B_z**2.)
-n_e = np.loadtxt(datafiles_path + 'mirror_d.out')
+n_e = np.loadtxt(datafiles_path + 'mirror_d.out')[::num_skip, ::num_skip]
+
+N1 = B_x.shape[0]
+N2 = B_x.shape[1]
+
+print N1
 
 nuratio = 1.e0
 max_nuratio = 1.e8;
@@ -67,8 +71,7 @@ def rotation_matrix(axis, theta):
 
 
 #-------------------------set up nu-theta space scan--------------------------#
-number_of_points = 20  #size of grid
-points_skipped   = 256 #sample every nth point
+number_of_points = 25  #size of grid
 
 relative_difference = np.empty([number_of_points, number_of_points])
 
@@ -103,24 +106,21 @@ for x in range(0, number_of_points):
 
 		for j in range(jIndexStart, jIndexEnd):
 		    for i in range(0, N1):
-			if(points_skipped == 0 or i % points_skipped == 0): 
-				exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
-		                                             B_mag[j][i],
- 		                                             n_e[j][i], 
-  		                                             obs_angle[j][i],
- 		                                             sp.MAXWELL_JUETTNER, 
-  		                                             sp.STOKES_I, 
-							     theta_e, 
-							     power_law_p, 
-  		                                             gamma_min, 
-							     gamma_max, 
-							     gamma_cutoff, 
-  		                                             kappa, 
-							     kappa_width
-   		                                            )
+			exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+	                                             B_mag[j][i],
+	                                             n_e[j][i], 
+	                                             obs_angle[j][i],
+	                                             sp.MAXWELL_JUETTNER, 
+	                                             sp.STOKES_I, 
+						     theta_e, 
+						     power_law_p, 
+	                                             gamma_min, 
+						     gamma_max, 
+						     gamma_cutoff, 
+	                                             kappa, 
+						     kappa_width
+	                                            )
 
-			elif(points_skipped != 0 and i % points_skipped != 0):
-				exact[j][i] = exact[j][i-1]
 
 		exact_avg = np.mean(exact)
 
