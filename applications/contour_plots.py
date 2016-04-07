@@ -26,8 +26,15 @@ B_scale = 30.
 nuratio_used    = []
 obs_angle_used  = []
 
+#----------------------set important parameters-------------------------------#
+
+num_skip              = 64                      #sample every nth point
+max_nuratio           = 1.e15                   #max nu/nu_c
+number_of_points      = 128                     #size of grid
+distribution_function = sp.KAPPA_DIST            #distribution function
+polarization          = sp.STOKES_I             #Stokes parameter
+
 #---------------------------import data from Dr. Kunz's simulation------------#
-num_skip = 64
 rank = 0
 size = 1
 
@@ -41,10 +48,8 @@ n_e = np.loadtxt(datafiles_path + 'mirror_d.out')[::num_skip, ::num_skip]
 N1 = B_x.shape[0]
 N2 = B_x.shape[1]
 
-print N1
 
 nuratio = 1.e0
-max_nuratio = 1.e8;
 
 B_x_avg        = np.mean(B_x)
 B_y_avg        = np.mean(B_y)
@@ -71,9 +76,10 @@ def rotation_matrix(axis, theta):
 
 
 #-------------------------set up nu-theta space scan--------------------------#
-number_of_points = 25  #size of grid
 
 relative_difference = np.empty([number_of_points, number_of_points])
+exact_avg_only      = np.empty([number_of_points, number_of_points])
+avgs_only           = np.empty([number_of_points, number_of_points])
 
 for x in range(0, number_of_points):
 	nuratio = 1. * 10.**(np.log10(max_nuratio) * x/(number_of_points-1.))
@@ -110,8 +116,8 @@ for x in range(0, number_of_points):
 	                                             B_mag[j][i],
 	                                             n_e[j][i], 
 	                                             obs_angle[j][i],
-	                                             sp.MAXWELL_JUETTNER, 
-	                                             sp.STOKES_I, 
+	                                             distribution_function, 
+	                                             polarization, 
 						     theta_e, 
 						     power_law_p, 
 	                                             gamma_min, 
@@ -125,12 +131,14 @@ for x in range(0, number_of_points):
 		exact_avg = np.mean(exact)
 
 		avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
-		                       obs_angle_avg, sp.MAXWELL_JUETTNER,
- 		                       sp.STOKES_I, theta_e, power_law_p,
+		                       obs_angle_avg, distribution_function,
+ 		                       polarization, theta_e, power_law_p,
  		                       gamma_min, gamma_max, gamma_cutoff,
    	   	                       kappa, kappa_width)
 
 		relative_difference[x][y] = ((exact_avg - avgs)/exact_avg)
+		exact_avg_only[x][y]      = exact_avg
+		avgs_only[x][y]           = avgs
 
 		if(x == 0):
 			obs_angle_used.append(obs_angle_avg * 180. / np.pi)
@@ -144,9 +152,22 @@ nuratio_used.reverse()   #nuratio_used is also reversed
 X, Y = np.meshgrid(nuratio_used, obs_angle_used)
 Z = relative_difference
 
-pl.contourf(np.log10(X), Y, Z)
+pl.contourf(np.log10(X), Y, exact_avg_only, 200)
+pl.title('<j_nu(exact)>')
 pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
 pl.ylabel('$\\theta$ (deg)')
-#pl.title('$j_\\nu()$ Percent Error using Fits')
+pl.colorbar()
+pl.show()
+
+pl.contourf(np.log10(X), Y, avgs_only, 200)
+pl.title('j_nu(<avgs>)')
+pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
+pl.ylabel('$\\theta$ (deg)')
+pl.colorbar()
+pl.show()
+
+pl.contourf(np.log10(X), Y, Z, 200)
+pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
+pl.ylabel('$\\theta$ (deg)')
 pl.colorbar()
 pl.show()
