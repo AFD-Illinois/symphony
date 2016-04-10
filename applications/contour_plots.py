@@ -23,16 +23,16 @@ kappa = 3.5
 kappa_width = 10.
 B_scale = 30. 
 
-nuratio_used    = []
-obs_angle_used  = []
+#nuratio_used    = []
+#obs_angle_used  = []
 
 #----------------------set important parameters-------------------------------#
 
 num_skip              = 64                      #sample every nth point
-max_nuratio           = 1.e15                   #max nu/nu_c
-number_of_points      = 128                     #size of grid
+max_nuratio           = 1.e10                   #max nu/nu_c
+number_of_points      = 64                     #size of grid
 distribution_function = sp.KAPPA_DIST            #distribution function
-polarization          = sp.STOKES_I             #Stokes parameter
+polarization          = sp.STOKES_V             #Stokes parameter
 
 #---------------------------import data from Dr. Kunz's simulation------------#
 rank = 0
@@ -80,6 +80,8 @@ def rotation_matrix(axis, theta):
 relative_difference = np.empty([number_of_points, number_of_points])
 exact_avg_only      = np.empty([number_of_points, number_of_points])
 avgs_only           = np.empty([number_of_points, number_of_points])
+nuratio_used        = np.empty([number_of_points])
+obs_angle_used      = np.empty([number_of_points])
 
 for x in range(0, number_of_points):
 	nuratio = 1. * 10.**(np.log10(max_nuratio) * x/(number_of_points-1.))
@@ -136,38 +138,43 @@ for x in range(0, number_of_points):
  		                       gamma_min, gamma_max, gamma_cutoff,
    	   	                       kappa, kappa_width)
 
-		relative_difference[x][y] = ((exact_avg - avgs)/exact_avg)
-		exact_avg_only[x][y]      = exact_avg
-		avgs_only[x][y]           = avgs
+#		relative_difference[x][y] = ((exact_avg - avgs)/exact_avg)
+		relative_difference[y][x] = ((exact_avg - avgs)/exact_avg)
+#		exact_avg_only[x][y]      = exact_avg
+		exact_avg_only[y][x]      = exact_avg
+#		avgs_only[x][y]           = avgs
+		avgs_only[y][x]           = avgs
 
 		if(x == 0):
-			obs_angle_used.append(obs_angle_avg * 180. / np.pi)
-	nuratio_used.append(nuratio)
+#			obs_angle_used.append(obs_angle_avg * 180. / np.pi)
+			obs_angle_used[y] = obs_angle_avg * 180. / np.pi
+#	nuratio_used.append(nuratio)
+	nuratio_used[x] = nuratio
 
-obs_angle_used.reverse() #obs_angle_used is reversed
-nuratio_used.reverse()   #nuratio_used is also reversed
+#obs_angle_used.reverse() #obs_angle_used is reversed
+#nuratio_used.reverse()   #nuratio_used is also reversed
 
 #------------------------make contour plot-------------------------------------#
-
 X, Y = np.meshgrid(nuratio_used, obs_angle_used)
 Z = relative_difference
 
-pl.contourf(np.log10(X), Y, exact_avg_only, 200)
-pl.title('<j_nu(exact)>')
-pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
-pl.ylabel('$\\theta$ (deg)')
-pl.colorbar()
-pl.show()
-
-pl.contourf(np.log10(X), Y, avgs_only, 200)
-pl.title('j_nu(<avgs>)')
-pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
-pl.ylabel('$\\theta$ (deg)')
-pl.colorbar()
-pl.show()
+#pl.contourf(np.log10(X), Y, exact_avg_only, 200)
+#pl.title('<j_nu(exact)>')
+#pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
+#pl.ylabel('$\\theta$ (deg)')
+#pl.colorbar()
+#pl.show()
+#
+#pl.contourf(np.log10(X), Y, avgs_only, 200)
+#pl.title('j_nu(<avgs>)')
+#pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
+#pl.ylabel('$\\theta$ (deg)')
+#pl.colorbar()
+#pl.show()
 
 pl.contourf(np.log10(X), Y, Z, 200)
 pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
 pl.ylabel('$\\theta$ (deg)')
 pl.colorbar()
 pl.show()
+
