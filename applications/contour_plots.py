@@ -23,16 +23,13 @@ kappa = 3.5
 kappa_width = 10.
 B_scale = 30. 
 
-#nuratio_used    = []
-#obs_angle_used  = []
-
 #----------------------set important parameters-------------------------------#
 
 num_skip              = 64                      #sample every nth point
-max_nuratio           = 1.e10                   #max nu/nu_c
-number_of_points      = 64                     #size of grid
-distribution_function = sp.KAPPA_DIST            #distribution function
-polarization          = sp.STOKES_V             #Stokes parameter
+max_nuratio           = 1.e8                   #max nu/nu_c
+number_of_points      = 4                      #size of grid
+distribution_function = sp.MAXWELL_JUETTNER     #distribution function
+polarization          = sp.STOKES_I             #Stokes parameter
 
 #---------------------------import data from Dr. Kunz's simulation------------#
 rank = 0
@@ -138,43 +135,32 @@ for x in range(0, number_of_points):
  		                       gamma_min, gamma_max, gamma_cutoff,
    	   	                       kappa, kappa_width)
 
-#		relative_difference[x][y] = ((exact_avg - avgs)/exact_avg)
-		relative_difference[y][x] = ((exact_avg - avgs)/exact_avg)
-#		exact_avg_only[x][y]      = exact_avg
+		relative_difference[y][x] = np.fabs((exact_avg - avgs)/exact_avg)
 		exact_avg_only[y][x]      = exact_avg
-#		avgs_only[x][y]           = avgs
 		avgs_only[y][x]           = avgs
 
 		if(x == 0):
-#			obs_angle_used.append(obs_angle_avg * 180. / np.pi)
 			obs_angle_used[y] = obs_angle_avg * 180. / np.pi
-#	nuratio_used.append(nuratio)
 	nuratio_used[x] = nuratio
 
-#obs_angle_used.reverse() #obs_angle_used is reversed
-#nuratio_used.reverse()   #nuratio_used is also reversed
 
 #------------------------make contour plot-------------------------------------#
 X, Y = np.meshgrid(nuratio_used, obs_angle_used)
 Z = relative_difference
 
-#pl.contourf(np.log10(X), Y, exact_avg_only, 200)
-#pl.title('<j_nu(exact)>')
-#pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
-#pl.ylabel('$\\theta$ (deg)')
-#pl.colorbar()
-#pl.show()
-#
-#pl.contourf(np.log10(X), Y, avgs_only, 200)
-#pl.title('j_nu(<avgs>)')
-#pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
-#pl.ylabel('$\\theta$ (deg)')
-#pl.colorbar()
-#pl.show()
+figure, ax = pl.subplots(1, 3, figsize=(25, 7))
+plot1 = ax[0].contourf(np.log10(X), Y, exact_avg_only, 200)
+figure.colorbar(plot1, ax=ax[0])
 
-pl.contourf(np.log10(X), Y, Z, 200)
+plot2 = ax[1].contourf(np.log10(X), Y, avgs_only, 200)
+figure.colorbar(plot2, ax=ax[1])
+
+plot3 = ax[2].contourf(np.log10(X), Y, Z, 200)
+figure.colorbar(plot3, ax=ax[2])
+
+figure.add_subplot(111, frameon=False)
+pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
 pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
 pl.ylabel('$\\theta$ (deg)')
-pl.colorbar()
-pl.show()
 
+pl.show()
