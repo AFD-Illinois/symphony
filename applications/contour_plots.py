@@ -27,9 +27,8 @@ B_scale = 30.
 
 num_skip              = 64                      #sample every nth point
 max_nuratio           = 1.e8                   #max nu/nu_c
-number_of_points      = 4                      #size of grid
+number_of_points      = 64                      #size of grid
 distribution_function = sp.MAXWELL_JUETTNER     #distribution function
-polarization          = sp.STOKES_I             #Stokes parameter
 
 #---------------------------import data from Dr. Kunz's simulation------------#
 rank = 0
@@ -74,9 +73,17 @@ def rotation_matrix(axis, theta):
 
 #-------------------------set up nu-theta space scan--------------------------#
 
-relative_difference = np.empty([number_of_points, number_of_points])
-exact_avg_only      = np.empty([number_of_points, number_of_points])
-avgs_only           = np.empty([number_of_points, number_of_points])
+relative_difference_I = np.empty([number_of_points, number_of_points])
+exact_avg_only_I      = np.empty([number_of_points, number_of_points])
+avgs_only_I           = np.empty([number_of_points, number_of_points])
+relative_difference_Q = np.empty([number_of_points, number_of_points])
+exact_avg_only_Q      = np.empty([number_of_points, number_of_points])
+avgs_only_Q           = np.empty([number_of_points, number_of_points])
+relative_difference_V = np.empty([number_of_points, number_of_points])
+exact_avg_only_V      = np.empty([number_of_points, number_of_points])
+avgs_only_V           = np.empty([number_of_points, number_of_points])
+
+
 nuratio_used        = np.empty([number_of_points])
 obs_angle_used      = np.empty([number_of_points])
 
@@ -104,19 +111,21 @@ for x in range(0, number_of_points):
 
 #----------------------scan over simulation------------------------------------#
 		exact_avg = 0
-		exact = np.zeros([N2, N1])
+		exact_I = np.zeros([N2, N1])
+		exact_Q = np.zeros([N2, N1])
+		exact_V = np.zeros([N2, N1])
 
 		jIndexStart =  rank    * N2 / size
 		jIndexEnd   = (rank+1) * N2 / size
 
 		for j in range(jIndexStart, jIndexEnd):
 		    for i in range(0, N1):
-			exact[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+			exact_I[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
 	                                             B_mag[j][i],
 	                                             n_e[j][i], 
 	                                             obs_angle[j][i],
 	                                             distribution_function, 
-	                                             polarization, 
+	                                             sp.STOKES_I, 
 						     theta_e, 
 						     power_law_p, 
 	                                             gamma_min, 
@@ -125,19 +134,67 @@ for x in range(0, number_of_points):
 	                                             kappa, 
 						     kappa_width
 	                                            )
+			exact_Q[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+                                                     B_mag[j][i],
+                                                     n_e[j][i],
+                                                     obs_angle[j][i],
+                                                     distribution_function,
+                                                     sp.STOKES_Q,
+                                                     theta_e,
+                                                     power_law_p,
+                                                     gamma_min,
+                                                     gamma_max,
+                                                     gamma_cutoff,
+                                                     kappa,
+                                                     kappa_width
+                                                    )
+			exact_V[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+                                                     B_mag[j][i],
+                                                     n_e[j][i],
+                                                     obs_angle[j][i],
+                                                     distribution_function,
+                                                     sp.STOKES_V,
+                                                     theta_e,
+                                                     power_law_p,
+                                                     gamma_min,
+                                                     gamma_max,
+                                                     gamma_cutoff,
+                                                     kappa,
+                                                     kappa_width
+                                                    )
 
 
-		exact_avg = np.mean(exact)
+		exact_avg_I = np.mean(exact_I)
+		exact_avg_Q = np.mean(exact_Q)
+		exact_avg_V = np.mean(exact_V)
 
-		avgs  = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+		avgs_I      = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
 		                       obs_angle_avg, distribution_function,
- 		                       polarization, theta_e, power_law_p,
+ 		                       sp.STOKES_I, theta_e, power_law_p,
  		                       gamma_min, gamma_max, gamma_cutoff,
    	   	                       kappa, kappa_width)
+		avgs_Q      = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+                                       obs_angle_avg, distribution_function,
+                                       sp.STOKES_Q, theta_e, power_law_p,
+                                       gamma_min, gamma_max, gamma_cutoff,
+                                       kappa, kappa_width)
+		avgs_V      = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+                                       obs_angle_avg, distribution_function,
+                                       sp.STOKES_V, theta_e, power_law_p,
+                                       gamma_min, gamma_max, gamma_cutoff,
+                                       kappa, kappa_width)
 
-		relative_difference[y][x] = np.fabs((exact_avg - avgs)/exact_avg)
-		exact_avg_only[y][x]      = exact_avg
-		avgs_only[y][x]           = avgs
+		relative_difference_I[y][x] = np.fabs((exact_avg_I - avgs_I)/exact_avg_I)
+		exact_avg_only_I[y][x]      = exact_avg_I
+		avgs_only_I[y][x]           = avgs_I
+
+		relative_difference_Q[y][x] = np.fabs((exact_avg_Q - avgs_Q)/exact_avg_Q)
+                exact_avg_only_Q[y][x]      = exact_avg_Q
+                avgs_only_Q[y][x]           = avgs_Q
+
+		relative_difference_V[y][x] = np.fabs((exact_avg_V - avgs_V)/exact_avg_V)
+                exact_avg_only_V[y][x]      = exact_avg_V
+                avgs_only_V[y][x]           = avgs_V
 
 		if(x == 0):
 			obs_angle_used[y] = obs_angle_avg * 180. / np.pi
@@ -146,17 +203,35 @@ for x in range(0, number_of_points):
 
 #------------------------make contour plot-------------------------------------#
 X, Y = np.meshgrid(nuratio_used, obs_angle_used)
-Z = relative_difference
 
-figure, ax = pl.subplots(1, 3, figsize=(25, 7))
-plot1 = ax[0].contourf(np.log10(X), Y, exact_avg_only, 200)
-figure.colorbar(plot1, ax=ax[0])
+figure, ax = pl.subplots(3, 3)
+plot1 = ax[0,0].contourf(np.log10(X), Y, exact_avg_only_I, 200)
+figure.colorbar(plot1, ax=ax[0,0])
 
-plot2 = ax[1].contourf(np.log10(X), Y, avgs_only, 200)
-figure.colorbar(plot2, ax=ax[1])
+plot2 = ax[0,1].contourf(np.log10(X), Y, avgs_only_I, 200)
+figure.colorbar(plot2, ax=ax[0,1])
 
-plot3 = ax[2].contourf(np.log10(X), Y, Z, 200)
-figure.colorbar(plot3, ax=ax[2])
+plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
+figure.colorbar(plot3, ax=ax[0,2])
+
+plot4 = ax[1,0].contourf(np.log10(X), Y, exact_avg_only_Q, 200)
+figure.colorbar(plot4, ax=ax[1,0])
+
+plot5 = ax[1,1].contourf(np.log10(X), Y, avgs_only_Q, 200)
+figure.colorbar(plot5, ax=ax[1,1])
+
+plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_Q, 200)
+figure.colorbar(plot6, ax=ax[1,2])
+
+plot7 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_V, 200)
+figure.colorbar(plot7, ax=ax[2,0])
+
+plot8 = ax[2,1].contourf(np.log10(X), Y, avgs_only_V, 200)
+figure.colorbar(plot8, ax=ax[2,1])
+
+plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_V, 200)
+figure.colorbar(plot9, ax=ax[2,2])
+
 
 figure.add_subplot(111, frameon=False)
 pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
