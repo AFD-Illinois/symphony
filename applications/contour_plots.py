@@ -1,12 +1,40 @@
 import sys
 
-#symphony_build_path = '/home/mani/work/symphony/build'
-symphony_build_path = '/home/alex/Documents/Spring_2016/1symphony/symphony/build'
+symphony_build_path = '/home/mani/work/symphony/build'
+#symphony_build_path = '/home/alex/Documents/Spring_2016/1symphony/symphony/build'
 sys.path.append(symphony_build_path)
 
 import symphonyPy as sp
 import numpy as np
 import pylab as pl
+
+# Set plot parameters to make beautiful plots
+pl.rcParams['figure.figsize']  = 12, 7.5
+pl.rcParams['lines.linewidth'] = 1.5
+pl.rcParams['font.family']     = 'serif'
+pl.rcParams['font.weight']     = 'bold'
+pl.rcParams['font.size']       = 15
+pl.rcParams['font.sans-serif'] = 'serif'
+pl.rcParams['text.usetex']     = True
+pl.rcParams['axes.linewidth']  = 1.5
+pl.rcParams['axes.titlesize']  = 'medium'
+pl.rcParams['axes.labelsize']  = 'medium'
+
+pl.rcParams['xtick.major.size'] = 8     
+pl.rcParams['xtick.minor.size'] = 4     
+pl.rcParams['xtick.major.pad']  = 8     
+pl.rcParams['xtick.minor.pad']  = 8     
+pl.rcParams['xtick.color']      = 'k'     
+pl.rcParams['xtick.labelsize']  = 'medium'
+pl.rcParams['xtick.direction']  = 'in'    
+
+pl.rcParams['ytick.major.size'] = 8     
+pl.rcParams['ytick.minor.size'] = 4     
+pl.rcParams['ytick.major.pad']  = 8     
+pl.rcParams['ytick.minor.pad']  = 8     
+pl.rcParams['ytick.color']      = 'k'     
+pl.rcParams['ytick.labelsize']  = 'medium'
+pl.rcParams['ytick.direction']  = 'in'    
 
 #--------------------set constant parameters for the calculation--------------#
 m = 9.1093826e-28
@@ -28,13 +56,14 @@ B_scale = 30.
 num_skip              = 64                      #sample every nth point
 max_nuratio           = 1.e8                   #max nu/nu_c
 number_of_points      = 64                      #size of grid
-distribution_function = sp.MAXWELL_JUETTNER     #distribution function
+distribution_function = sp.KAPPA_DIST     #distribution function
 
 #---------------------------import data from Dr. Kunz's simulation------------#
 rank = 0
 size = 1
 
-datafiles_path = '/home/alex/Documents/Spring_2016/'
+#datafiles_path = '/home/alex/Documents/Spring_2016/'
+datafiles_path = '/home/mani/work/kunz_data/'
 B_x = np.loadtxt(datafiles_path + 'mirror_bx.out')[::num_skip, ::num_skip] * B_scale
 B_y = np.loadtxt(datafiles_path + 'mirror_by.out')[::num_skip, ::num_skip] * B_scale
 B_z = np.loadtxt(datafiles_path + 'mirror_bz.out')[::num_skip, ::num_skip] * B_scale
@@ -204,15 +233,19 @@ for x in range(0, number_of_points):
 #------------------------make contour plot-------------------------------------#
 X, Y = np.meshgrid(nuratio_used, obs_angle_used)
 
-figure, ax = pl.subplots(3, 3)
+figure, ax = pl.subplots(3, 3, figsize=(15, 15))
+figure.suptitle("Kappa distribution")
 plot1 = ax[0,0].contourf(np.log10(X), Y, exact_avg_only_I, 200)
 figure.colorbar(plot1, ax=ax[0,0])
+ax[0,0].set_title('$<j_\\nu(n, \mathbf{B})>$')
 
 plot2 = ax[0,1].contourf(np.log10(X), Y, avgs_only_I, 200)
 figure.colorbar(plot2, ax=ax[0,1])
+ax[0,1].set_title('$j_\\nu(<n>, <\mathbf{B}>)$')
 
 plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
 figure.colorbar(plot3, ax=ax[0,2])
+ax[0,2].set_title('$|\mathrm{Error}|$')
 
 plot4 = ax[1,0].contourf(np.log10(X), Y, exact_avg_only_Q, 200)
 figure.colorbar(plot4, ax=ax[1,0])
@@ -237,5 +270,6 @@ figure.add_subplot(111, frameon=False)
 pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
 pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
 pl.ylabel('$\\theta$ (deg)')
+pl.tight_layout()
 
 pl.show()
