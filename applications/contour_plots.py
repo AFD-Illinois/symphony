@@ -1,7 +1,7 @@
 import sys
 
-symphony_build_path = '/home/mani/work/symphony/build'
-#symphony_build_path = '/home/alex/Documents/Spring_2016/1symphony/symphony/build'
+#symphony_build_path = '/home/mani/work/symphony/build'
+symphony_build_path = '/home/alex/Documents/Spring_2016/1symphony/symphony/build'
 sys.path.append(symphony_build_path)
 
 import symphonyPy as sp
@@ -54,16 +54,16 @@ B_scale = 30.
 #----------------------set important parameters-------------------------------#
 
 num_skip              = 64                      #sample every nth point
-max_nuratio           = 1.e8                   #max nu/nu_c
+max_nuratio           = 1.e4                   #max nu/nu_c
 number_of_points      = 64                      #size of grid
-distribution_function = sp.KAPPA_DIST     #distribution function
+distribution_function = sp.MAXWELL_JUETTNER     #distribution function
 
 #---------------------------import data from Dr. Kunz's simulation------------#
 rank = 0
 size = 1
 
-#datafiles_path = '/home/alex/Documents/Spring_2016/'
-datafiles_path = '/home/mani/work/kunz_data/'
+datafiles_path = '/home/alex/Documents/Spring_2016/'
+#datafiles_path = '/home/mani/work/kunz_data/'
 B_x = np.loadtxt(datafiles_path + 'mirror_bx.out')[::num_skip, ::num_skip] * B_scale
 B_y = np.loadtxt(datafiles_path + 'mirror_by.out')[::num_skip, ::num_skip] * B_scale
 B_z = np.loadtxt(datafiles_path + 'mirror_bz.out')[::num_skip, ::num_skip] * B_scale
@@ -120,7 +120,9 @@ for x in range(0, number_of_points):
 	nuratio = 1. * 10.**(np.log10(max_nuratio) * x/(number_of_points-1.))
         print 100.0*x/number_of_points, '% complete'
 	for y in range(0, number_of_points):
-		axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0]
+#		axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0] #rotates out of plane
+		axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]] #should rotate in plane
+#		axis_of_rot = [0, 0, 1] #approximate vector to rotate in plane
 		theta       = (1.0*y/number_of_points * np.pi/2.)
 
 		obs_vector  = np.dot(rotation_matrix(axis_of_rot, theta), 
@@ -233,8 +235,10 @@ for x in range(0, number_of_points):
 #------------------------make contour plot-------------------------------------#
 X, Y = np.meshgrid(nuratio_used, obs_angle_used)
 
-figure, ax = pl.subplots(3, 3, figsize=(15, 15))
-figure.suptitle("Kappa distribution")
+#figure, ax = pl.subplots(3, 3, figsize=(15, 15))
+figure, ax = pl.subplots(3, 3, figsize=(10, 10))
+figure.suptitle("MJ Distribution, viewed in-plane")
+#figure.suptitle("Kappa distribution")
 plot1 = ax[0,0].contourf(np.log10(X), Y, exact_avg_only_I, 200)
 figure.colorbar(plot1, ax=ax[0,0])
 ax[0,0].set_title('$<j_\\nu(n, \mathbf{B})>$')
