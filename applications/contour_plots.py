@@ -54,9 +54,12 @@ B_scale = 30.
 #----------------------set important parameters-------------------------------#
 
 num_skip              = 64                      #sample every nth point
-max_nuratio           = 1.e4                   #max nu/nu_c
+max_nuratio           = 1.e8                    #max nu/nu_c
 number_of_points      = 64                      #size of grid
 distribution_function = sp.MAXWELL_JUETTNER     #distribution function
+EMISS                 = True                    #True = j_nu, False = alpha_nu
+IN_PLANE              = True		        #True = obs_angle in plane
+figure_title          = 'MJ Distribution viewed in-plane'
 
 #---------------------------import data from Dr. Kunz's simulation------------#
 rank = 0
@@ -69,6 +72,7 @@ B_y = np.loadtxt(datafiles_path + 'mirror_by.out')[::num_skip, ::num_skip] * B_s
 B_z = np.loadtxt(datafiles_path + 'mirror_bz.out')[::num_skip, ::num_skip] * B_scale
 B_mag = np.sqrt(B_x**2. + B_y**2. + B_z**2.)
 n_e = np.loadtxt(datafiles_path + 'mirror_d.out')[::num_skip, ::num_skip]
+
 
 N1 = B_x.shape[0]
 N2 = B_x.shape[1]
@@ -99,6 +103,19 @@ def rotation_matrix(axis, theta):
                      [2*(bc-ad), aa+cc-bb-dd, 2*(cd+ab)],
                      [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc]])
 
+#-----------------choose j_nu or alpha_nu--------------------------------------#
+def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
+	             polarization, theta_e, power_law_p, gamma_min,
+		     gamma_max, gamma_cutoff, kappa, kappa_width):
+
+	if(EMISS == True):
+		return sp.j_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
+                     polarization, theta_e, power_law_p, gamma_min,
+                     gamma_max, gamma_cutoff, kappa, kappa_width)
+	else:
+		return sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
+                     polarization, theta_e, power_law_p, gamma_min,
+                     gamma_max, gamma_cutoff, kappa, kappa_width)
 
 #-------------------------set up nu-theta space scan--------------------------#
 
@@ -120,9 +137,12 @@ for x in range(0, number_of_points):
 	nuratio = 1. * 10.**(np.log10(max_nuratio) * x/(number_of_points-1.))
         print 100.0*x/number_of_points, '% complete'
 	for y in range(0, number_of_points):
-#		axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0] #rotates out of plane
-		axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]] #should rotate in plane
-#		axis_of_rot = [0, 0, 1] #approximate vector to rotate in plane
+
+		if(IN_PLANE == True):
+			axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]] #should rotate in plane
+		else:
+			axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0] #rotates out of plane
+
 		theta       = (1.0*y/number_of_points * np.pi/2.)
 
 		obs_vector  = np.dot(rotation_matrix(axis_of_rot, theta), 
@@ -151,7 +171,7 @@ for x in range(0, number_of_points):
 
 		for j in range(jIndexStart, jIndexEnd):
 		    for i in range(0, N1):
-			exact_I[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+			exact_I[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
 	                                             B_mag[j][i],
 	                                             n_e[j][i], 
 	                                             obs_angle[j][i],
@@ -165,7 +185,7 @@ for x in range(0, number_of_points):
 	                                             kappa, 
 						     kappa_width
 	                                            )
-			exact_Q[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+			exact_Q[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
                                                      B_mag[j][i],
                                                      n_e[j][i],
                                                      obs_angle[j][i],
@@ -179,7 +199,7 @@ for x in range(0, number_of_points):
                                                      kappa,
                                                      kappa_width
                                                     )
-			exact_V[j][i] = sp.j_nu_fit_py(nuratio * nu_c[j][i],
+			exact_V[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
                                                      B_mag[j][i],
                                                      n_e[j][i],
                                                      obs_angle[j][i],
@@ -199,17 +219,17 @@ for x in range(0, number_of_points):
 		exact_avg_Q = np.mean(exact_Q)
 		exact_avg_V = np.mean(exact_V)
 
-		avgs_I      = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+		avgs_I      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
 		                       obs_angle_avg, distribution_function,
  		                       sp.STOKES_I, theta_e, power_law_p,
  		                       gamma_min, gamma_max, gamma_cutoff,
    	   	                       kappa, kappa_width)
-		avgs_Q      = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+		avgs_Q      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_Q, theta_e, power_law_p,
                                        gamma_min, gamma_max, gamma_cutoff,
                                        kappa, kappa_width)
-		avgs_V      = sp.j_nu_fit_py(nu_avg, B_mag_avg, n_e_avg,
+		avgs_V      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_V, theta_e, power_law_p,
                                        gamma_min, gamma_max, gamma_cutoff,
@@ -237,7 +257,7 @@ X, Y = np.meshgrid(nuratio_used, obs_angle_used)
 
 #figure, ax = pl.subplots(3, 3, figsize=(15, 15))
 figure, ax = pl.subplots(3, 3, figsize=(10, 10))
-figure.suptitle("MJ Distribution, viewed in-plane")
+figure.suptitle(figure_title)
 #figure.suptitle("Kappa distribution")
 plot1 = ax[0,0].contourf(np.log10(X), Y, exact_avg_only_I, 200)
 figure.colorbar(plot1, ax=ax[0,0])
