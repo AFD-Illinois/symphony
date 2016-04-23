@@ -46,7 +46,7 @@ h = 6.6260693e-27
 gamma_min = 1.
 gamma_max = 1000.
 gamma_cutoff = 1e10
-power_law_p = 3.5
+power_law_p = 3.
 kappa = 3.5
 kappa_width = 10.
 B_scale = 30. 
@@ -139,9 +139,11 @@ for x in range(0, number_of_points):
 	for y in range(0, number_of_points):
 
 		if(IN_PLANE == True):
-			axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]] #should rotate in plane
+#			axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]] #should rotate in plane
+			axis_of_rot = [0., 0., 1.] #rotates about z axis
 		else:
-			axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0] #rotates out of plane
+#			axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0] #rotates out of plane
+			axis_of_rot = [1, 0, 0] #rotates about x axis
 
 		theta       = (1.0*y/number_of_points * np.pi/2.)
 
@@ -155,7 +157,7 @@ for x in range(0, number_of_points):
 
 		#generate remaining averages
 		obs_angle_avg  = np.mean(obs_angle)
-		nu_c           = electron_charge * (B_mag * B_scale) / (2. * np.pi * m * c)
+		nu_c           = electron_charge * (B_mag) / (2. * np.pi * m * c)
 		nu_c_avg       = np.mean(nu_c)
 		nu_avg         = nuratio * nu_c_avg
 
