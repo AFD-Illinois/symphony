@@ -58,8 +58,8 @@ max_nuratio           = 1.e8                    #max nu/nu_c
 number_of_points      = 64                      #size of grid
 distribution_function = sp.MAXWELL_JUETTNER     #distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
-IN_PLANE              = True		        #True = obs_angle in plane
-figure_title          = 'MJ Distribution viewed out of plane'
+IN_PLANE              = False		        #True = obs_angle in plane
+figure_title          = 'MJ Distribution viewed in plane'
 
 #---------------------------import data from Dr. Kunz's simulation------------#
 rank = 0
@@ -107,12 +107,6 @@ def rotation_matrix(axis, theta):
 def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 	             polarization, theta_e, power_law_p, gamma_min,
 		     gamma_max, gamma_cutoff, kappa, kappa_width):
-
-#	return B**2. * np.sin(obs_angle)**2. / nu     #j_nu PL_3 (low error)
-#	return B**2. * np.sin(obs_angle)**2. / nu**2. #alpha_nu PL_2 (high error)
-
-#	return B * np.sin(obs_angle)**2.	#testing j_nu case
-#	return B**-1. * np.sin(obs_angle)**2.	#testing alpha_nu case
 
 	if(EMISS == True):
 		return sp.j_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
@@ -264,6 +258,11 @@ for x in range(0, number_of_points):
 		exact_avg_U = np.mean(exact_U)
 		exact_avg_V = np.mean(exact_V)
 
+	  	theta_obs_avg = np.arccos(1. * B_y_avg / B_mag_avg)
+                phi_obs_avg   = np.arccos(1. * B_x_avg / B_mag_avg)
+
+
+
 		avgs_I      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
 		                       obs_angle_avg, distribution_function,
  		                       sp.STOKES_I, theta_e, power_law_p,
@@ -273,12 +272,18 @@ for x in range(0, number_of_points):
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_Q, theta_e, power_law_p,
                                        gamma_min, gamma_max, gamma_cutoff,
-                                       kappa, kappa_width) #* np.mean(np.sin(theta_obs) * np.cos(phi_obs)) #TODO: check this 
+                                       kappa, kappa_width) * np.sin(theta_obs_avg) * np.cos(phi_obs_avg) #TODO: check this 
+#* np.mean(np.sin(theta_obs) * np.cos(phi_obs)) #TODO: check this 
+
+
 		avgs_U      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_Q, theta_e, power_law_p,
                                        gamma_min, gamma_max, gamma_cutoff,
-                                       kappa, kappa_width) #* np.mean(np.sin(theta_obs-np.pi/4.) * np.cos(phi_obs)) #TODO: check this too
+                                       kappa, kappa_width) * np.mean(np.sin(theta_obs-np.pi/4.) * np.cos(phi_obs)) #TODO: check this too 
+#* np.mean(np.sin(theta_obs-np.pi/4.) * np.cos(phi_obs)) #TODO: check this too
+
+
 		avgs_V      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_V, theta_e, power_law_p,
