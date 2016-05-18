@@ -46,7 +46,7 @@ h = 6.6260693e-27
 gamma_min = 1.
 gamma_max = 1000.
 gamma_cutoff = 1e10
-power_law_p = 3.
+power_law_p = 2.
 kappa = 3.5
 kappa_width = 10.
 B_scale = 30. 
@@ -59,7 +59,7 @@ number_of_points      = 64                      #size of grid
 distribution_function = sp.MAXWELL_JUETTNER     #distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
 IN_PLANE              = True		        #True = obs_angle in plane
-figure_title          = 'MJ Distribution viewed in-plane'
+figure_title          = 'MJ Distribution viewed out of plane'
 
 #---------------------------import data from Dr. Kunz's simulation------------#
 rank = 0
@@ -108,6 +108,12 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 	             polarization, theta_e, power_law_p, gamma_min,
 		     gamma_max, gamma_cutoff, kappa, kappa_width):
 
+#	return B**2. * np.sin(obs_angle)**2. / nu     #j_nu PL_3 (low error)
+#	return B**2. * np.sin(obs_angle)**2. / nu**2. #alpha_nu PL_2 (high error)
+
+#	return B * np.sin(obs_angle)**2.	#testing j_nu case
+#	return B**-1. * np.sin(obs_angle)**2.	#testing alpha_nu case
+
 	if(EMISS == True):
 		return sp.j_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
                      polarization, theta_e, power_law_p, gamma_min,
@@ -125,6 +131,9 @@ avgs_only_I           = np.empty([number_of_points, number_of_points])
 relative_difference_Q = np.empty([number_of_points, number_of_points])
 exact_avg_only_Q      = np.empty([number_of_points, number_of_points])
 avgs_only_Q           = np.empty([number_of_points, number_of_points])
+relative_difference_U = np.empty([number_of_points, number_of_points])
+exact_avg_only_U      = np.empty([number_of_points, number_of_points])
+avgs_only_U           = np.empty([number_of_points, number_of_points])
 relative_difference_V = np.empty([number_of_points, number_of_points])
 exact_avg_only_V      = np.empty([number_of_points, number_of_points])
 avgs_only_V           = np.empty([number_of_points, number_of_points])
@@ -139,16 +148,22 @@ for x in range(0, number_of_points):
 	for y in range(0, number_of_points):
 
 		if(IN_PLANE == True):
-#			axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]] #should rotate in plane
-			axis_of_rot = [0., 0., 1.] #rotates about z axis
+			axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]] #should rotate in plane
+#			axis_of_rot = [0., 0., 1.] #rotates about z axis
 		else:
-#			axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0] #rotates out of plane
-			axis_of_rot = [1, 0, 0] #rotates about x axis
+			axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0] #rotates out of plane
+#			axis_of_rot = [0, 1, 0] #rotates about y axis
+#			axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0.]
 
 		theta       = (1.0*y/number_of_points * np.pi/2.)
 
+
 		obs_vector  = np.dot(rotation_matrix(axis_of_rot, theta), 
  				     B_avg_vector)
+
+#		obs_vector  = np.dot(rotation_matrix(axis_of_rot, theta),
+#				     [1, 0, 0])
+
 
 		obs_angle = np.arccos((B_x * obs_vector[0] 
                                        + B_y * obs_vector[1]
@@ -166,13 +181,23 @@ for x in range(0, number_of_points):
 		exact_avg = 0
 		exact_I = np.zeros([N2, N1])
 		exact_Q = np.zeros([N2, N1])
+		exact_U = np.zeros([N2, N1])
 		exact_V = np.zeros([N2, N1])
+
+		theta_obs = np.zeros([N2, N1])
+		phi_obs   = np.zeros([N2, N1])
 
 		jIndexStart =  rank    * N2 / size
 		jIndexEnd   = (rank+1) * N2 / size
 
 		for j in range(jIndexStart, jIndexEnd):
 		    for i in range(0, N1):
+
+			#theta_obs is angle between simulation B and y axis
+			#phi_obs is angle between simulation B and x axis
+			theta_obs[j][i] = np.arccos(1. * B_y[j][i] / B_mag[j][i])
+			phi_obs[j][i]   = np.arccos(1. * B_x[j][i] / B_mag[j][i])
+
 			exact_I[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
 	                                             B_mag[j][i],
 	                                             n_e[j][i], 
@@ -187,6 +212,7 @@ for x in range(0, number_of_points):
 	                                             kappa, 
 						     kappa_width
 	                                            )
+
 			exact_Q[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
                                                      B_mag[j][i],
                                                      n_e[j][i],
@@ -200,7 +226,23 @@ for x in range(0, number_of_points):
                                                      gamma_cutoff,
                                                      kappa,
                                                      kappa_width
-                                                    )
+                                                    ) * np.cos(phi_obs[j][i]) * np.sin(theta_obs[j][i])
+
+                        exact_U[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
+                                                     B_mag[j][i],
+                                                     n_e[j][i],
+                                                     obs_angle[j][i],
+                                                     distribution_function,
+                                                     sp.STOKES_Q,
+                                                     theta_e,
+                                                     power_law_p,
+                                                     gamma_min,
+                                                     gamma_max,
+                                                     gamma_cutoff,
+                                                     kappa,
+                                                     kappa_width
+                                                    ) * np.cos(phi_obs[j][i]) * np.sin(theta_obs[j][i] - np.pi/4.)
+
 			exact_V[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
                                                      B_mag[j][i],
                                                      n_e[j][i],
@@ -219,6 +261,7 @@ for x in range(0, number_of_points):
 
 		exact_avg_I = np.mean(exact_I)
 		exact_avg_Q = np.mean(exact_Q)
+		exact_avg_U = np.mean(exact_U)
 		exact_avg_V = np.mean(exact_V)
 
 		avgs_I      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
@@ -230,7 +273,12 @@ for x in range(0, number_of_points):
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_Q, theta_e, power_law_p,
                                        gamma_min, gamma_max, gamma_cutoff,
-                                       kappa, kappa_width)
+                                       kappa, kappa_width) #* np.mean(np.sin(theta_obs) * np.cos(phi_obs)) #TODO: check this 
+		avgs_U      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
+                                       obs_angle_avg, distribution_function,
+                                       sp.STOKES_Q, theta_e, power_law_p,
+                                       gamma_min, gamma_max, gamma_cutoff,
+                                       kappa, kappa_width) #* np.mean(np.sin(theta_obs-np.pi/4.) * np.cos(phi_obs)) #TODO: check this too
 		avgs_V      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_V, theta_e, power_law_p,
@@ -245,6 +293,10 @@ for x in range(0, number_of_points):
                 exact_avg_only_Q[y][x]      = exact_avg_Q
                 avgs_only_Q[y][x]           = avgs_Q
 
+		relative_difference_U[y][x] = np.fabs((exact_avg_U - avgs_U)/exact_avg_U)
+                exact_avg_only_U[y][x]      = exact_avg_U
+                avgs_only_U[y][x]           = avgs_U
+
 		relative_difference_V[y][x] = np.fabs((exact_avg_V - avgs_V)/exact_avg_V)
                 exact_avg_only_V[y][x]      = exact_avg_V
                 avgs_only_V[y][x]           = avgs_V
@@ -258,9 +310,8 @@ for x in range(0, number_of_points):
 X, Y = np.meshgrid(nuratio_used, obs_angle_used)
 
 #figure, ax = pl.subplots(3, 3, figsize=(15, 15))
-figure, ax = pl.subplots(3, 3, figsize=(10, 10))
+figure, ax = pl.subplots(4, 3, figsize=(10, 10))
 figure.suptitle(figure_title)
-#figure.suptitle("Kappa distribution")
 plot1 = ax[0,0].contourf(np.log10(X), Y, exact_avg_only_I, 200)
 figure.colorbar(plot1, ax=ax[0,0])
 ax[0,0].set_title('$<j_\\nu(n, \mathbf{B})>$')
@@ -268,6 +319,10 @@ ax[0,0].set_title('$<j_\\nu(n, \mathbf{B})>$')
 plot2 = ax[0,1].contourf(np.log10(X), Y, avgs_only_I, 200)
 figure.colorbar(plot2, ax=ax[0,1])
 ax[0,1].set_title('$j_\\nu(<n>, <\mathbf{B}>)$')
+
+if(EMISS == False):
+        ax[0,0].set_title('$<\\alpha_\\nu(n, \mathbf{B})>$')
+        ax[0,1].set_title('$\\alpha_\\nu(<n>, <\mathbf{B}>)$')
 
 plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
 figure.colorbar(plot3, ax=ax[0,2])
@@ -282,14 +337,26 @@ figure.colorbar(plot5, ax=ax[1,1])
 plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_Q, 200)
 figure.colorbar(plot6, ax=ax[1,2])
 
-plot7 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_V, 200)
-figure.colorbar(plot7, ax=ax[2,0])
 
-plot8 = ax[2,1].contourf(np.log10(X), Y, avgs_only_V, 200)
-figure.colorbar(plot8, ax=ax[2,1])
+plot7 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_U, 200)
+figure.colorbar(plot4, ax=ax[2,0])
 
-plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_V, 200)
-figure.colorbar(plot9, ax=ax[2,2])
+plot8 = ax[2,1].contourf(np.log10(X), Y, avgs_only_U, 200)
+figure.colorbar(plot5, ax=ax[2,1])
+
+plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_U, 200)
+figure.colorbar(plot6, ax=ax[2,2])
+
+
+
+plot10 = ax[3,0].contourf(np.log10(X), Y, exact_avg_only_V, 200)
+figure.colorbar(plot7, ax=ax[3,0])
+
+plot11 = ax[3,1].contourf(np.log10(X), Y, avgs_only_V, 200)
+figure.colorbar(plot8, ax=ax[3,1])
+
+plot12 = ax[3,2].contourf(np.log10(X), Y, relative_difference_V, 200)
+figure.colorbar(plot9, ax=ax[3,2])
 
 
 figure.add_subplot(111, frameon=False)
