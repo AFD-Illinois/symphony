@@ -58,7 +58,7 @@ max_nuratio           = 1.e8                    #max nu/nu_c
 number_of_points      = 64                      #size of grid
 distribution_function = sp.MAXWELL_JUETTNER     #distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
-IN_PLANE              = False		        #True = obs_angle in plane
+IN_PLANE              = True		        #True = obs_angle in plane
 figure_title          = 'MJ Distribution viewed in plane'
 
 #---------------------------import data from Dr. Kunz's simulation------------#
@@ -273,15 +273,12 @@ for x in range(0, number_of_points):
                                        sp.STOKES_Q, theta_e, power_law_p,
                                        gamma_min, gamma_max, gamma_cutoff,
                                        kappa, kappa_width) * np.sin(theta_obs_avg) * np.cos(phi_obs_avg) #TODO: check this 
-#* np.mean(np.sin(theta_obs) * np.cos(phi_obs)) #TODO: check this 
-
 
 		avgs_U      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_Q, theta_e, power_law_p,
                                        gamma_min, gamma_max, gamma_cutoff,
-                                       kappa, kappa_width) * np.mean(np.sin(theta_obs-np.pi/4.) * np.cos(phi_obs)) #TODO: check this too 
-#* np.mean(np.sin(theta_obs-np.pi/4.) * np.cos(phi_obs)) #TODO: check this too
+                                       kappa, kappa_width) * np.sin(theta_obs_avg - np.pi/4.) * np.cos(phi_obs_avg) #TODO: check this too 
 
 
 		avgs_V      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
@@ -344,24 +341,24 @@ figure.colorbar(plot6, ax=ax[1,2])
 
 
 plot7 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_U, 200)
-figure.colorbar(plot4, ax=ax[2,0])
+figure.colorbar(plot7, ax=ax[2,0])
 
 plot8 = ax[2,1].contourf(np.log10(X), Y, avgs_only_U, 200)
-figure.colorbar(plot5, ax=ax[2,1])
+figure.colorbar(plot8, ax=ax[2,1])
 
 plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_U, 200)
-figure.colorbar(plot6, ax=ax[2,2])
+figure.colorbar(plot9, ax=ax[2,2])
 
 
 
 plot10 = ax[3,0].contourf(np.log10(X), Y, exact_avg_only_V, 200)
-figure.colorbar(plot7, ax=ax[3,0])
+figure.colorbar(plot10, ax=ax[3,0])
 
 plot11 = ax[3,1].contourf(np.log10(X), Y, avgs_only_V, 200)
-figure.colorbar(plot8, ax=ax[3,1])
+figure.colorbar(plot11, ax=ax[3,1])
 
 plot12 = ax[3,2].contourf(np.log10(X), Y, relative_difference_V, 200)
-figure.colorbar(plot9, ax=ax[3,2])
+figure.colorbar(plot12, ax=ax[3,2])
 
 
 figure.add_subplot(111, frameon=False)
