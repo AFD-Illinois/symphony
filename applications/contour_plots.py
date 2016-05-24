@@ -41,7 +41,7 @@ m = 9.1093826e-28
 c = 2.99792458e10
 electron_charge = 4.80320680e-10
 theta_e = 10. #TODO: Do we need to do anything about electron temp?
-e = 4.80320680e-10
+#e = 4.80320680e-10
 h = 6.6260693e-27
 gamma_min = 1.
 gamma_max = 1000.
@@ -53,13 +53,13 @@ B_scale = 30.
 
 #----------------------set important parameters-------------------------------#
 
-num_skip              = 64                      #sample every nth point
+num_skip              = 128                      #sample every nth point
 max_nuratio           = 1.e8                    #max nu/nu_c
 number_of_points      = 64                      #size of grid
-distribution_function = sp.MAXWELL_JUETTNER     #distribution function
+distribution_function = sp.KAPPA_DIST     #distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
 IN_PLANE              = True		        #True = obs_angle in plane
-figure_title          = 'MJ Distribution viewed in plane'
+figure_title          = 'Kappa Distribution viewed in plane'
 
 #---------------------------import data from Dr. Kunz's simulation------------#
 rank = 0
@@ -187,10 +187,16 @@ for x in range(0, number_of_points):
 		for j in range(jIndexStart, jIndexEnd):
 		    for i in range(0, N1):
 
-			#theta_obs is angle between simulation B and y axis
-			#phi_obs is angle between simulation B and x axis
+			#theta_obs is angle between simulation B and observer y axis
+			#phi_obs is angle between simulation B and observer x axis
 			theta_obs[j][i] = np.arccos(1. * B_y[j][i] / B_mag[j][i])
 			phi_obs[j][i]   = np.arccos(1. * B_x[j][i] / B_mag[j][i])
+
+			#TODO: remove this; rotating observer by 45deg should send U -> Q
+#                        theta_obs[j][i] = np.arccos(1. * B_y[j][i] / B_mag[j][i]) - np.pi/4.
+#                        phi_obs[j][i]   = np.arccos(1. * B_x[j][i] / B_mag[j][i])
+
+
 
 			exact_I[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
 	                                             B_mag[j][i],
@@ -220,7 +226,7 @@ for x in range(0, number_of_points):
                                                      gamma_cutoff,
                                                      kappa,
                                                      kappa_width
-                                                    ) * np.cos(phi_obs[j][i]) * np.sin(theta_obs[j][i])
+                                                    ) * np.cos(phi_obs[j][i]) * np.cos(2.*theta_obs[j][i])
 
                         exact_U[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
                                                      B_mag[j][i],
@@ -235,7 +241,7 @@ for x in range(0, number_of_points):
                                                      gamma_cutoff,
                                                      kappa,
                                                      kappa_width
-                                                    ) * np.cos(phi_obs[j][i]) * np.sin(theta_obs[j][i] - np.pi/4.)
+                                                    ) * np.cos(phi_obs[j][i]) * np.sin(2.*theta_obs[j][i])
 
 			exact_V[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
                                                      B_mag[j][i],
@@ -258,8 +264,14 @@ for x in range(0, number_of_points):
 		exact_avg_U = np.mean(exact_U)
 		exact_avg_V = np.mean(exact_V)
 
+		#angles between the assumed B field and the mean B field
 	  	theta_obs_avg = np.arccos(1. * B_y_avg / B_mag_avg)
                 phi_obs_avg   = np.arccos(1. * B_x_avg / B_mag_avg)
+
+		#TODO: remove this; rotating by 45deg to send Q -> U
+#                theta_obs_avg = np.arccos(1. * B_y_avg / B_mag_avg) - np.pi/4.
+#                phi_obs_avg   = np.arccos(1. * B_x_avg / B_mag_avg)
+
 
 
 
@@ -272,13 +284,13 @@ for x in range(0, number_of_points):
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_Q, theta_e, power_law_p,
                                        gamma_min, gamma_max, gamma_cutoff,
-                                       kappa, kappa_width) * np.sin(theta_obs_avg) * np.cos(phi_obs_avg) #TODO: check this 
+                                       kappa, kappa_width) * np.cos(2.*theta_obs_avg) * np.cos(phi_obs_avg) #TODO: check this 
 
 		avgs_U      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_Q, theta_e, power_law_p,
                                        gamma_min, gamma_max, gamma_cutoff,
-                                       kappa, kappa_width) * np.sin(theta_obs_avg - np.pi/4.) * np.cos(phi_obs_avg) #TODO: check this too 
+                                       kappa, kappa_width) * np.sin(2.*theta_obs_avg) * np.cos(phi_obs_avg) #TODO: check this too 
 
 
 		avgs_V      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
@@ -311,9 +323,9 @@ for x in range(0, number_of_points):
 #------------------------make contour plot-------------------------------------#
 X, Y = np.meshgrid(nuratio_used, obs_angle_used)
 
-#figure, ax = pl.subplots(3, 3, figsize=(15, 15))
 figure, ax = pl.subplots(4, 3, figsize=(10, 10))
 figure.suptitle(figure_title)
+
 plot1 = ax[0,0].contourf(np.log10(X), Y, exact_avg_only_I, 200)
 figure.colorbar(plot1, ax=ax[0,0])
 ax[0,0].set_title('$<j_\\nu(n, \mathbf{B})>$')
@@ -326,6 +338,7 @@ if(EMISS == False):
         ax[0,0].set_title('$<\\alpha_\\nu(n, \mathbf{B})>$')
         ax[0,1].set_title('$\\alpha_\\nu(<n>, <\mathbf{B}>)$')
 
+#plot3 = ax[0,2].contourf(np.log10(X), Y, np.log10(relative_difference_I), 200)
 plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
 figure.colorbar(plot3, ax=ax[0,2])
 ax[0,2].set_title('$|\mathrm{Error}|$')
@@ -336,9 +349,9 @@ figure.colorbar(plot4, ax=ax[1,0])
 plot5 = ax[1,1].contourf(np.log10(X), Y, avgs_only_Q, 200)
 figure.colorbar(plot5, ax=ax[1,1])
 
-plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_Q, 200)
+plot6 = ax[1,2].contour(np.log10(X), Y, relative_difference_Q, 200)
+#plot6 = ax[1,2].contourf(np.log10(X), Y, np.log10(relative_difference_Q), 200)
 figure.colorbar(plot6, ax=ax[1,2])
-
 
 plot7 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_U, 200)
 figure.colorbar(plot7, ax=ax[2,0])
@@ -346,9 +359,10 @@ figure.colorbar(plot7, ax=ax[2,0])
 plot8 = ax[2,1].contourf(np.log10(X), Y, avgs_only_U, 200)
 figure.colorbar(plot8, ax=ax[2,1])
 
-plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_U, 200)
-figure.colorbar(plot9, ax=ax[2,2])
 
+plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_U, 200)
+#plot9 = ax[2,2].contourf(np.log10(X), Y, np.log10(relative_difference_U), 200)
+figure.colorbar(plot9, ax=ax[2,2])
 
 
 plot10 = ax[3,0].contourf(np.log10(X), Y, exact_avg_only_V, 200)
@@ -357,6 +371,7 @@ figure.colorbar(plot10, ax=ax[3,0])
 plot11 = ax[3,1].contourf(np.log10(X), Y, avgs_only_V, 200)
 figure.colorbar(plot11, ax=ax[3,1])
 
+#plot12 = ax[3,2].contourf(np.log10(X), Y, np.log10(relative_difference_V), 200)
 plot12 = ax[3,2].contourf(np.log10(X), Y, relative_difference_V, 200)
 figure.colorbar(plot12, ax=ax[3,2])
 
@@ -367,4 +382,7 @@ pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
 pl.ylabel('$\\theta$ (deg)')
 pl.tight_layout()
 
+figure.clim(-1, 1)
+
 pl.show()
+
