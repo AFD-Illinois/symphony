@@ -1,40 +1,22 @@
 import sys
-
 #symphony_build_path = '/home/mani/work/symphony/build'
 symphony_build_path = '/home/alex/Documents/Spring_2016/1symphony/symphony/build'
 sys.path.append(symphony_build_path)
-
 import symphonyPy as sp
 import numpy as np
 import pylab as pl
+import numpy.ma
 
-# Set plot parameters to make beautiful plots
-pl.rcParams['figure.figsize']  = 12, 7.5
-pl.rcParams['lines.linewidth'] = 1.5
-pl.rcParams['font.family']     = 'serif'
-pl.rcParams['font.weight']     = 'bold'
-pl.rcParams['font.size']       = 15
-pl.rcParams['font.sans-serif'] = 'serif'
-pl.rcParams['text.usetex']     = True
-pl.rcParams['axes.linewidth']  = 1.5
-pl.rcParams['axes.titlesize']  = 'medium'
-pl.rcParams['axes.labelsize']  = 'medium'
+#----------------------set important parameters-------------------------------#
 
-pl.rcParams['xtick.major.size'] = 8     
-pl.rcParams['xtick.minor.size'] = 4     
-pl.rcParams['xtick.major.pad']  = 8     
-pl.rcParams['xtick.minor.pad']  = 8     
-pl.rcParams['xtick.color']      = 'k'     
-pl.rcParams['xtick.labelsize']  = 'medium'
-pl.rcParams['xtick.direction']  = 'in'    
-
-pl.rcParams['ytick.major.size'] = 8     
-pl.rcParams['ytick.minor.size'] = 4     
-pl.rcParams['ytick.major.pad']  = 8     
-pl.rcParams['ytick.minor.pad']  = 8     
-pl.rcParams['ytick.color']      = 'k'     
-pl.rcParams['ytick.labelsize']  = 'medium'
-pl.rcParams['ytick.direction']  = 'in'    
+num_skip              = 64                      #sample every nth point
+max_nuratio           = 1.e8                    #max nu/nu_c
+number_of_points      = 64                      #size of grid
+distribution_function = sp.POWER_LAW		#distribution function
+EMISS                 = True                    #True = j_nu, False = alpha_nu
+IN_PLANE              = True		        #True = obs_angle in plane
+figure_title          = 'Power-law Distribution viewed in plane'
+mask_tolerance        = 1.			#error > tolerance set to be white in error plots
 
 #--------------------set constant parameters for the calculation--------------#
 m = 9.1093826e-28
@@ -49,18 +31,7 @@ gamma_cutoff = 1e10
 power_law_p = 2.
 kappa = 3.5
 kappa_width = 10.
-B_scale = 30. 
-
-#----------------------set important parameters-------------------------------#
-
-num_skip              = 128                      #sample every nth point
-max_nuratio           = 1.e8                    #max nu/nu_c
-number_of_points      = 64                      #size of grid
-distribution_function = sp.KAPPA_DIST     #distribution function
-EMISS                 = True                    #True = j_nu, False = alpha_nu
-IN_PLANE              = True		        #True = obs_angle in plane
-figure_title          = 'Kappa Distribution viewed in plane'
-
+B_scale = 30.
 #---------------------------import data from Dr. Kunz's simulation------------#
 rank = 0
 size = 1
@@ -321,6 +292,35 @@ for x in range(0, number_of_points):
 
 
 #------------------------make contour plot-------------------------------------#
+
+# Set plot parameters to make beautiful plots
+pl.rcParams['figure.figsize']  = 12, 7.5
+pl.rcParams['lines.linewidth'] = 1.5
+pl.rcParams['font.family']     = 'serif'
+pl.rcParams['font.weight']     = 'bold'
+pl.rcParams['font.size']       = 15
+pl.rcParams['font.sans-serif'] = 'serif'
+pl.rcParams['text.usetex']     = True
+pl.rcParams['axes.linewidth']  = 1.5
+pl.rcParams['axes.titlesize']  = 'medium'
+pl.rcParams['axes.labelsize']  = 'medium'
+
+pl.rcParams['xtick.major.size'] = 8
+pl.rcParams['xtick.minor.size'] = 4
+pl.rcParams['xtick.major.pad']  = 8
+pl.rcParams['xtick.minor.pad']  = 8
+pl.rcParams['xtick.color']      = 'k'
+pl.rcParams['xtick.labelsize']  = 'medium'
+pl.rcParams['xtick.direction']  = 'in'
+
+pl.rcParams['ytick.major.size'] = 8
+pl.rcParams['ytick.minor.size'] = 4
+pl.rcParams['ytick.major.pad']  = 8
+pl.rcParams['ytick.minor.pad']  = 8
+pl.rcParams['ytick.color']      = 'k'
+pl.rcParams['ytick.labelsize']  = 'medium'
+pl.rcParams['ytick.direction']  = 'in'
+
 X, Y = np.meshgrid(nuratio_used, obs_angle_used)
 
 figure, ax = pl.subplots(4, 3, figsize=(10, 10))
@@ -339,7 +339,9 @@ if(EMISS == False):
         ax[0,1].set_title('$\\alpha_\\nu(<n>, <\mathbf{B}>)$')
 
 #plot3 = ax[0,2].contourf(np.log10(X), Y, np.log10(relative_difference_I), 200)
+relative_difference_I = np.ma.array(relative_difference_I, mask=relative_difference_I > mask_tolerance)
 plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
+#plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
 figure.colorbar(plot3, ax=ax[0,2])
 ax[0,2].set_title('$|\mathrm{Error}|$')
 
@@ -349,7 +351,10 @@ figure.colorbar(plot4, ax=ax[1,0])
 plot5 = ax[1,1].contourf(np.log10(X), Y, avgs_only_Q, 200)
 figure.colorbar(plot5, ax=ax[1,1])
 
-plot6 = ax[1,2].contour(np.log10(X), Y, relative_difference_Q, 200)
+
+relative_difference_Q = np.ma.array(relative_difference_Q, mask=relative_difference_Q > mask_tolerance)
+plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_Q, 200)
+#plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_Q, 200)
 #plot6 = ax[1,2].contourf(np.log10(X), Y, np.log10(relative_difference_Q), 200)
 figure.colorbar(plot6, ax=ax[1,2])
 
@@ -359,11 +364,11 @@ figure.colorbar(plot7, ax=ax[2,0])
 plot8 = ax[2,1].contourf(np.log10(X), Y, avgs_only_U, 200)
 figure.colorbar(plot8, ax=ax[2,1])
 
-
+relative_difference_U = np.ma.array(relative_difference_U, mask=relative_difference_U > mask_tolerance)
 plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_U, 200)
+#plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_U, 200)
 #plot9 = ax[2,2].contourf(np.log10(X), Y, np.log10(relative_difference_U), 200)
 figure.colorbar(plot9, ax=ax[2,2])
-
 
 plot10 = ax[3,0].contourf(np.log10(X), Y, exact_avg_only_V, 200)
 figure.colorbar(plot10, ax=ax[3,0])
@@ -371,18 +376,17 @@ figure.colorbar(plot10, ax=ax[3,0])
 plot11 = ax[3,1].contourf(np.log10(X), Y, avgs_only_V, 200)
 figure.colorbar(plot11, ax=ax[3,1])
 
-#plot12 = ax[3,2].contourf(np.log10(X), Y, np.log10(relative_difference_V), 200)
+relative_difference_V = np.ma.array(relative_difference_V, mask=relative_difference_V > mask_tolerance)
 plot12 = ax[3,2].contourf(np.log10(X), Y, relative_difference_V, 200)
+#plot12 = ax[3,2].contourf(np.log10(X), Y, np.log10(relative_difference_V), 200)
+#plot12 = ax[3,2].contourf(np.log10(X), Y, relative_difference_V, 200)
 figure.colorbar(plot12, ax=ax[3,2])
-
 
 figure.add_subplot(111, frameon=False)
 pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
 pl.xlabel('$log_{10}(\\nu/\\nu_c)$')
 pl.ylabel('$\\theta$ (deg)')
 pl.tight_layout()
-
-figure.clim(-1, 1)
 
 pl.show()
 
