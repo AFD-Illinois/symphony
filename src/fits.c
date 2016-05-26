@@ -156,6 +156,74 @@ double alpha_nu_fit(double nu,
   return 0.;
 }
 
+/* Fits to Faraday rotation/conversion coefficients; right now only has
+ * formulae for Maxwell-Juettner distribution, from Dexter (2016)
+ * TODO: write full documentation for this
+ */
+double rho_nu_fit(double nu,
+                  double magnetic_field,
+                  double electron_density,
+                  double observer_angle,
+                  int distribution,
+                  int polarization,
+                  double theta_e,
+                  double power_law_p,
+                  double gamma_min,
+                  double gamma_max,
+                  double gamma_cutoff,
+                  double kappa,
+                  double kappa_width)
+{
+/*fill the struct with values*/
+  struct parameters params;
+  setConstParams(&params);
+  params.nu                 = nu;
+  params.magnetic_field     = magnetic_field;
+  params.observer_angle     = observer_angle;
+  params.electron_density   = electron_density;
+  params.distribution       = distribution;
+  params.polarization       = polarization;
+  params.mode               = params.ABSORPTIVITY;
+  params.theta_e            = theta_e;
+  params.power_law_p        = power_law_p;
+  params.gamma_min          = gamma_min;
+  params.gamma_max          = gamma_max;
+  params.gamma_cutoff       = gamma_cutoff;
+  params.kappa              = kappa;
+  params.kappa_width        = kappa_width;
+
+//  check_for_errors(&params);
+
+  if(params.polarization == params.STOKES_I)
+  {
+    printf("No Faraday rotation of total intensity");
+    return 0.;
+  }
+
+  if(params.distribution == params.MAXWELL_JUETTNER)
+  {
+    if     (params.polarization == params.STOKES_Q) return maxwell_juettner_rho_Q(&params);
+    else if(params.polarization == params.STOKES_U) return 0.;
+    else if(params.polarization == params.STOKES_V) return maxwell_juettner_rho_V(&params);
+  }
+
+//  else if(params.distribution == params.POWER_LAW)
+//  {
+//    if     (params.polarization == params.STOKES_Q) return power_law_rho_Q(&params);
+//    else if(params.polarization == params.STOKES_U) return 0.;
+//    else if(params.polarization == params.STOKES_V) return power_law_rho_V(&params);
+//  }
+//
+//  else if(params.distribution == params.KAPPA_DIST)
+//  {
+//    if     (params.polarization == params.STOKES_Q) return kappa_rho_Q(&params);
+//    else if(params.polarization == params.STOKES_U) return 0.;
+//    else if(params.polarization == params.STOKES_V) return kappa_rho_V(&params);
+//  }
+
+  return 0.;
+}
+
 /*check_for_errors: takes in struct of parameters and checks the provided
  *                  user inputs for values that are not physical or are 
  *                  outside of the limits of validity for the fitting 

@@ -12,10 +12,10 @@ import numpy.ma
 num_skip              = 64                      #sample every nth point
 max_nuratio           = 1.e8                    #max nu/nu_c
 number_of_points      = 64                      #size of grid
-distribution_function = sp.POWER_LAW		#distribution function
+distribution_function = sp.MAXWELL_JUETTNER	#distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
 IN_PLANE              = True		        #True = obs_angle in plane
-figure_title          = 'Power-law Distribution viewed in plane'
+figure_title          = 'MJ Distribution viewed in plane'
 mask_tolerance        = 1.			#error > tolerance set to be white in error plots
 
 #--------------------set constant parameters for the calculation--------------#
@@ -164,7 +164,7 @@ for x in range(0, number_of_points):
 			phi_obs[j][i]   = np.arccos(1. * B_x[j][i] / B_mag[j][i])
 
 			#TODO: remove this; rotating observer by 45deg should send U -> Q
-#                        theta_obs[j][i] = np.arccos(1. * B_y[j][i] / B_mag[j][i]) - np.pi/4.
+#                        theta_obs[j][i] = np.arccos(1. * B_y[j][i] / B_mag[j][i]) + np.pi/4.
 #                        phi_obs[j][i]   = np.arccos(1. * B_x[j][i] / B_mag[j][i])
 
 
@@ -240,7 +240,7 @@ for x in range(0, number_of_points):
                 phi_obs_avg   = np.arccos(1. * B_x_avg / B_mag_avg)
 
 		#TODO: remove this; rotating by 45deg to send Q -> U
-#                theta_obs_avg = np.arccos(1. * B_y_avg / B_mag_avg) - np.pi/4.
+#                theta_obs_avg = np.arccos(1. * B_y_avg / B_mag_avg) + np.pi/4.
 #                phi_obs_avg   = np.arccos(1. * B_x_avg / B_mag_avg)
 
 

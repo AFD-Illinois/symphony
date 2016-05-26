@@ -160,3 +160,63 @@ double maxwell_juettner_V_abs(struct parameters * params)
   double ans = maxwell_juettner_V(params)/planck_func(params);
   return ans;
 }
+
+//TODO: write documentation here
+double maxwell_juettner_rho_Q(struct parameters * params)
+{
+  double omega0 = params->electron_charge*params->magnetic_field
+                  / (params->mass_electron*params->speed_light);
+
+  double wp2 = 4. * params->pi * params->electron_density 
+	       * pow(params->electron_charge, 2.) / params->mass_electron;
+
+  /* argument for function f(X) (called jffunc) below */
+  double x = params->theta_e * sqrt(sqrt(2.) * sin(params->observer_angle)
+                 * (1.e3*omega0 / (2. * params->pi * params->nu)));
+
+  /* this is the definition of the modified factor f(X) from Dexter (2016) */
+  double extraterm = (.011*exp(-x/47.2) - pow(2., (-1./3.)) / pow(3., (23./6.))
+                      * params->pi * 1.e4 * pow((x + 1.e-16), (-8./3.)))
+                     * (0.5 + 0.5 * tanh((log(x) - log(120.)) / 0.1));
+
+  double jffunc = 2.011 * exp(-pow(x, 1.035)/4.7) - cos(x/2.) 
+                  * exp(-pow(x, 1.2)/2.73) - .011 * exp(-x / 47.2) + extraterm;
+
+  double eps11m22 = jffunc * wp2 * pow(omega0, 2.) 
+                    / pow(2.*params->pi * params->nu, 4.)
+                    * (gsl_sf_bessel_Kn(1, 1./params->theta_e) 
+                       / gsl_sf_bessel_Kn(2, 1./params->theta_e)
+                       + 6. * params->theta_e) 
+                    * pow(sin(params->observer_angle), 2.);
+
+  double rhoq = 2. * params->pi * params->nu /(2. * params->speed_light) 
+                * eps11m22;
+
+  return rhoq;
+}
+
+//TODO: write documentation here
+double maxwell_juettner_rho_V(struct parameters * params)
+{
+  double omega0 = params->electron_charge*params->magnetic_field
+                  / (params->mass_electron*params->speed_light);
+
+  double wp2 = 4. * params->pi * params->electron_density 
+	       * pow(params->electron_charge, 2.) / params->mass_electron;
+
+  /* argument for function g(X) (called shgmfunc) below */
+  double x = params->theta_e * sqrt(sqrt(2.) * sin(params->observer_angle)
+                 * (1.e3*omega0 / (2. * params->pi * params->nu)));
+
+  /* this is the definition of the modified factor g(X) from Dexter (2016) */
+  double shgmfunc = 0.43793091 * log(1. + 0.00185777 * pow(x, 1.50316886));
+
+  double eps12 = wp2 * omega0 / pow((2. * params->pi * params->nu), 3.) 
+                 * (gsl_sf_bessel_Kn(0, 1./params->theta_e) - shgmfunc)
+                 / gsl_sf_bessel_Kn(2, 1./params->theta_e)
+                 * cos(params->observer_angle);
+    
+  double rhov = 2. * params->pi * params->nu / params->speed_light * eps12;
+
+  return rhov;
+}
