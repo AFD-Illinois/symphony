@@ -70,16 +70,3 @@ cdef extern from "symphony.h":
                         double kappa,
                         double kappa_width)
 
-
-#cdef extern from "params.h":
-#
-#    struct parameters:
-#      pass 
-#
-#    void setConstParams(struct parameters * params)
-#
-#cdef extern from "distribution_function_common_routines.h":
-#
-#   double numerical_differential_of_f(double gamma, struct parameters * params)
-#   double differential_of_f(double gamma, struct parameters * params)
-

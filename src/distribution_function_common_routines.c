@@ -10,9 +10,7 @@ double normalize_f(double (*distribution)(double, void *),
                    struct parameters * params
                   )
 {
-  static double ans = 0;
-  if (ans != 0) return ans;
-
+  double ans = 0.;
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
   double result, error;
   gsl_function F;
@@ -24,7 +22,8 @@ double normalize_f(double (*distribution)(double, void *),
   gsl_integration_qagiu(&F, 1, 0, 1e-8, 1000,
                          w, &result, &error
                        );
-  gsl_integration_workspace_free (w);
+
+  gsl_integration_workspace_free(w);
   ans = result;
   return result;
 }

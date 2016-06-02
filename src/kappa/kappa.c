@@ -45,7 +45,15 @@ double kappa_to_be_normalized(double gamma, void * paramsInput)
 double kappa_f(double gamma, struct parameters * params)
 {
 
-  double norm = 1./normalize_f(&kappa_to_be_normalized, params);
+  
+  /*The distribution function only needs to be normalized once; the
+    static variable declaration and if statement below ensure that
+    it is not being normalized with each function call to kappa_f */
+  static double norm = 0.;
+  if(norm == 0.)
+  {
+    norm = 1./normalize_f(&kappa_to_be_normalized, params);
+  }
 
   double kappa_body = params->electron_density * pow((1. + (gamma - 1.)
                      /(params->kappa * params->kappa_width)), -params->kappa-1);

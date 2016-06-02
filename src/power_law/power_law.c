@@ -45,6 +45,16 @@ double power_law_to_be_normalized(double gamma, void * paramsInput)
  */
 double power_law_f(double gamma, struct parameters * params) 
 {
+
+  /*The distribution function only needs to be normalized once; the
+    static variable declaration and if statement below ensure that
+    it is not being normalized with each function call to power_law_f */
+  static double norm = 0.;
+  if(norm == 0.)
+  {
+    norm = 1./normalize_f(&power_law_to_be_normalized, params);
+  }
+
   double beta = sqrt(1. - 1./(gamma*gamma));
 
   double prefactor = params->electron_density * (params->power_law_p - 1.) 
@@ -54,11 +64,10 @@ double power_law_f(double gamma, struct parameters * params)
   double body = pow(gamma, -params->power_law_p) 
                 * exp(- gamma / params->gamma_cutoff);
 
-  double ans = 1./normalize_f(&power_law_to_be_normalized, params) * prefactor 
-                              * body 
-                              * 1./(pow(params->mass_electron, 3.) 
-                                    * pow(params->speed_light, 3.) 
-                                    * gamma*gamma * beta);
+  double ans = norm * prefactor * body 
+               * 1./(pow(params->mass_electron, 3.) 
+               * pow(params->speed_light, 3.) 
+               * gamma*gamma * beta);
 
   return ans;
 

@@ -1,6 +1,4 @@
 from symphonyHeaders cimport j_nu, alpha_nu, j_nu_fit, alpha_nu_fit, rho_nu_fit
-#from symphonyHeaders cimport differential_of_f, numerical_differential_of_f
-#from symphonyHeaders cimport setConstParams
 
 def j_nu_py(double nu,
             double magnetic_field,
@@ -152,44 +150,6 @@ def rho_nu_fit_py(double nu,
                       observer_angle, distribution, polarization,
                       theta_e, power_law_p, gamma_min, gamma_max,
                       gamma_cutoff, kappa, kappa_width)
-
-
-
-#def numerical_differential_of_f_py(double gamma,
-#                                   double nu,
-#                  	  	   double magnetic_field,
-#                 	 	   double electron_density,
-#                  	 	   double observer_angle,
-#                  		   int distribution,
-#                   		   int polarization,
-#                    		   double theta_e,
-#                    		   double power_law_p,
-#                    		   double gamma_min,
-#                    		   double gamma_max,
-#                   		   double gamma_cutoff,
-#                    		   double kappa,
-#                    		   double kappa_width):
-#
-#  
-#  struct parameters params;
-#  setConstParams(&params);
-#  params.nu                 = nu;
-#  params.magnetic_field     = magnetic_field;
-#  params.observer_angle     = observer_angle;
-#  params.electron_density   = electron_density;
-#  params.distribution       = distribution;
-#  params.polarization       = polarization;
-#  params.mode               = params.EMISSIVITY;
-#  params.theta_e            = theta_e;
-#  params.power_law_p        = power_law_p;
-#  params.gamma_min          = gamma_min;
-#  params.gamma_max          = gamma_max;
-#  params.gamma_cutoff       = gamma_cutoff;
-#  params.kappa              = kappa;
-#  params.kappa_width        = kappa_width;
-#  set_distribution_function(&params);
-#
-#  return numerical_differential_of_f(gamma, &params)
 
 
 
