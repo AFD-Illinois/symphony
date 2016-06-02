@@ -161,7 +161,15 @@ double maxwell_juettner_V_abs(struct parameters * params)
   return ans;
 }
 
-//TODO: write documentation here
+/*maxwell_juettner_rho_Q: Fitting formula for Faraday conversion coefficient
+ *                        rho_Q from Dexter (2016) for a Maxwell-Juettner
+ *                        distribution.  This formula comes from his
+ *                        equations B4, B6, B8, and B13.
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to the Faraday conversion coefficient
+ *          for a Maxwell-Juettner distribution of electrons. 
+ */
 double maxwell_juettner_rho_Q(struct parameters * params)
 {
   double omega0 = params->electron_charge*params->magnetic_field
@@ -195,7 +203,15 @@ double maxwell_juettner_rho_Q(struct parameters * params)
   return rhoq;
 }
 
-//TODO: write documentation here
+/*maxwell_juettner_rho_V: Fitting formula for Faraday rotation coefficient
+ *                        rho_V from Dexter (2016) for a Maxwell-Juettner
+ *                        distribution.  This formula comes from his
+ *                        equations B7, B8, B14, and B15.
+ *
+ *@params: struct of parameters params
+ *@returns: fitting formula to the Faraday rotation coefficient
+ *          for a Maxwell-Juettner distribution of electrons. 
+ */
 double maxwell_juettner_rho_V(struct parameters * params)
 {
   double omega0 = params->electron_charge*params->magnetic_field

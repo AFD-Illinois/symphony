@@ -1,6 +1,6 @@
 import sys
 #symphony_build_path = '/home/mani/work/symphony/build'
-symphony_build_path = '/home/alex/Documents/Spring_2016/1symphony/symphony/build'
+symphony_build_path = '/home/alex/Documents/Spring_2016/symphony/symphony/build'
 sys.path.append(symphony_build_path)
 import symphonyPy as sp
 import numpy as np
