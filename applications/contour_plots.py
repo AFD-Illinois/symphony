@@ -149,8 +149,8 @@ for x in range(0, number_of_points):
 		exact_U = np.zeros([N2, N1])
 		exact_V = np.zeros([N2, N1])
 
-		theta_obs = np.zeros([N2, N1])
-		phi_obs   = np.zeros([N2, N1])
+		beta_obs  = np.zeros([N2, N1])
+		alpha_obs = np.zeros([N2, N1])
 
 		jIndexStart =  rank    * N2 / size
 		jIndexEnd   = (rank+1) * N2 / size
@@ -160,13 +160,8 @@ for x in range(0, number_of_points):
 
 			#theta_obs is angle between simulation B and observer y axis
 			#phi_obs is angle between simulation B and observer x axis
-			theta_obs[j][i] = np.arccos(1. * B_y[j][i] / B_mag[j][i])
-			phi_obs[j][i]   = np.arccos(1. * B_x[j][i] / B_mag[j][i])
-
-			#TODO: remove this; rotating observer by 45deg should send U -> Q
-#                        theta_obs[j][i] = np.arccos(1. * B_y[j][i] / B_mag[j][i]) + np.pi/4.
-#                        phi_obs[j][i]   = np.arccos(1. * B_x[j][i] / B_mag[j][i])
-
+			beta_obs[j][i]  = np.arccos(1. * B_y[j][i] / B_mag[j][i])
+			alpha_obs[j][i] = np.arccos(1. * B_x[j][i] / B_mag[j][i])
 
 
 			exact_I[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
@@ -197,7 +192,7 @@ for x in range(0, number_of_points):
                                                      gamma_cutoff,
                                                      kappa,
                                                      kappa_width
-                                                    ) * np.cos(phi_obs[j][i]) * np.cos(2.*theta_obs[j][i])
+                                                    ) * np.cos(alpha_obs[j][i]) * np.cos(2.*beta_obs[j][i])
 
                         exact_U[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
                                                      B_mag[j][i],
@@ -212,7 +207,7 @@ for x in range(0, number_of_points):
                                                      gamma_cutoff,
                                                      kappa,
                                                      kappa_width
-                                                    ) * np.cos(phi_obs[j][i]) * np.sin(2.*theta_obs[j][i])
+                                                    ) * np.cos(alpha_obs[j][i]) * np.sin(2.*beta_obs[j][i])
 
 			exact_V[j][i] = j_nu_or_alpha_nu(nuratio * nu_c[j][i],
                                                      B_mag[j][i],
@@ -236,15 +231,8 @@ for x in range(0, number_of_points):
 		exact_avg_V = np.mean(exact_V)
 
 		#angles between the assumed B field and the mean B field
-	  	theta_obs_avg = np.arccos(1. * B_y_avg / B_mag_avg)
-                phi_obs_avg   = np.arccos(1. * B_x_avg / B_mag_avg)
-
-		#TODO: remove this; rotating by 45deg to send Q -> U
-#                theta_obs_avg = np.arccos(1. * B_y_avg / B_mag_avg) + np.pi/4.
-#                phi_obs_avg   = np.arccos(1. * B_x_avg / B_mag_avg)
-
-
-
+	  	beta_obs_avg  = np.arccos(1. * B_y_avg / B_mag_avg)
+                alpha_obs_avg = np.arccos(1. * B_x_avg / B_mag_avg)
 
 		avgs_I      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
 		                       obs_angle_avg, distribution_function,
@@ -255,14 +243,13 @@ for x in range(0, number_of_points):
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_Q, theta_e, power_law_p,
                                        gamma_min, gamma_max, gamma_cutoff,
-                                       kappa, kappa_width) * np.cos(2.*theta_obs_avg) * np.cos(phi_obs_avg) #TODO: check this 
+                                       kappa, kappa_width) * np.cos(2.*beta_obs_avg) * np.cos(alpha_obs_avg)  
 
 		avgs_U      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
                                        obs_angle_avg, distribution_function,
                                        sp.STOKES_Q, theta_e, power_law_p,
                                        gamma_min, gamma_max, gamma_cutoff,
-                                       kappa, kappa_width) * np.sin(2.*theta_obs_avg) * np.cos(phi_obs_avg) #TODO: check this too 
-
+                                       kappa, kappa_width) * np.sin(2.*beta_obs_avg) * np.cos(alpha_obs_avg) 
 
 		avgs_V      = j_nu_or_alpha_nu(nu_avg, B_mag_avg, n_e_avg,
                                        obs_angle_avg, distribution_function,
@@ -338,10 +325,8 @@ if(EMISS == False):
         ax[0,0].set_title('$<\\alpha_\\nu(n, \mathbf{B})>$')
         ax[0,1].set_title('$\\alpha_\\nu(<n>, <\mathbf{B}>)$')
 
-#plot3 = ax[0,2].contourf(np.log10(X), Y, np.log10(relative_difference_I), 200)
 relative_difference_I = np.ma.array(relative_difference_I, mask=relative_difference_I > mask_tolerance)
 plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
-#plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
 figure.colorbar(plot3, ax=ax[0,2])
 ax[0,2].set_title('$|\mathrm{Error}|$')
 
@@ -354,8 +339,6 @@ figure.colorbar(plot5, ax=ax[1,1])
 
 relative_difference_Q = np.ma.array(relative_difference_Q, mask=relative_difference_Q > mask_tolerance)
 plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_Q, 200)
-#plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_Q, 200)
-#plot6 = ax[1,2].contourf(np.log10(X), Y, np.log10(relative_difference_Q), 200)
 figure.colorbar(plot6, ax=ax[1,2])
 
 plot7 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_U, 200)
@@ -366,8 +349,6 @@ figure.colorbar(plot8, ax=ax[2,1])
 
 relative_difference_U = np.ma.array(relative_difference_U, mask=relative_difference_U > mask_tolerance)
 plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_U, 200)
-#plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_U, 200)
-#plot9 = ax[2,2].contourf(np.log10(X), Y, np.log10(relative_difference_U), 200)
 figure.colorbar(plot9, ax=ax[2,2])
 
 plot10 = ax[3,0].contourf(np.log10(X), Y, exact_avg_only_V, 200)
@@ -378,8 +359,6 @@ figure.colorbar(plot11, ax=ax[3,1])
 
 relative_difference_V = np.ma.array(relative_difference_V, mask=relative_difference_V > mask_tolerance)
 plot12 = ax[3,2].contourf(np.log10(X), Y, relative_difference_V, 200)
-#plot12 = ax[3,2].contourf(np.log10(X), Y, np.log10(relative_difference_V), 200)
-#plot12 = ax[3,2].contourf(np.log10(X), Y, relative_difference_V, 200)
 figure.colorbar(plot12, ax=ax[3,2])
 
 figure.add_subplot(111, frameon=False)
