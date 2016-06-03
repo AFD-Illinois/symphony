@@ -151,7 +151,7 @@ double kappa_I_abs(struct parameters * params)
 
   double z = -params->kappa*params->kappa_width;
 
-/*GSL 2F1 only works for |z| < 1; had to apply a hypergeometric function
+  /*GSL 2F1 only works for |z| < 1; had to apply a hypergeometric function
   identity because in our case z = -kappa*w, so |z| > 1 */
   double hyp2f1 = pow(1.-z, -a) * tgamma(c) * tgamma(b-a) 
                  / (tgamma(b)*tgamma(c-a)) 
@@ -208,7 +208,7 @@ double kappa_Q_abs(struct parameters * params)
 
   double z = -params->kappa * params->kappa_width;
 
-/*GSL 2F1 only works for |z| < 1; had to apply a hypergeometric function
+  /*GSL 2F1 only works for |z| < 1; had to apply a hypergeometric function
   identity because in our case z = -kappa*w, so |z| > 1 */
   double hyp2f1 = pow(1.-z, -a) * tgamma(c) * tgamma(b-a) 
                   / (tgamma(b) * tgamma(c-a))
@@ -264,7 +264,7 @@ double kappa_V_abs(struct parameters * params)
 
   double z = -params->kappa * params->kappa_width;
 
-/*GSL 2F1 only works for |z| < 1; had to apply a hypergeometric function
+  /*GSL 2F1 only works for |z| < 1; had to apply a hypergeometric function
   identity because in our case z = -kappa*w, so |z| > 1 */
   double hyp2f1 = pow(1.-z, -a) * tgamma(c) * tgamma(b-a) 
                   / (tgamma(b) * tgamma(c-a))

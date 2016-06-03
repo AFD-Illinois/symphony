@@ -36,19 +36,32 @@ double gamma_integration_result(double n, void * paramsInput)
   double result = 0.;
 
   /*integrator needs help resolving peak for nu/nu_c > 1e6*/
-
   double gamma_peak = (gamma_plus+gamma_minus)/2.;
 
   double width = 1.;
 
-  /* TODO: Remove hard coded limits here and put in params */
-  if (params->nu/nu_c > 1.e6 && params->nu/nu_c <= 3.e8) width = 10.;
-  else if (params->nu/nu_c > 3.e8)               width = 1000.;
+  /* For a given value of nu there is a peak in gamma space at the
+     location gamma_peak; the integrator can miss this peak if the
+     integration range is too wide.  Since we know the peak location
+     and the approximate width of the peak, we narrow the integration
+     range by a factor of 10 between nu_low and nu_high and then by
+     a factor of 1000 for nu > nu_high */
+  double nu_low  = 1.e6;
+  double nu_high = 3.e8;
+  if (params->nu/nu_c > nu_low && params->nu/nu_c <= nu_high) width = 10.;
+  else if (params->nu/nu_c > nu_high)                         width = 1000.;
+
 
   double gamma_minus_high = gamma_peak - (gamma_peak - gamma_minus)/width;
   double gamma_plus_high  = gamma_peak - (gamma_peak - gamma_plus) /width;
 
-  /*Stokes V is hard to resolve; do 2 separate integrations to make it easier*/
+  /*Stokes V is hard to resolve; described in the last paragraph of section
+    4.2 of [1].  We split the sinusoid-like integrand into a positive and 
+    negative part (determined by variable stokes_v_switch) and integrate
+    these parts separately over gamma and n.  We then sum them at the end.
+    In this case, the variable stokes_v_switch takes values -1 for the 
+    first lobe and +1 for the second lobe of the sinusoid-like gamma
+    integrand.*/
   if(params->polarization == params->STOKES_V && params->stokes_v_switch >= 0) 
   {
     double neg_result = gamma_integral(gamma_minus_high, gamma_peak, n, params);
@@ -118,9 +131,6 @@ double n_integration(double n_minus,
     double deriv_tol = 1.e-5;
     double tolerance = 1.e5;
 
-    // TODO: Put a debug mode which activates the diagnostic printf statements.
-    //printf("GOT INTO N INTEGRATION");
-
     /*keep taking steps and integrating in n until the integral stops giving
       contributions greater than tolerance */
     while (fabs(contrib) >= fabs(ans/tolerance)) 
@@ -159,8 +169,14 @@ double n_summation(struct parameters *params)
   double nu_c    = get_nu_c(*params);
   double n_minus = (params->nu/nu_c) * fabs(sin(params->observer_angle)); 
 
-  //need 2 separate n integrations to numerically resolve STOKES_V
-  params->stokes_v_switch = -1; // TODO: describe: -1: , 1: 
+  /*Stokes V is hard to resolve; described in the last paragraph of section
+    4.2 of [1].  We split the sinusoid-like integrand into a positive and 
+    negative part (determined by variable stokes_v_switch) and integrate
+    these parts separately over gamma and n.  We then sum them at the end.
+    In this case, the variable stokes_v_switch takes values -1 for the 
+    first lobe and +1 for the second lobe of the sinusoid-like gamma
+    integrand.*/
+  params->stokes_v_switch = -1;  
 
   /*perform n summation by summing the result of the gamma integral for 
     each value of n from 1 to n_max*/
@@ -228,7 +244,12 @@ double gamma_integral(double min,
   paramsGSL.params = *params;
   paramsGSL.n      = n;
 
-  //TODO: describe why this is necessary
+  /*For some of the small contributions to the gamma integral at high nu
+    the integrator will fail to meet the relative error tolerance and 
+    will quit the program.  This problem only occurs for portions of
+    the gamma integrand that produce negligible contributions, so it 
+    is better to turn off the error handler to prevent it from spontaneously
+    quitting.*/
   if(params->nu/nu_c >= 1.e6)
   {
      gsl_set_error_handler_off();
@@ -242,9 +263,14 @@ double gamma_integral(double min,
 
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
 
-  // TODO: Remove hard coded limits
-  gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
-                      3,  w, &result, &error); 
+  /* Integrator parameters */
+  double absolute_error  = 0.;
+  double relative_error  = 1.e-3;
+  size_t limit           = 1000;
+  int gauss_kronrod_rule = 3;
+
+  gsl_integration_qag(&F, min, max, absolute_error, relative_error, limit,
+                      gauss_kronrod_rule,  w, &result, &error);
 
   gsl_integration_workspace_free (w);
 
@@ -268,7 +294,12 @@ double n_integral(double min,
 {
   double nu_c = get_nu_c(*params);
 
-  //TODO: describe why this is necessary
+  /*For some of the small contributions to the gamma integral at high nu
+    the integrator will fail to meet the relative error tolerance and 
+    will quit the program.  This problem only occurs for portions of
+    the gamma integrand that produce negligible contributions, so it 
+    is better to turn off the error handler to prevent it from spontaneously
+    quitting.*/
   if(params->nu/nu_c >= 1.e6)
   {
   gsl_set_error_handler_off();
@@ -282,9 +313,14 @@ double n_integral(double min,
 
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
 
-  // TODO: Remove hard coded limits
-  gsl_integration_qag(&F, min, max, 0., 1.e-3, 1000,
-                         3,  w, &result, &error);
+  /* Integrator parameters */
+  double absolute_error  = 0.;
+  double relative_error  = 1.e-3;
+  size_t limit           = 1000;
+  int gauss_kronrod_rule = 3;
+
+  gsl_integration_qag(&F, min, max, absolute_error, relative_error, limit,
+                      gauss_kronrod_rule,  w, &result, &error);
 
   gsl_integration_workspace_free (w);
 

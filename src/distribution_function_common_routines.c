@@ -10,7 +10,13 @@ double normalize_f(double (*distribution)(double, void *),
                    struct parameters * params
                   )
 {
-  double ans = 0.;
+  
+  /*set GSL QAGIU integrator parameters */
+  double lower_bound = 1.;
+  double absolute_error = 0.;
+  double relative_error = 1e-8;
+  int limit  = 1000;
+
   gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
   double result, error;
   gsl_function F;
@@ -18,13 +24,14 @@ double normalize_f(double (*distribution)(double, void *),
   F.function = distribution;
 
   F.params = params;
-  // TODO: Remove hard coded limits
-  gsl_integration_qagiu(&F, 1, 0, 1e-8, 1000,
-                         w, &result, &error
+  
+  gsl_integration_qagiu(&F, lower_bound, absolute_error, 
+                        relative_error, limit, w, &result, &error
                        );
 
+
   gsl_integration_workspace_free(w);
-  ans = result;
+  
   return result;
 }
 

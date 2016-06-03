@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
   int points_per_pow_10 = 1;
   int max_index = (int) log10(max_nuratio)*points_per_pow_10;
 
-//  printf("\nnu/nu_c         j_nu()          j_nu_fit()");
+  printf("\nnu/nu_c         j_nu()          j_nu_fit()");
 
   for (int index=0; index <= max_index; index++) 
   {
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     paramsM.nu = pow(10., (double)index/(double)points_per_pow_10) * nu_c;
 
     printf("\n%e	%e	%e", paramsM.nu/nu_c, 
-                                     alpha_nu(paramsM.nu, 
+                                     j_nu(paramsM.nu, 
                                           paramsM.magnetic_field, 
                                           paramsM.electron_density, 
                                           paramsM.observer_angle, 
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
                                           paramsM.kappa,              
                                           paramsM.kappa_width        
                                           ), 
-                                 alpha_nu_fit(paramsM.nu,
+                                 j_nu_fit(paramsM.nu,
                                           paramsM.magnetic_field,
                                           paramsM.electron_density,
                                           paramsM.observer_angle,

@@ -3,9 +3,9 @@
 /*polarization_term: term in the gamma integrand that varies based upon the 
  *                   Stokes parameter; this term is denoted K_S in [1],
  *                   eq. 3 and 12.  The functional form K_S takes is
- *                   described in eq. 4-7 of [1].
- *
- * TODO: Describe which function is calling this function
+ *                   described in eq. 4-7 of [1].  This term is a part
+ *                   of the gamma integrand, and thus is called by
+ *                   gamma_integrand() below. 
  *
  *@params: Lorentz factor gamma, harmonic number n,
  *         struct of parameters params 
@@ -87,14 +87,6 @@ double gamma_integrand(double gamma, void * paramsGSLInput)
   struct parameters * params       = &(paramsGSL->params);
 
   double beta = sqrt(1. - 1./(gamma*gamma));
-
-//  double func_I = 
-//      (2. * params->pi * pow(params->electron_charge * params->nu, 2.) )
-//    / params->speed_light * (  pow(params->mass_electron * params->speed_light, 3.) 
-//                             * gamma*gamma * beta * 2. * params->pi
-//                            )
-//    * params->distribution_function(gamma, params) 
-//    * polarization_term(gamma, paramsGSL->n, params);
 
   double ans = 0.;
 

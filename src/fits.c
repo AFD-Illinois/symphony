@@ -50,9 +50,9 @@ double j_nu_fit(double nu,
   params.kappa_width        = kappa_width;
 
 
-//  check_for_errors(&params); //TODO: fix this
+  check_for_errors(&params);
   
- if(params.distribution == params.MAXWELL_JUETTNER)
+  if(params.distribution == params.MAXWELL_JUETTNER)
   {
     if     (params.polarization == params.STOKES_I) return maxwell_juettner_I(&params); 
     else if(params.polarization == params.STOKES_Q) return maxwell_juettner_Q(&params);
@@ -127,7 +127,6 @@ double alpha_nu_fit(double nu,
   params.kappa              = kappa;
   params.kappa_width        = kappa_width;
 
-//  check_for_errors(&params);
 
   if(params.distribution == params.MAXWELL_JUETTNER)
   {
@@ -156,9 +155,16 @@ double alpha_nu_fit(double nu,
   return 0.;
 }
 
-/* Fits to Faraday rotation/conversion coefficients; right now only has
- * formulae for Maxwell-Juettner distribution, from Dexter (2016)
- * TODO: write full documentation for this
+/*rho_nu_fit: Fits to Faraday rotation/conversion coefficients; right now only has
+ *            formulae for Maxwell-Juettner distribution, from Dexter (2016)
+ * 
+ *@params: nu, magnetic_field, electron_density, observer_angle,
+ *         distribution, polarization, theta_e, power_law_p,
+ *         gamma_min, gamma_max, gamma_cutoff, kappa, 
+ *         kappa_width 
+ *@returns: the corresponding Faraday coefficient fitting formula 
+ *          (based on the distribution function) evaluated for 
+ *          the input parameters.
  */
 double rho_nu_fit(double nu,
                   double magnetic_field,
@@ -207,6 +213,7 @@ double rho_nu_fit(double nu,
     else if(params.polarization == params.STOKES_V) return maxwell_juettner_rho_V(&params);
   }
 
+/*Faraday rotation coefficients for Power-law and Kappa distributions will be added later*/
 //  else if(params.distribution == params.POWER_LAW)
 //  {
 //    if     (params.polarization == params.STOKES_Q) return power_law_rho_Q(&params);
@@ -243,28 +250,25 @@ double check_for_errors(struct parameters * params)
      (params->polarization == params->STOKES_Q 
       || params->polarization == params->STOKES_V))
   {
-    printf("\n WARNING: nu may be out of range for Stokes Q and V fits\n");
-    //exit(0);
+    printf("\n WARNING: nu high; Stokes Q and V fits may be inaccurate \n");
   }
   if(params->magnetic_field < 0)
   {
-    printf("\n ERROR: B magnitude cannot be negative\n");
+    printf("\n ERROR: B magnitude cannot be negative \n");
     exit(0);
   }
   if(params->electron_density < 0)
   {
-    printf("\n ERROR: cannot have negative electron number density\n");
+    printf("\n ERROR: cannot have negative electron number density \n");
     exit(0);
   }
   if(params->kappa < 2.5 || params->kappa > 7.5)
   {
-    printf("\n WARNING: kappa out of range of fitting formula\n");
-    //exit(0);
+    printf("\n WARNING: kappa out of range of fitting formula \n");
   }
   if(params->kappa_width < 3 || params->kappa_width > 200)
   {
     printf("\n WARNING: w out of range; fitting formula may be inaccurate\n");
-    //exit(0);
   }
   if(params->gamma_min < 1)
   {
@@ -274,8 +278,7 @@ double check_for_errors(struct parameters * params)
   if(params->observer_angle < 5.*(params->pi)/180. 
      || params->observer_angle == 90.*(params->pi)/180.)
   {
-    printf("\n WARNING: theta out of range; fitting formula may be inaccurate\n");
-    //exit(0);
+    printf("\n WARNING: theta out of range; fitting formula may be inaccurate \n");
   }
 
   return 0.;

@@ -9,7 +9,6 @@
  *         distribution, polarization, theta_e, power_law_p,
  *         gamma_min, gamma_max, gamma_cutoff, kappa, 
  *         kappa_width
- *
  *@returns: n_summation(&params), which takes the struct of 
  *          parameters (now populated with values) and 
  *          performs the integration to evaluate j_nu().
@@ -60,7 +59,6 @@ double j_nu(double nu,
  *         distribution, polarization, theta_e, power_law_p,
  *         gamma_min, gamma_max, gamma_cutoff, kappa, 
  *         kappa_width
- *
  *@returns: n_summation(&params), which takes the struct of 
  *          parameters (now populated with values) and 
  *          performs the integration to evaluate alpha_nu().
