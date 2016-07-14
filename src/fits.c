@@ -50,7 +50,7 @@ double j_nu_fit(double nu,
   params.kappa_width        = kappa_width;
 
 
-  check_for_errors(&params);
+//  check_for_errors(&params);
   
   if(params.distribution == params.MAXWELL_JUETTNER)
   {
