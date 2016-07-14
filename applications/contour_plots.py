@@ -61,7 +61,11 @@ B_avg_vector = [B_x_avg, B_y_avg, B_z_avg]
 B_avg_vector = B_avg_vector/np.linalg.norm(B_avg_vector)
 
 #-------------------------------define rotation matrix------------------------#
-#TODO: comment on this
+#Euler-Rodrigues rotation matrix, as implemented by user "unutbu" from
+# http://stackoverflow.com/questions/6802577/python-rotation-of-3d-vector
+#It matches the literature Euler-Rodrigues formula, and has been shown to
+#produce the correct results. This version provides a clockwise rotation, 
+#whereas its transpose (as on Wikipedia) produces a counterclockwise rotation.
 def rotation_matrix(axis, theta):
     axis = np.asarray(axis)
     theta = np.asarray(theta)
@@ -115,20 +119,14 @@ for x in range(0, number_of_points):
 
 		if(IN_PLANE == True):
 			axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]] #should rotate in plane
-#			axis_of_rot = [0., 0., 1.] #rotates about z axis
 		else:
 			axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0] #rotates out of plane
-#			axis_of_rot = [0, 1, 0] #rotates about y axis
-#			axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0.]
 
 		theta       = (1.0*y/number_of_points * np.pi/2.)
 
 
 		obs_vector  = np.dot(rotation_matrix(axis_of_rot, theta), 
  				     B_avg_vector)
-
-#		obs_vector  = np.dot(rotation_matrix(axis_of_rot, theta),
-#				     [1, 0, 0])
 
 
 		obs_angle = np.arccos((B_x * obs_vector[0] 
