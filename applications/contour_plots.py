@@ -10,11 +10,10 @@ import numpy.ma
 #----------------------set important parameters-------------------------------#
 
 num_skip              = 64                      #sample every nth point
-nu_min 		      = 200e9			#minimum frequency
-nu_max                = 500e9			#maximum frequency
+max_nuratio           = 1.e8                    #maximum nu/nu_c_avg
 number_of_points      = 64                      #size of grid
-distribution_function = sp.MAXWELL_JUETTNER	#distribution function
-EMISS                 = False                    #True = j_nu, False = alpha_nu
+distribution_function = sp.MAXWELL_JUETTNER   	#distribution function
+EMISS                 = True                    #True = j_nu, False = alpha_nu
 IN_PLANE              = True		        #True = obs_angle in plane
 figure_title          = 'MJ Distribution viewed in plane'
 mask_tolerance        = 1.			#error > tolerance set to be white in error plots
@@ -28,8 +27,8 @@ h = 6.6260693e-27
 gamma_min = 1.
 gamma_max = 1000.
 gamma_cutoff = 1e10
-power_law_p = 2.
-kappa = 3.5
+power_law_p = 3.
+kappa = 2.5
 kappa_width = 10.
 B_scale = 30.
 
@@ -59,6 +58,8 @@ B_mag_avg      = np.mean(B_mag)
 B_vector     = [B_x, B_y, B_z]
 B_avg_vector = [B_x_avg, B_y_avg, B_z_avg]
 B_avg_vector = B_avg_vector/np.linalg.norm(B_avg_vector)
+
+nu_c_avg = (electron_charge * B_mag_avg) / (2. * np.pi * m * c)
 
 #-------------------------------define rotation matrix------------------------#
 #Euler-Rodrigues rotation matrix, as implemented by user "unutbu" from
@@ -113,8 +114,8 @@ nu_used             = np.empty([number_of_points])
 obs_angle_used      = np.empty([number_of_points])
 
 for x in range(0, number_of_points):
-	nu = nu_min + x * (nu_max - nu_min) / (number_of_points)
-        print 100.0*x/number_of_points, '% complete'
+	nu = nu_c_avg * 10.**(1.*x / (number_of_points - 1) * np.log10(max_nuratio))
+        print 100.0*x/(number_of_points - 1), '% complete'
 	for y in range(0, number_of_points):
 
 		if(IN_PLANE == True):
@@ -136,8 +137,6 @@ for x in range(0, number_of_points):
 
 		#generate remaining averages
 		obs_angle_avg  = np.mean(obs_angle)
-		nu_c           = electron_charge * (B_mag) / (2. * np.pi * m * c)
-		nu_c_avg       = np.mean(nu_c)
 
 #----------------------scan over simulation------------------------------------#
 		exact_avg = 0
@@ -272,7 +271,7 @@ for x in range(0, number_of_points):
 
 		if(x == 0):
 			obs_angle_used[y] = obs_angle_avg * 180. / np.pi
-	nu_used[x] = nu  
+	nu_used[x] = nu / nu_c_avg
 
 #------------------------make contour plot-------------------------------------#
 
@@ -309,12 +308,12 @@ X, Y = np.meshgrid(nu_used, obs_angle_used)
 figure, ax = pl.subplots(4, 3, figsize=(10, 10))
 figure.suptitle(figure_title)
 
-plot1 = ax[0,0].contourf(X, Y, exact_avg_only_I, 200)
+plot1 = ax[0,0].contourf(np.log10(X), Y, exact_avg_only_I, 200)
 figure.colorbar(plot1, ax=ax[0,0])
 ax[0,0].set_title('$<j_\\nu(n, \mathbf{B})>$')
 
 
-plot2 = ax[0,1].contourf(X, Y, avgs_only_I, 200)
+plot2 = ax[0,1].contourf(np.log10(X), Y, avgs_only_I, 200)
 figure.colorbar(plot2, ax=ax[0,1])
 ax[0,1].set_title('$j_\\nu(<n>, <\mathbf{B}>)$')
 
@@ -323,46 +322,70 @@ if(EMISS == False):
         ax[0,1].set_title('$\\alpha_\\nu(<n>, <\mathbf{B}>)$')
 
 relative_difference_I = np.ma.array(relative_difference_I, mask=relative_difference_I > mask_tolerance)
-plot3 = ax[0,2].contourf(X, Y, relative_difference_I, 200)
+plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
 figure.colorbar(plot3, ax=ax[0,2])
 ax[0,2].set_title('$|\mathrm{Error}|$')
 
-plot4 = ax[1,0].contourf(X, Y, exact_avg_only_Q, 200)
+plot4 = ax[1,0].contourf(np.log10(X), Y, exact_avg_only_Q, 200)
 figure.colorbar(plot4, ax=ax[1,0])
 
-plot5 = ax[1,1].contourf(X, Y, avgs_only_Q, 200)
+plot5 = ax[1,1].contourf(np.log10(X), Y, avgs_only_Q, 200)
 figure.colorbar(plot5, ax=ax[1,1])
 
 
 relative_difference_Q = np.ma.array(relative_difference_Q, mask=relative_difference_Q > mask_tolerance)
-plot6 = ax[1,2].contourf(X, Y, relative_difference_Q, 200)
+plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_Q, 200)
 figure.colorbar(plot6, ax=ax[1,2])
 
-plot7 = ax[2,0].contourf(X, Y, exact_avg_only_U, 200)
+plot7 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_U, 200)
 figure.colorbar(plot7, ax=ax[2,0])
 
-plot8 = ax[2,1].contourf(X, Y, avgs_only_U, 200)
+plot8 = ax[2,1].contourf(np.log10(X), Y, avgs_only_U, 200)
 figure.colorbar(plot8, ax=ax[2,1])
 
 relative_difference_U = np.ma.array(relative_difference_U, mask=relative_difference_U > mask_tolerance)
-plot9 = ax[2,2].contourf(X, Y, relative_difference_U, 200)
+plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_U, 200)
 figure.colorbar(plot9, ax=ax[2,2])
 
-plot10 = ax[3,0].contourf(X, Y, exact_avg_only_V, 200)
+plot10 = ax[3,0].contourf(np.log10(X), Y, exact_avg_only_V, 200)
 figure.colorbar(plot10, ax=ax[3,0])
 
-plot11 = ax[3,1].contourf(X, Y, avgs_only_V, 200)
+plot11 = ax[3,1].contourf(np.log10(X), Y, avgs_only_V, 200)
 figure.colorbar(plot11, ax=ax[3,1])
 
 relative_difference_V = np.ma.array(relative_difference_V, mask=relative_difference_V > mask_tolerance)
-plot12 = ax[3,2].contourf(X, Y, relative_difference_V, 200)
+plot12 = ax[3,2].contourf(np.log10(X), Y, relative_difference_V, 200)
 figure.colorbar(plot12, ax=ax[3,2])
 
 figure.add_subplot(111, frameon=False)
 pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
-pl.xlabel('$\\nu$', fontsize='large')
+pl.xlabel('$\\log_{10}(\\nu/\\overline{\\nu}_c)$', fontsize='large')
 pl.ylabel('$\\theta$ (deg)', fontsize='large')
 pl.tight_layout()
 
 pl.show()
+
+#print error at position where j_nu or alpha_nu is maximal
+max_value_I = np.amax(np.abs(exact_avg_only_I))
+location_I = np.where(np.abs(exact_avg_only_I) == max_value_I)
+x_I, y_I = location_I[0][0], location_I[1][0]
+
+max_value_Q = np.amax(np.abs(exact_avg_only_Q))
+location_Q = np.where(np.abs(exact_avg_only_Q) == max_value_Q)
+x_Q, y_Q = location_Q[0][0], location_Q[1][0]
+
+max_value_U = np.amax(np.abs(exact_avg_only_U))
+location_U = np.where(np.abs(exact_avg_only_U) == max_value_U)
+x_U, y_U = location_U[0][0], location_U[1][0]
+
+max_value_V = np.amax(np.abs(exact_avg_only_V))
+location_V = np.where(np.abs(exact_avg_only_V) == max_value_V)
+x_V, y_V = location_V[0][0], location_V[1][0]
+
+
+print '\nError at location of max j_nu or alpha_nu: '
+print 'STOKES I: ', relative_difference_I[x_I][y_I]
+print 'STOKES Q: ', relative_difference_Q[x_Q][y_Q]
+print 'STOKES U: ', relative_difference_U[x_U][y_U]
+print 'STOKES V: ', relative_difference_V[x_V][y_V]
 
