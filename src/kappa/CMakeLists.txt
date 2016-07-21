@@ -6,3 +6,4 @@ add_library(kappa
             kappa.c 
             kappa.h 
             kappa_fits.c)
+target_link_libraries(kappa ${GSL_LIBRARIES})

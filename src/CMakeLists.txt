@@ -14,10 +14,10 @@ cmake_minimum_required(VERSION 2.8)
 project(symphony)
 
 # ------------------------------USER OPTIONS----------------------------------#
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -O3 -g")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -DDEBUG")
 
-# Custon GSL install directory
+# Custom GSL install directory
 #set(GSL_ROOT_DIR "")
 # ------------------------------END OF USER OPTIONS---------------------------#
 # Needed to link python interfaces to precompiled .so libraries

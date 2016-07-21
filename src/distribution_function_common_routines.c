@@ -50,44 +50,44 @@ double normalize_f(double (*distribution)(double, void *),
  *@returns: differential of the distribution function term in the gamma
  *          integrand.  
  */
-double differential_of_f(double gamma, struct parameters * params) 
-{
-  /*described in Section 2 of [1] */
-
-  double Df = 0.;
-
-  /*all of the distribution functions used are independent of gyrophase
-    phi, so integrate out dphi to get 2*pi */
-  double gyrophase_indep =  2. * params->pi;
-
-  /*need to convert d^3p to dgamma dcos(xi) by multiplying by
-    a factor of m^3 c^3 */
-  double d3p_to_dgamma   =  pow(params->mass_electron, 3.)
-                          * pow(params->speed_light, 3.);
-
-  /*prefactor from [1] eq. 13, multiplied by 2*pi from integrating
-    out phi and m^3 c^3 from changing from d3p to dgamma dcos(xi) */
-  double prefactor = (2. * params->pi * params->nu
-                      / (params->mass_electron
-                         *params->speed_light*params->speed_light))
-                     * gyrophase_indep
-                     * d3p_to_dgamma;
-
-  if(params->distribution == params->MAXWELL_JUETTNER)
-  {
-    Df = differential_of_maxwell_juettner(gamma, params);
-  }
-  else if(params->distribution == params->POWER_LAW)
-  {
-    Df = differential_of_power_law(gamma, params);
-  }
-  else if(params->distribution == params->KAPPA_DIST)
-  {
-    Df = differential_of_kappa(gamma, params);
-  }
-
-  return prefactor * Df;
-}
+//double differential_of_f(double gamma, struct parameters * params) 
+//{
+//  /*described in Section 2 of [1] */
+//
+//  double Df = 0.;
+//
+//  /*all of the distribution functions used are independent of gyrophase
+//    phi, so integrate out dphi to get 2*pi */
+//  double gyrophase_indep =  2. * params->pi;
+//
+//  /*need to convert d^3p to dgamma dcos(xi) by multiplying by
+//    a factor of m^3 c^3 */
+//  double d3p_to_dgamma   =  pow(params->mass_electron, 3.)
+//                          * pow(params->speed_light, 3.);
+//
+//  /*prefactor from [1] eq. 13, multiplied by 2*pi from integrating
+//    out phi and m^3 c^3 from changing from d3p to dgamma dcos(xi) */
+//  double prefactor = (2. * params->pi * params->nu
+//                      / (params->mass_electron
+//                         *params->speed_light*params->speed_light))
+//                     * gyrophase_indep
+//                     * d3p_to_dgamma;
+//
+//  if(params->distribution == params->MAXWELL_JUETTNER)
+//  {
+//    Df = differential_of_maxwell_juettner(gamma, params);
+//  }
+//  else if(params->distribution == params->POWER_LAW)
+//  {
+//    Df = differential_of_power_law(gamma, params);
+//  }
+//  else if(params->distribution == params->KAPPA_DIST)
+//  {
+//    Df = differential_of_kappa(gamma, params);
+//  }
+//
+//  return prefactor * Df;
+//}
 
 double numerical_differential_of_f(double gamma, struct parameters * params)
 {
