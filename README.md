@@ -2,7 +2,9 @@
 
 ##Overview
 
-*symphony* calculates synchrotron emissivities and absorptivities, polarized in the Stokes basis {I, Q, U, V}, for any arbitrary gyrotropic momentum space distribution function.  Three distribution functions are built in: a relativistic thermal (Maxwell-Juettner) distribution, a nonthermal power-law distribution, and a kappa distribution.  
+*symphony* calculates synchrotron emissivities and absorptivities, polarized in the Stokes basis {I, Q, U, V}, for any arbitrary gyrotropic momentum space distribution function.  Three distribution functions are built in: a relativistic thermal (Maxwell-Juettner) distribution, a nonthermal power-law distribution, and a kappa distribution.
+
+*symphony* is described in [Pandya et al., 2016 ApJ 822 34](http://dx.doi.org/10.3847/0004-637X/822/1/34). If you use this code in an academic context, cite that paper.
 
 ##Features
 
