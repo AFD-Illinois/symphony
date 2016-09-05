@@ -129,15 +129,18 @@ void set_distribution_function(struct parameters * params)
     params->distribution_function = &maxwell_juettner_f;
     params->use_n_peak            = 1;
     params->n_peak                = &maxwell_juettner_n_peak;
+    params->analytic_differential = &differential_of_maxwell_juettner;
   }
   else if(params->distribution == params->POWER_LAW)
   {
     params->distribution_function = &power_law_f;
     params->use_n_peak            = 0;
+    params->analytic_differential = &differential_of_power_law;
   }
   else if(params->distribution == params->KAPPA_DIST)
   {
     params->distribution_function = &kappa_f;
     params->use_n_peak            = 0;
+    params->analytic_differential = differential_of_kappa;
   }
 }
