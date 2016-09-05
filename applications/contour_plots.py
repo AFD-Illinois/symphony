@@ -7,7 +7,7 @@ import numpy as np
 import pylab as pl
 import numpy.ma
 
-#----------------------set important parameters-------------------------------#
+#----------------------set important parameters--------------------------------#
 
 num_skip              = 64                      #sample every nth point
 max_nuratio           = 1.e8                    #maximum nu/nu_c_avg
@@ -16,7 +16,7 @@ distribution_function = sp.MAXWELL_JUETTNER   	#distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
 IN_PLANE              = True		        #True = obs_angle in plane
 figure_title          = 'MJ Distribution viewed in plane'
-mask_tolerance        = 1.			#error > tolerance set to be white in error plots
+mask_tolerance        = 1.			#error > tolerance is white
 
 #--------------------set constant parameters for the calculation--------------#
 m = 9.1093826e-28
@@ -119,10 +119,13 @@ for x in range(0, number_of_points):
 	for y in range(0, number_of_points):
 
 		if(IN_PLANE == True):
-			axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]] #should rotate in plane
+			#rotates observer vector in plane
+			axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]]
 		else:
-			axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0] #rotates out of plane
+			#rotates observer vector out of plane
+			axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0]
 
+		#desired angle between observer vector and mean B
 		theta       = (1.0*y/number_of_points * np.pi/2.)
 
 
@@ -135,7 +138,6 @@ for x in range(0, number_of_points):
                                        + B_z * obs_vector[2])
                                       / (np.linalg.norm(obs_vector)*B_mag))
 
-		#generate remaining averages
 		obs_angle_avg  = np.mean(obs_angle)
 
 #----------------------scan over simulation------------------------------------#
@@ -155,10 +157,10 @@ for x in range(0, number_of_points):
 		    for i in range(0, N1):
 
 			#beta_obs  is angle between simulation B and observer y axis
-			#alpha_obs is angle between simulation B and observer x axis
 			beta_obs[j][i]  = np.arccos(1. * B_y[j][i] / B_mag[j][i])
-			alpha_obs[j][i] = np.arccos(1. * B_x[j][i] / B_mag[j][i])
 
+                        #alpha_obs is angle between simulation B and observer x axis
+			alpha_obs[j][i] = np.arccos(1. * B_x[j][i] / B_mag[j][i])
 
 			exact_I[j][i] = j_nu_or_alpha_nu(nu, 
 	                                             B_mag[j][i],
