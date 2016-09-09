@@ -46,13 +46,32 @@ include(UseCython)
 
 include_directories(${GSL_INCLUDE_DIRS}  ${PYTHON_NUMPY_INCLUDE_DIR} .)
 
-add_subdirectory(maxwell_juettner)
-add_subdirectory(power_law)
-add_subdirectory(kappa)
-add_subdirectory(integrator)
+add_library(symphony
+bessel_mod.c
+distribution_function_common_routines.c
+distribution_function_common_routines.h
+integrator/integrands.c
+integrator/integrands.h
+integrator/integrate.c
+integrator/integrate.h
+fits.c
+fits.h
+kappa/kappa.c
+kappa/kappa.h
+kappa/kappa_fits.c
+maxwell_juettner/maxwell_juettner.c
+maxwell_juettner/maxwell_juettner.h
+maxwell_juettner/maxwell_juettner_fits.c
+params.c
+params.h
+power_law/power_law.c
+power_law/power_law.h
+power_law/power_law_fits.c
+symphony.c
+symphony.h
+)
 
-add_library(symphony symphony.c symphony.h fits.c fits.h bessel_mod.c)
-target_link_libraries(symphony maxwell_juettner power_law kappa integrator
+target_link_libraries(symphony
                       ${MATH_LIBRARIES}
                       ${GSL_LIBRARIES}
                       ${CBLAS_LIBRARIES})
@@ -60,8 +79,8 @@ target_link_libraries(symphony maxwell_juettner power_law kappa integrator
 add_executable(demo demo.c)
 target_link_libraries(demo symphony)
 
-cython_add_module(symphonyPy symphonyPy.pyx fits.c fits.h)
-target_link_libraries(symphonyPy symphony kappa power_law maxwell_juettner
+cython_add_module(symphonyPy symphonyPy.pyx)
+target_link_libraries(symphonyPy symphony
   ${GSL_LIBRARIES} ${CBLAS_LIBRARIES})
 
 message("")
