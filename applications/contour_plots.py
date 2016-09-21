@@ -12,11 +12,13 @@ import numpy.ma
 num_skip              = 64                      #sample every nth point
 max_nuratio           = 1.e8                    #maximum nu/nu_c_avg
 number_of_points      = 64                      #size of grid
-distribution_function = sp.MAXWELL_JUETTNER   	#distribution function
+distribution_function = sp.POWER_LAW	#distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
 IN_PLANE              = True		        #True = obs_angle in plane
-figure_title          = 'MJ Distribution viewed in plane'
+figure_title          = 'Power-law Distribution viewed in plane'
 mask_tolerance        = 1.			#error > tolerance is white
+observer_rotation     = 0.
+
 
 #--------------------set constant parameters for the calculation--------------#
 m = 9.1093826e-28
@@ -41,6 +43,7 @@ datafiles_path = '/home/alex/Documents/Spring_2016/'
 B_x = np.loadtxt(datafiles_path + 'mirror_bx.out')[::num_skip, ::num_skip] * B_scale
 B_y = np.loadtxt(datafiles_path + 'mirror_by.out')[::num_skip, ::num_skip] * B_scale
 B_z = np.loadtxt(datafiles_path + 'mirror_bz.out')[::num_skip, ::num_skip] * B_scale
+
 B_mag = np.sqrt(B_x**2. + B_y**2. + B_z**2.)
 n_e = np.loadtxt(datafiles_path + 'mirror_d.out')[::num_skip, ::num_skip]
 
@@ -138,7 +141,11 @@ for x in range(0, number_of_points):
                                        + B_z * obs_vector[2])
                                       / (np.linalg.norm(obs_vector)*B_mag))
 
-		obs_angle_avg  = np.mean(obs_angle)
+
+#		obs_angle_avg  = np.mean(obs_angle) #TODO: testing this
+		angle_to_mean_field = np.arccos(np.dot(B_avg_vector, obs_vector)) #TODO: testing this
+		obs_angle_avg = angle_to_mean_field #TODO: testing this
+
 
 #----------------------scan over simulation------------------------------------#
 		exact_avg = 0
@@ -157,7 +164,7 @@ for x in range(0, number_of_points):
 		    for i in range(0, N1):
 
 			#beta_obs  is angle between simulation B and observer y axis
-			beta_obs[j][i]  = np.arccos(1. * B_y[j][i] / B_mag[j][i])
+			beta_obs[j][i]  = np.arccos(1. * B_y[j][i] / B_mag[j][i]) + observer_rotation
 
                         #alpha_obs is angle between simulation B and observer x axis
 			alpha_obs[j][i] = np.arccos(1. * B_x[j][i] / B_mag[j][i])
@@ -228,7 +235,7 @@ for x in range(0, number_of_points):
 		exact_avg_V = np.mean(exact_V)
 
 		#angles between the assumed B field and the mean B field
-	  	beta_obs_avg  = np.arccos(1. * B_y_avg / B_mag_avg)
+	  	beta_obs_avg  = np.arccos(1. * B_y_avg / B_mag_avg) + observer_rotation
                 alpha_obs_avg = np.arccos(1. * B_x_avg / B_mag_avg)
 
 		avgs_I      = j_nu_or_alpha_nu(nu, B_mag_avg, n_e_avg, 
@@ -270,6 +277,7 @@ for x in range(0, number_of_points):
 		relative_difference_V[y][x] = np.fabs((exact_avg_V - avgs_V)/exact_avg_V)
                 exact_avg_only_V[y][x]      = exact_avg_V
                 avgs_only_V[y][x]           = avgs_V
+
 
 		if(x == 0):
 			obs_angle_used[y] = obs_angle_avg * 180. / np.pi
@@ -390,4 +398,3 @@ print 'STOKES I: ', relative_difference_I[x_I][y_I]
 print 'STOKES Q: ', relative_difference_Q[x_Q][y_Q]
 print 'STOKES U: ', relative_difference_U[x_U][y_U]
 print 'STOKES V: ', relative_difference_V[x_V][y_V]
-
