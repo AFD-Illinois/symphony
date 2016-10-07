@@ -2,18 +2,19 @@
 import sys
 
 #symphony_build_path = '/home/mani/work/symphony/build'
-symphony_build_path = '/home/alex/Documents/Spring_2016/1symphony/symphony/build'
+#symphony_build_path = '/home/alex/Documents/Spring_2016/1symphony/symphony/build'
+symphony_build_path = '../build'
 sys.path.append(symphony_build_path)
 
 import symphonyPy as sp
 import numpy as np
 import pylab as pl
-#from mpi4py import MPI
+from mpi4py import MPI
 
-#comm = MPI.COMM_WORLD
-#rank = MPI.COMM_WORLD.Get_rank()
-#size = MPI.COMM_WORLD.Get_size()
-#name = MPI.Get_processor_name()
+comm = MPI.COMM_WORLD
+rank = MPI.COMM_WORLD.Get_rank()
+size = MPI.COMM_WORLD.Get_size()
+name = MPI.Get_processor_name()
 
 #set constant parameters for the calculation
 m = 9.1093826e-28
@@ -35,21 +36,32 @@ B_scale = 30. #TODO: check if sim data is actually normalized to init. val.
 N2 = 1152
 N1 = 1152
 
-rank = 0
-size = 1
 
-#comm.Barrier()
+num_skip = 2
+
+N2 = N2 / num_skip
+N1 = N1 / num_skip
+
+#rank = 0
+#size = 1
+
+comm.Barrier()
 if (rank==0):
 #    datafiles_path = '/home/mani/work/kunz_data/'
-    datafiles_path = '/home/alex/Documents/Spring_2016/'
-    B_x = np.loadtxt(datafiles_path + 'mirror_bx.out') * B_scale
-    B_y = np.loadtxt(datafiles_path + 'mirror_by.out') * B_scale
-    B_z = np.loadtxt(datafiles_path + 'mirror_bz.out') * B_scale
+#    datafiles_path = '/home/alex/Documents/Spring_2016/'
+    datafiles_path = ''
+    B_x = np.loadtxt(datafiles_path + 'mirror_bx.out')[::num_skip, ::num_skip] * B_scale
+    B_y = np.loadtxt(datafiles_path + 'mirror_by.out')[::num_skip, ::num_skip] * B_scale
+    B_z = np.loadtxt(datafiles_path + 'mirror_bz.out')[::num_skip, ::num_skip] * B_scale
     B_mag = np.sqrt(B_x**2. + B_y**2. + B_z**2.)
-    n_e = np.loadtxt(datafiles_path + 'mirror_d.out')
+    n_e = np.loadtxt(datafiles_path + 'mirror_d.out')[::num_skip, ::num_skip]
 
-    #N2 = B_x.shape[0]
-    #N1 = B_x.shape[1]
+    B_x   = np.ascontiguousarray(B_x)
+    B_y   = np.ascontiguousarray(B_y)
+    B_z   = np.ascontiguousarray(B_z)
+    B_mag = np.ascontiguousarray(B_mag)
+    n_e   = np.ascontiguousarray(n_e)
+
 else:
     B_x = np.zeros([N2, N1])
     B_y = np.zeros([N2, N1])
@@ -57,11 +69,12 @@ else:
     B_mag = np.zeros([N2, N1])
     n_e = np.zeros([N2, N1])
 
-#comm.Bcast([B_x, MPI.DOUBLE])
-#comm.Bcast([B_y, MPI.DOUBLE])
-#comm.Bcast([B_z, MPI.DOUBLE])
-#comm.Bcast([B_mag, MPI.DOUBLE])
-#comm.Bcast([n_e, MPI.DOUBLE])
+comm.Bcast([B_x, MPI.DOUBLE])
+comm.Bcast([B_y, MPI.DOUBLE])
+comm.Bcast([B_z, MPI.DOUBLE])
+comm.Bcast([B_mag, MPI.DOUBLE])
+comm.Bcast([n_e, MPI.DOUBLE])
+
 
 #still thinking about how to do observer_angle.  Is there a better way than this?
 obs_angle = np.arccos(1./(1.) * (0.*B_x + -1.*B_y + 0.*B_z)/B_mag)
@@ -81,7 +94,7 @@ MJ_I_exact = np.zeros([N2, N1])
 jIndexStart =  rank    * N2 / size
 jIndexEnd   = (rank+1) * N2 / size
 
-nu_c = electron_charge * (B_mag * 30) / (2. * np.pi * m * c)
+nu_c = electron_charge * (B_mag * 1.) / (2. * np.pi * m * c)
 
 for j in range(jIndexStart, jIndexEnd):
     print "j = ", j, ", rank = ", rank
@@ -96,13 +109,14 @@ for j in range(jIndexStart, jIndexEnd):
                                           kappa, kappa_width
                                          )
 
-#comm.barrier()
-#comm.Allgather([MJ_I_exact[jIndexStart:jIndexEnd, :], MPI.DOUBLE],
-#               [MJ_I_exact, MPI.DOUBLE]
-#              )
+MJ_I_exact_gathered = np.zeros([N1, N2])
+comm.barrier()
+comm.Allgather([MJ_I_exact[jIndexStart:jIndexEnd, :], MPI.DOUBLE],
+               [MJ_I_exact_gathered, MPI.DOUBLE]
+              )
 if (rank==0):
-    np.savetxt("MJ_I_using_symphony_fits.txt", MJ_I_exact)
-    pl.contourf(MJ_I_exact, 100)
+    np.savetxt("MJ_I_using_symphony_fits.txt", MJ_I_exact_gathered)
+    pl.contourf(MJ_I_exact_gathered, 100)
     pl.colorbar()
     pl.show()
 
