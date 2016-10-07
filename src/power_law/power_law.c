@@ -48,11 +48,24 @@ double power_law_f(double gamma, struct parameters * params)
 
   /*The distribution function only needs to be normalized once; the
     static variable declaration and if statement below ensure that
-    it is not being normalized with each function call to power_law_f */
+    it is not being normalized with each function call to power_law_f;
+    it does need to be normalized again if any of the distribution
+    function parameters change, though. */
   static double norm = 0.;
-  if(norm == 0.)
+  static double previous_power_law_p  = 0.;
+  static double previous_gamma_min    = 0.;
+  static double previous_gamma_max    = 0.;
+  static double previous_gamma_cutoff = 0.;
+  if(norm == 0. || previous_power_law_p  != params->power_law_p
+                || previous_gamma_min    != params->gamma_min
+                || previous_gamma_max    != params->gamma_max
+                || previous_gamma_cutoff != params->gamma_cutoff)
   {
     norm = 1./normalize_f(&power_law_to_be_normalized, params);
+    previous_power_law_p  = params->power_law_p;
+    previous_gamma_min    = params->gamma_min;
+    previous_gamma_max    = params->gamma_max;
+    previous_gamma_cutoff = params->gamma_cutoff;
   }
 
   double beta = sqrt(1. - 1./(gamma*gamma));

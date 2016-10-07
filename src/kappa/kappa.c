@@ -48,11 +48,20 @@ double kappa_f(double gamma, struct parameters * params)
   
   /*The distribution function only needs to be normalized once; the
     static variable declaration and if statement below ensure that
-    it is not being normalized with each function call to kappa_f */
-  static double norm = 0.;
-  if(norm == 0.)
+    it is not being normalized with each function call to kappa_f;
+    it does need to be normalized again if any of the distribution
+    function parameters change, though. */
+  static double norm                  = 0.;
+  static double previous_kappa        = 0.;
+  static double previous_kappa_width  = 0.;
+  static double previous_gamma_cutoff = 0.;
+  if(norm == 0. || previous_kappa_width != params->kappa_width
+                || previous_kappa       != params->kappa)
   {
-    norm = 1./normalize_f(&kappa_to_be_normalized, params);
+    norm                  = 1./normalize_f(&kappa_to_be_normalized, params);
+    previous_kappa        = params->kappa;
+    previous_kappa_width  = params->kappa_width;
+    previous_gamma_cutoff = params->gamma_cutoff;
   }
 
   double kappa_body = params->electron_density * pow((1. + (gamma - 1.)

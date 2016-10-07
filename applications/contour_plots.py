@@ -12,9 +12,9 @@ import numpy.ma
 num_skip              = 64                      #sample every nth point
 max_nuratio           = 1.e8                    #maximum nu/nu_c_avg
 number_of_points      = 64                      #size of grid
-distribution_function = sp.POWER_LAW	#distribution function
+distribution_function = sp.KAPPA_DIST	#distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
-IN_PLANE              = True		        #True = obs_angle in plane
+IN_PLANE              = False		        #True = obs_angle in plane
 figure_title          = 'Power-law Distribution viewed in plane'
 mask_tolerance        = 1.			#error > tolerance is white
 observer_rotation     = 0.
