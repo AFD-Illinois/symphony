@@ -10,7 +10,7 @@ from mpi4py import MPI
 
 #----------------------set important parameters--------------------------------#
 
-num_skip              = 1152/2                     #sample every nth point
+num_skip              = 16                     #sample every nth point
 distribution_function = sp.MAXWELL_JUETTNER	#distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
 IN_PLANE              = False		        #True = obs_angle in plane
@@ -174,7 +174,7 @@ else:
 #obs_vector  = np.dot(rotation_matrix(axis_of_rot, theta), 
 #		     B_avg_vector)
 
-obs_vector = np.array([0, 0, 1])
+obs_vector = np.array([1, 1, 1])
 
 obs_angle = np.arccos((B_x * obs_vector[0] 
                        + B_y * obs_vector[1]
@@ -193,8 +193,6 @@ for x in range(number_of_points):
 
 	cone_rot = (1.0 * x / number_of_points * 2.*np.pi)
 
-#	cone_rot = np.pi/6.
-
 	cone_angles_used[x] = cone_rot
 
 	k_parallel = (np.dot(obs_vector, B_avg_vector) 
@@ -205,35 +203,34 @@ for x in range(number_of_points):
 	k_perp_rotated = np.dot(rotation_matrix(k_parallel, cone_rot), 
         	                k_perp)
 
-#	obs_vector = k_perp_rotated + k_parallel
-
 	k_vector = k_perp_rotated + k_parallel
+
+#	print np.dot(k_vector, B_avg_vector)
 
 
 #-------------------------BEGIN MODIFICATIONS----------------------------------#
 
 	#create NxN array of symphony frame e_alpha axis #TODO: check this
-#	obs_vector_array = [np.full(np.shape(B_x), obs_vector[0]),
-#			    np.full(np.shape(B_x), obs_vector[1]),
-#		            np.full(np.shape(B_x), obs_vector[2])]		
-
         obs_vector_array = [np.full(np.shape(B_x), k_vector[0]),
                            np.full(np.shape(B_x), k_vector[1]),
                            np.full(np.shape(B_x), k_vector[2])]  
 
-
 	b_hat_dot_k_hat = b_hat[0] * obs_vector_array[0] + b_hat[1] * obs_vector_array[1] + b_hat[2] * obs_vector_array[2]
+
 	
 	e_alpha_unnormed = (b_hat - obs_vector_array * b_hat_dot_k_hat)
 	e_alpha_norm = np.sqrt(e_alpha_unnormed[0]**2. + e_alpha_unnormed[1]**2. + e_alpha_unnormed[2]**2.)
 	e_alpha_normed = [e_alpha_unnormed[0]/e_alpha_norm, e_alpha_unnormed[1]/e_alpha_norm, e_alpha_unnormed[2]/e_alpha_norm]
-	
+
+
+#	print e_alpha_unnormed[0][0][0], e_alpha_unnormed[1][0][0], e_alpha_unnormed[2][0][0]
+
 	#create e_alpha_prime #TODO: check this
 	e_alpha_p_not_perp = B_avg_vector
 
 
 #	e_alpha_p_perp = (e_alpha_p_not_perp - obs_vector * np.dot(obs_vector, e_alpha_p_not_perp))
-	e_alpha_p_perp = (e_alpha_p_not_perp - obs_vector * np.dot(k_vector, e_alpha_p_not_perp))
+	e_alpha_p_perp = (e_alpha_p_not_perp - k_vector * np.dot(k_vector, e_alpha_p_not_perp))
 
 
 	e_alpha_p_normed = e_alpha_p_perp / np.linalg.norm(e_alpha_p_perp)
@@ -246,6 +243,8 @@ for x in range(number_of_points):
 	
 	xi = np.nan_to_num(xi)
 
+
+#	print xi
 
 #---------------------------END MODIFICATIONS---------------------------------#
 
@@ -359,33 +358,36 @@ for x in range(number_of_points):
 #	print 'V:', exact_avg_V
 	cone_angles[x] = exact_avg_U
 
-	print x
+#	print x
 
 #print cone_angles
-pl.plot(cone_angles_used * 180. / np.pi, cone_angles)
+#pl.plot(cone_angles_used * 180. / np.pi, cone_angles, label='U Emission')
 #pl.plot(cone_angles_used, cone_angles)
-mean_cone = np.mean(cone_angles)
-print mean_cone
-pl.axhline(mean_cone, c='r', lw=2)
-pl.xlim([0, 360])
-pl.title('Mean is ' + str(mean_cone))
+#mean_cone = np.mean(cone_angles)
+#print mean_cone
+#pl.axhline(mean_cone, c='r', lw=2)
+#pl.xlim([0, 360])
+#pl.title('Mean is ' + str(mean_cone))
 #pl.xlim([0, 25])
-pl.show()
+#pl.xlabel('cone angle (deg)')
+#pl.ylabel('$j_\\nu$')
+#pl.legend(loc='lower right')
+#pl.show()
 #	figure, ax = pl.subplots(1, 4, figsize=(10, 10))
-#	figure, ax = pl.subplots(1, 2)
+	figure, ax = pl.subplots(1, 2)
 #	plot1 = ax[0].contourf(exact_I, 100)
-#	plot2 = ax[0].contourf(exact_Q, 100)
-#	plot3 = ax[1].contourf(exact_U, 100)
+	plot2 = ax[0].contourf(exact_Q, 100)
+	plot3 = ax[1].contourf(exact_U, 100)
 #	plot4 = ax[3].contourf(exact_V, 100)
 #	figure.colorbar(plot1, ax=ax[0])
-#	figure.colorbar(plot2, ax=ax[0])
-#	figure.colorbar(plot3, ax=ax[1])
+	figure.colorbar(plot2, ax=ax[0])
+	figure.colorbar(plot3, ax=ax[1])
 #	figure.colorbar(plot4, ax=ax[3])
 #	pl.tight_layout()
 #	pl.show()
-#	print x
-#	figure.savefig(str(x)+'.png')
-#	pl.close(figure)
+	print x
+	figure.savefig(str(x)+'.png')
+	pl.close(figure)
 
 #--------------MORE MODIFICATIONS---------------------------------------------#
 #if(np.abs(np.dot(B_avg_vector, obs_vector) - 1) < 1e-7):
