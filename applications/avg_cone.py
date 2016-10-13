@@ -10,7 +10,7 @@ from mpi4py import MPI
 
 #----------------------set important parameters--------------------------------#
 
-num_skip              = 128                     #sample every nth point
+num_skip              = 1152/2                     #sample every nth point
 distribution_function = sp.MAXWELL_JUETTNER	#distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
 IN_PLANE              = False		        #True = obs_angle in plane
@@ -122,9 +122,6 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 	             polarization, theta_e, power_law_p, gamma_min,
 		     gamma_max, gamma_cutoff, kappa, kappa_width):
 
-#	if(obs_angle < 1e-5):
-#                   return 0.
-
 	if(EMISS == True):
 
 		return sp.j_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
@@ -169,7 +166,7 @@ else:
 	axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0]
 
 #desired angle between observer vector and mean B
-theta = np.pi/4.
+#theta = np.pi/4.
 #theta       = (1.0*y/number_of_points * np.pi/2.)
 
 #		print theta * 180./np.pi
@@ -177,7 +174,7 @@ theta = np.pi/4.
 #obs_vector  = np.dot(rotation_matrix(axis_of_rot, theta), 
 #		     B_avg_vector)
 
-obs_vector = np.array([-0.5, 0.5634654, 1])
+obs_vector = np.array([0, 0, 1])
 
 obs_angle = np.arccos((B_x * obs_vector[0] 
                        + B_y * obs_vector[1]
@@ -196,6 +193,8 @@ for x in range(number_of_points):
 
 	cone_rot = (1.0 * x / number_of_points * 2.*np.pi)
 
+#	cone_rot = np.pi/6.
+
 	cone_angles_used[x] = cone_rot
 
 	k_parallel = (np.dot(obs_vector, B_avg_vector) 
@@ -206,20 +205,23 @@ for x in range(number_of_points):
 	k_perp_rotated = np.dot(rotation_matrix(k_parallel, cone_rot), 
         	                k_perp)
 
-	obs_vector = k_perp_rotated + k_parallel
+#	obs_vector = k_perp_rotated + k_parallel
 
-#	print obs_vector
+	k_vector = k_perp_rotated + k_parallel
 
-#	print k_perp_rotated, np.arccos(np.dot(k_perp_rotated, k_perp)/(np.dot(k_perp, k_perp)*np.dot(k_perp_rotated, k_perp_rotated)))
-#	print np.dot((k_parallel + k_perp), B_avg_vector)#, np.dot(obs_vector, B_avg_vector)
-#	continue
 
 #-------------------------BEGIN MODIFICATIONS----------------------------------#
 
 	#create NxN array of symphony frame e_alpha axis #TODO: check this
-	obs_vector_array = [np.full(np.shape(B_x), obs_vector[0]),
-			    np.full(np.shape(B_x), obs_vector[1]),
-		            np.full(np.shape(B_x), obs_vector[2])]		
+#	obs_vector_array = [np.full(np.shape(B_x), obs_vector[0]),
+#			    np.full(np.shape(B_x), obs_vector[1]),
+#		            np.full(np.shape(B_x), obs_vector[2])]		
+
+        obs_vector_array = [np.full(np.shape(B_x), k_vector[0]),
+                           np.full(np.shape(B_x), k_vector[1]),
+                           np.full(np.shape(B_x), k_vector[2])]  
+
+
 	b_hat_dot_k_hat = b_hat[0] * obs_vector_array[0] + b_hat[1] * obs_vector_array[1] + b_hat[2] * obs_vector_array[2]
 	
 	e_alpha_unnormed = (b_hat - obs_vector_array * b_hat_dot_k_hat)
@@ -228,7 +230,12 @@ for x in range(number_of_points):
 	
 	#create e_alpha_prime #TODO: check this
 	e_alpha_p_not_perp = B_avg_vector
-	e_alpha_p_perp = (e_alpha_p_not_perp - obs_vector * np.dot(obs_vector, e_alpha_p_not_perp))
+
+
+#	e_alpha_p_perp = (e_alpha_p_not_perp - obs_vector * np.dot(obs_vector, e_alpha_p_not_perp))
+	e_alpha_p_perp = (e_alpha_p_not_perp - obs_vector * np.dot(k_vector, e_alpha_p_not_perp))
+
+
 	e_alpha_p_normed = e_alpha_p_perp / np.linalg.norm(e_alpha_p_perp)
 	
 	
@@ -354,11 +361,15 @@ for x in range(number_of_points):
 
 	print x
 
+#print cone_angles
 pl.plot(cone_angles_used * 180. / np.pi, cone_angles)
+#pl.plot(cone_angles_used, cone_angles)
 mean_cone = np.mean(cone_angles)
 print mean_cone
 pl.axhline(mean_cone, c='r', lw=2)
 pl.xlim([0, 360])
+pl.title('Mean is ' + str(mean_cone))
+#pl.xlim([0, 25])
 pl.show()
 #	figure, ax = pl.subplots(1, 4, figsize=(10, 10))
 #	figure, ax = pl.subplots(1, 2)
