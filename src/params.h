@@ -60,8 +60,9 @@ struct parameters
     numerical differential_of_f */
   double (*analytic_differential)(double gamma, struct parameters *);
 
-
   int stokes_v_switch;
+
+  char *error_message; /* if not NULL, records source of error in current calculation */
 };
 
 struct parametersGSL

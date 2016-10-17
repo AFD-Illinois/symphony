@@ -1,4 +1,5 @@
 #include "params.h"
+#include <stddef.h> /* for NULL */
 
 /*setConstParams: sets values of constant parameters used throughout
  *                the calculation, such as pi or the charge of an 
@@ -32,7 +33,7 @@ void setConstParams(struct parameters *params)
   params->EMISSIVITY       = 11;
   /*Default: find n-space peak adaptively */
   params->use_n_peak       = 0;
-
+  params->error_message    = NULL;
 }
 
 /*get_nu_c: takes in values of electron_charge, magnetic_field, mass_electron,

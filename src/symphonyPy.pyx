@@ -25,10 +25,14 @@ def j_nu_py(double nu,
                                 symphonyPy.STOKES_U,
                                 symphonyPy.STOKES_V"""
 
-  return j_nu(nu, magnetic_field, electron_density,
-              observer_angle, distribution, polarization,
-              theta_e, power_law_p, gamma_min, gamma_max,
-              gamma_cutoff, kappa, kappa_width)
+  cdef char* error_message = NULL
+  result = j_nu(nu, magnetic_field, electron_density,
+                observer_angle, distribution, polarization,
+                theta_e, power_law_p, gamma_min, gamma_max,
+                gamma_cutoff, kappa, kappa_width, &error_message)
+  if error_message:
+    raise RuntimeError (error_message)
+  return result
 
 def alpha_nu_py(double nu,
                 double magnetic_field,
@@ -55,10 +59,14 @@ def alpha_nu_py(double nu,
                                 symphonyPy.STOKES_U,
                                 symphonyPy.STOKES_V"""
 
-  return alpha_nu(nu, magnetic_field, electron_density,
-              observer_angle, distribution, polarization,
-              theta_e, power_law_p, gamma_min, gamma_max,
-              gamma_cutoff, kappa, kappa_width)
+  cdef char* error_message = NULL
+  result = alpha_nu(nu, magnetic_field, electron_density,
+                    observer_angle, distribution, polarization,
+                    theta_e, power_law_p, gamma_min, gamma_max,
+                    gamma_cutoff, kappa, kappa_width, &error_message)
+  if error_message:
+    raise RuntimeError (error_message)
+  return result
 
 def j_nu_fit_py(double nu,
                 double magnetic_field,

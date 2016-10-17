@@ -239,7 +239,7 @@ double gamma_integral(double min,
                      )
 {
   double nu_c = get_nu_c(*params);
-
+  gsl_error_handler_t *prev_handler = NULL;
   struct parametersGSL paramsGSL;
   paramsGSL.params = *params;
   paramsGSL.n      = n;
@@ -252,7 +252,7 @@ double gamma_integral(double min,
     quitting.*/
   if(params->nu/nu_c >= 1.e6)
   {
-     gsl_set_error_handler_off();
+     prev_handler = gsl_set_error_handler_off();
   }
 
   double result, error;
@@ -274,6 +274,11 @@ double gamma_integral(double min,
 
   gsl_integration_workspace_free (w);
 
+  if(params->nu/nu_c >= 1.e6)
+  {
+     gsl_set_error_handler(prev_handler);
+  }
+
   return result;
 }
 
@@ -292,6 +297,7 @@ double n_integral(double min,
                   struct parameters * params
                  )
 {
+  gsl_error_handler_t *prev_handler = NULL;
   double nu_c = get_nu_c(*params);
 
   /*For some of the small contributions to the gamma integral at high nu
@@ -302,7 +308,7 @@ double n_integral(double min,
     quitting.*/
   if(params->nu/nu_c >= 1.e6)
   {
-  gsl_set_error_handler_off();
+    prev_handler = gsl_set_error_handler_off();
   }
 
   double result, error;
@@ -323,6 +329,11 @@ double n_integral(double min,
                       gauss_kronrod_rule,  w, &result, &error);
 
   gsl_integration_workspace_free (w);
+
+  if(params->nu/nu_c >= 1.e6)
+  {
+    gsl_set_error_handler(prev_handler);
+  }
 
   return result;
 }

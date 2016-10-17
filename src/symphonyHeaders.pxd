@@ -12,7 +12,8 @@ cdef extern from "symphony.h":
                 double gamma_max,
                 double gamma_cutoff,
                 double kappa,
-                double kappa_width)
+                double kappa_width,
+                char **error_message)
 
     double alpha_nu(double nu,
                     double magnetic_field,
@@ -26,7 +27,8 @@ cdef extern from "symphony.h":
                     double gamma_max,
                     double gamma_cutoff,
                     double kappa,
-                    double kappa_width)
+                    double kappa_width,
+                    char **error_message)
 
     double j_nu_fit(double nu,
                     double magnetic_field,
