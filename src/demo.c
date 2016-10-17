@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
   double max_nuratio = 1e6;
   int points_per_pow_10 = 1;
   int max_index = (int) log10(max_nuratio)*points_per_pow_10;
+  char *error_message = NULL;
 
   printf("\nnu/nu_c         j_nu()          j_nu_fit()");
 
@@ -63,7 +64,8 @@ int main(int argc, char *argv[])
                                           paramsM.gamma_max,        
                                           paramsM.gamma_cutoff,      
                                           paramsM.kappa,              
-                                          paramsM.kappa_width        
+                                          paramsM.kappa_width,
+                                          &error_message
                                           ), 
                                  j_nu_fit(paramsM.nu,
                                           paramsM.magnetic_field,
@@ -77,8 +79,8 @@ int main(int argc, char *argv[])
                                           paramsM.gamma_max,       
                                           paramsM.gamma_cutoff,     
                                           paramsM.kappa,             
-                                          paramsM.kappa_width 
-                                          ));
+                                          paramsM.kappa_width
+				          ));
 
   }
   printf("\n");
