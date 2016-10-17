@@ -27,7 +27,7 @@ def j_nu_py(double nu,
 
   cdef char* error_message = NULL
   result = j_nu(nu, magnetic_field, electron_density,
-                observer_angle, distribution, polarizatiaon,
+                observer_angle, distribution, polarization,
                 theta_e, power_law_p, gamma_min, gamma_max,
                 gamma_cutoff, kappa, kappa_width, &error_message)
   if error_message:
