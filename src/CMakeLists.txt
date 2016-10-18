@@ -44,7 +44,7 @@ find_package(NumPy REQUIRED)
 
 include(UseCython)
 
-include_directories(${GSL_INCLUDE_DIRS}  ${PYTHON_NUMPY_INCLUDE_DIR} .)
+include_directories(${GSL_INCLUDES}  ${PYTHON_NUMPY_INCLUDE_DIR} .)
 
 add_library(symphony
 bessel_mod.c
