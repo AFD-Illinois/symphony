@@ -11,14 +11,16 @@ from mpi4py import MPI
 #----------------------set important parameters--------------------------------#
 
 num_skip              = 128                     #sample every nth point
-distribution_function = sp.KAPPA_DIST	#distribution function
+distribution_function = sp.POWER_LAW	#distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
-IN_PLANE              = True		        #True = obs_angle in plane
+IN_PLANE              = False		        #True = obs_angle in plane
 mask_tolerance        = 1.			#error > tolerance is white
 number_of_points      = 32
-cone_resolution       = 50
+cone_resolution       = 24
 max_nuratio           = 1e6
 figure_title          = ''
+
+print 'IN_PLANE: ', IN_PLANE
 
 #--------------------set constant parameters for the calculation--------------#
 m = 9.1093826e-28
@@ -187,44 +189,46 @@ avgs_U = 0.
 avgs_V = 0.
 
 
-for cone_point in range(cone_resolution):
-	if(rank == 0):
-		print 1.0*cone_point / cone_resolution * 100., '%'
-	for x in range(0, number_of_points):
-		nu = nu_c_avg * 10.**(1.*x / (number_of_points - 1) * np.log10(max_nuratio))
-#	        if (rank == 0):
-#		   print 100.0*x/(number_of_points - 1), '% complete'
-		for y in range(0, number_of_points):
-	
-			if(IN_PLANE == True):
-				#rotates observer vector in plane
-				axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]]
-			else:
-				#rotates observer vector out of plane
-				axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0]
-			
-			#desired angle between observer vector and mean B
-			theta       = (1.0*y/number_of_points * np.pi/2.)
-			
-			#		print theta * 180./np.pi
-			
-			obs_vector  = np.dot(rotation_matrix(axis_of_rot, theta), 
-					     B_avg_vector)
-			
-			obs_angle = np.arccos((B_x * obs_vector[0] 
-			                       + B_y * obs_vector[1]
-			                       + B_z * obs_vector[2])
-			                       / (np.linalg.norm(obs_vector)*B_mag))
-			
-			
-			#		obs_angle_avg  = np.mean(obs_angle) #not physically correct
-			angle_to_mean_field = np.arccos(np.dot(B_avg_vector, obs_vector)) 
-			obs_angle_avg = angle_to_mean_field
-			
-			
-			#-----------------------avg over cone angle------------------------------------#
-			#for cone_point in range(cone_resolution):
-			
+#for cone_point in range(cone_resolution):
+#	if(rank == 0):
+#		print 1.0*cone_point / cone_resolution * 100., '%'
+#cone_point = 0
+for x in range(0, number_of_points):
+	nu = nu_c_avg * 10.**(1.*x / (number_of_points - 1) * np.log10(max_nuratio))
+	if (rank == 0):
+		print 100.0*x/(number_of_points - 1), '% complete'
+	for y in range(0, number_of_points):
+
+		if(IN_PLANE == True):
+			#rotates observer vector in plane
+			axis_of_rot = [0, B_avg_vector[2], -B_avg_vector[1]]
+			axis_of_rot = axis_of_rot / np.linalg.norm(axis_of_rot)
+		else:
+			#rotates observer vector out of plane
+			axis_of_rot = [-B_avg_vector[1], B_avg_vector[0], 0]
+			axis_of_rot = axis_of_rot / np.linalg.norm(axis_of_rot)
+		
+		#desired angle between observer vector and mean B
+		theta       = (1.0*y/number_of_points * np.pi/2.)
+		
+		#		print theta * 180./np.pi
+		
+		obs_vector  = np.dot(rotation_matrix(axis_of_rot, theta), 
+				     B_avg_vector)
+		
+#		obs_angle = np.arccos((B_x * obs_vector[0] 
+#		                       + B_y * obs_vector[1]
+#		                       + B_z * obs_vector[2])
+#		                       / (np.linalg.norm(obs_vector)*B_mag))
+		
+		
+		#		obs_angle_avg  = np.mean(obs_angle) #not physically correct
+		angle_to_mean_field = np.arccos(np.dot(B_avg_vector, obs_vector)) 
+		obs_angle_avg = angle_to_mean_field
+		
+		
+		#-----------------------avg over cone angle------------------------------------#
+		for cone_point in range(cone_resolution):
 			
 			cone_rot = (1.0 * cone_point / cone_resolution * 2.*np.pi)
 	
@@ -241,7 +245,14 @@ for cone_point in range(cone_resolution):
 		        	                k_perp)
 			
 			k_vector = k_perp_rotated + k_parallel
-	
+
+
+			obs_angle = np.arccos((B_x * k_vector[0]
+                                       + B_y * k_vector[1]
+                                       + B_z * k_vector[2])
+                                       / (np.linalg.norm(k_vector)*B_mag))
+
+
 			#-------------------------BEGIN MODIFICATIONS----------------------------------#
 			
 				#create NxN array of symphony frame e_alpha axis #TODO: check this
@@ -254,7 +265,7 @@ for cone_point in range(cone_resolution):
 			
 			e_alpha_unnormed = (b_hat - obs_vector_array * b_hat_dot_k_hat)
 			e_alpha_norm = np.sqrt(e_alpha_unnormed[0]**2. + e_alpha_unnormed[1]**2. + e_alpha_unnormed[2]**2.)
-
+	
 			e_alpha_normed = [e_alpha_unnormed[0]/e_alpha_norm, e_alpha_unnormed[1]/e_alpha_norm, e_alpha_unnormed[2]/e_alpha_norm]
 			
 			
@@ -387,11 +398,11 @@ for cone_point in range(cone_resolution):
 		
 			else:
 				e_alpha_avg = (B_avg_vector - k_vector * np.dot(B_avg_vector, k_vector))
-
+	
 			#TODO: testing this
 				if(np.linalg.norm(e_alpha_avg) == 0.):
 					e_alpha_avg = B_avg_vector
-
+	
 				e_alpha_avg = e_alpha_avg / np.linalg.norm(e_alpha_avg)
 				if(np.dot(e_alpha_avg, e_alpha_p_normed) - 1. > 0 and np.dot(e_alpha_avg, e_alpha_p_normed) - 1. < 1e-6):
 					xi_avg = np.arccos(1.)
@@ -424,40 +435,40 @@ for cone_point in range(cone_resolution):
 			                       gamma_min, gamma_max, gamma_cutoff,
 			                       kappa, kappa_width)
 		
-#			relative_difference_I[y][x] = np.fabs((exact_avg_I - avgs_I)/exact_avg_I)
-#			exact_avg_only_I[y][x]      = exact_avg_I
-#			avgs_only_I[y][x]           = avgs_I
-#		
-#			relative_difference_Q[y][x] = np.fabs((exact_avg_Q - avgs_Q)/exact_avg_Q)
-#		        exact_avg_only_Q[y][x]      = exact_avg_Q
-#		        avgs_only_Q[y][x]           = avgs_Q
-#		
-#			relative_difference_U[y][x] = np.fabs((exact_avg_U - avgs_U)/exact_avg_U)
-#		        exact_avg_only_U[y][x]      = exact_avg_U
-#		        avgs_only_U[y][x]           = avgs_U
-#		
-#			relative_difference_V[y][x] = np.fabs((exact_avg_V - avgs_V)/exact_avg_V)
-#		        exact_avg_only_V[y][x]      = exact_avg_V
-#		        avgs_only_V[y][x]           = avgs_V
+	#		relative_difference_I[y][x] = np.fabs((exact_avg_I - avgs_I)/exact_avg_I)
+	#		exact_avg_only_I[y][x]      = exact_avg_I
+	#		avgs_only_I[y][x]           = avgs_I
+	#	
+	#		relative_difference_Q[y][x] = np.fabs((exact_avg_Q - avgs_Q)/exact_avg_Q)
+	#	        exact_avg_only_Q[y][x]      = exact_avg_Q
+	#	        avgs_only_Q[y][x]           = avgs_Q
+	#	
+	#		relative_difference_U[y][x] = np.fabs((exact_avg_U - avgs_U)/exact_avg_U)
+	#	        exact_avg_only_U[y][x]      = exact_avg_U
+	#	        avgs_only_U[y][x]           = avgs_U
+	#	
+	#		relative_difference_V[y][x] = np.fabs((exact_avg_V - avgs_V)/exact_avg_V)
+	#	        exact_avg_only_V[y][x]      = exact_avg_V
+	#	        avgs_only_V[y][x]           = avgs_V
 		
-
+	
 			if(rank == 0):
 				relative_difference_I_TOT[y][x] += np.fabs((exact_avg_I - avgs_I)/exact_avg_I) / cone_resolution
-                        	exact_avg_only_I_TOT[y][x]      += exact_avg_I / cone_resolution
-                        	avgs_only_I_TOT[y][x]           += avgs_I / cone_resolution
+	                	exact_avg_only_I_TOT[y][x]      += exact_avg_I / cone_resolution
+	                	avgs_only_I_TOT[y][x]           += avgs_I / cone_resolution
 	
 				relative_difference_Q_TOT[y][x] += np.fabs((exact_avg_Q - avgs_Q)/exact_avg_Q) / cone_resolution
-                                exact_avg_only_Q_TOT[y][x]      += exact_avg_Q / cone_resolution
-                                avgs_only_Q_TOT[y][x]           += avgs_Q / cone_resolution
-
+	                        exact_avg_only_Q_TOT[y][x]      += exact_avg_Q / cone_resolution
+	                        avgs_only_Q_TOT[y][x]           += avgs_Q / cone_resolution
+	
 				relative_difference_U_TOT[y][x] += np.fabs((exact_avg_U - avgs_U)/exact_avg_U) / cone_resolution
-                                exact_avg_only_U_TOT[y][x]      += exact_avg_U / cone_resolution
-                                avgs_only_U_TOT[y][x]           += avgs_U / cone_resolution
-
+	                        exact_avg_only_U_TOT[y][x]      += exact_avg_U / cone_resolution
+	                        avgs_only_U_TOT[y][x]           += avgs_U / cone_resolution
+	
 				relative_difference_V_TOT[y][x] += np.fabs((exact_avg_V - avgs_V)/exact_avg_V) / cone_resolution
-                                exact_avg_only_V_TOT[y][x]      += exact_avg_V / cone_resolution
-                                avgs_only_V_TOT[y][x]           += avgs_V / cone_resolution
-
+	                        exact_avg_only_V_TOT[y][x]      += exact_avg_V / cone_resolution
+	                        avgs_only_V_TOT[y][x]           += avgs_V / cone_resolution
+	
 	
 			if(x == 0):
 				obs_angle_used[y] = obs_angle_avg * 180. / np.pi
