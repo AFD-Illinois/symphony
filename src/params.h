@@ -30,7 +30,7 @@ struct parameters
   /*USER PARAMS:*/
   double nu;               /* GHz */
   double magnetic_field;   /* Gauss */
-  double electron_density; /* g/cc */
+  double electron_density; /* 1/cc */
   double observer_angle;   /* rad */  
   int    distribution;     
   int    polarization; 
