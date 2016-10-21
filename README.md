@@ -33,10 +33,11 @@ symphonyPy.j_nu_py?
 ```
 
 ###Arguments for Emissivity and Absorptivity Functions
-* Arguments for all emissivity and absorptivity functions in both `C` and `Python` take the same arguments and ouput a double.  The arguments are: 
+* Arguments for all emissivity and absorptivity functions in both `C` and `Python` take nearly the same arguments and output a double.  The only difference is that the C version has an `error_message` parameter for handling evaluation errors. The arguments are: 
 ```
 j_nu(nu, magnetic_field, electron_density, observer_angle, distribution, polarization, 
-     theta_e, power_law_p, gamma_min, gamma_max, gamma_cutoff, kappa, kappa_width)
+     theta_e, power_law_p, gamma_min, gamma_max, gamma_cutoff, kappa, kappa_width,
+	 error_message)
 ```
 Sample values:
 ```

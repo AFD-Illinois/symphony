@@ -18,7 +18,8 @@ double j_nu(double nu,
             double gamma_max,
             double gamma_cutoff,
             double kappa,
-            double kappa_width);
+            double kappa_width,
+            char **error_message);
 double alpha_nu(double nu,
                 double magnetic_field,
                 double electron_density,
@@ -31,5 +32,6 @@ double alpha_nu(double nu,
                 double gamma_max,
                 double gamma_cutoff,
                 double kappa,
-                double kappa_width);
+                double kappa_width,
+                char **error_message);
 #endif /* SYMPHONY_H_ */
