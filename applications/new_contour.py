@@ -10,17 +10,17 @@ from mpi4py import MPI
 
 #----------------------set important parameters--------------------------------#
 
-num_skip              = 128                     #sample every nth point
+num_skip              = 128                      #sample every nth point
 distribution_function = sp.POWER_LAW	#distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
-IN_PLANE              = False		        #True = obs_angle in plane
+IN_PLANE              = True		        #True = obs_angle in plane
 mask_tolerance        = 1.			#error > tolerance is white
-number_of_points      = 32
-cone_resolution       = 24
-max_nuratio           = 1e6
+number_of_points      = 10
+cone_resolution       = 5
+max_nuratio           = 1e4
 figure_title          = ''
 
-print 'IN_PLANE: ', IN_PLANE
+#print 'IN_PLANE: ', IN_PLANE
 
 #--------------------set constant parameters for the calculation--------------#
 m = 9.1093826e-28
@@ -91,8 +91,8 @@ B_mag_avg      = np.mean(B_mag)
 B_vector     = [B_x, B_y, B_z]
 B_avg_vector = [B_x_avg, B_y_avg, B_z_avg]
 B_avg_vector = B_avg_vector/np.linalg.norm(B_avg_vector)
-b_hat        = B_vector / np.linalg.norm(B_vector)
-
+#b_hat        = B_vector / np.linalg.norm(B_vector)
+b_hat        = B_vector / np.sqrt(B_x**2. + B_y**2. + B_z**2.)
 
 nu_c_avg = (electron_charge * B_mag_avg) / (2. * np.pi * m * c)
 
@@ -123,8 +123,12 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 	             polarization, theta_e, power_law_p, gamma_min,
 		     gamma_max, gamma_cutoff, kappa, kappa_width):
 
-	if(obs_angle == 0.):
+	if(obs_angle < 1e-3):
 		return 0.
+	if(np.abs(obs_angle - np.pi/2.) < 1e-3):
+		obs_angle = 89.9 * np.pi / 180.
+	if(np.abs(obs_angle - np.pi/6.) < 1e-3):
+		obs_angle = 29.9 * np.pi/180.
 
 
 	if(EMISS == True):
@@ -133,9 +137,10 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 				 electron_charge * B_mag_avg 
 				 / (2. * np.pi * m * c) / c)
 
-		return sp.j_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
+		return sp.j_nu_py(nu, B, n_e, obs_angle, distribution_function,
                      polarization, theta_e, power_law_p, gamma_min,
                      gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
+
 
 	else:
 
@@ -144,7 +149,7 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 
 		return sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
                      polarization, theta_e, power_law_p, gamma_min,
-                     gamma_max, gamma_cutoff, kappa, kappa_width)  
+                     gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor 
 
 #-------------------------set up nu-theta space scan--------------------------#
 
@@ -179,6 +184,13 @@ exact_avg_only_V_TOT      = np.zeros([number_of_points, number_of_points])
 avgs_only_V_TOT           = np.zeros([number_of_points, number_of_points])
 
 
+relative_difference_lin = np.zeros([number_of_points, number_of_points])
+exact_avg_only_lin      = np.zeros([number_of_points, number_of_points])
+avgs_only_lin           = np.zeros([number_of_points, number_of_points])
+
+relative_difference_circ = np.zeros([number_of_points, number_of_points])
+exact_avg_only_circ      = np.zeros([number_of_points, number_of_points])
+avgs_only_circ           = np.zeros([number_of_points, number_of_points])
 
 nu_used             = np.empty([number_of_points])
 obs_angle_used      = np.empty([number_of_points])
@@ -187,6 +199,9 @@ avgs_I = 0.
 avgs_Q = 0.
 avgs_U = 0.
 avgs_V = 0.
+
+avgs_lin  = 0.
+avgs_circ = 0.
 
 
 #for cone_point in range(cone_resolution):
@@ -230,6 +245,9 @@ for x in range(0, number_of_points):
 		#-----------------------avg over cone angle------------------------------------#
 		for cone_point in range(cone_resolution):
 			
+			if(rank == 0):
+				print 'cone point: ', cone_point			
+	
 			cone_rot = (1.0 * cone_point / cone_resolution * 2.*np.pi)
 	
 			#cone_rot = np.pi/5.		
@@ -387,11 +405,25 @@ for x in range(0, number_of_points):
 			exact_U = exact_U_gathered
 			exact_V = exact_V_gathered
 			
+
+#			exact_lin = exact_Q_gathered + exact_U_gathered
+
+			exact_circ = exact_V
+
 			exact_avg_I = np.mean(exact_I)
 			exact_avg_Q = np.mean(exact_Q)
 			exact_avg_U = np.mean(exact_U)
 			exact_avg_V = np.mean(exact_V)
 			
+#			exact_avg_lin = np.mean(exact_lin) / exact_avg_I
+
+			if(exact_avg_I == 0):
+				exact_avg_lin = 0.
+				exact_avg_circ = 0.
+			else:
+				exact_avg_lin = np.sqrt(exact_avg_Q**2. + exact_avg_U**2.)/exact_avg_I
+				exact_avg_circ = np.abs(exact_avg_V) / exact_avg_I
+
 		#--------------MORE MODIFICATIONS---------------------------------------------#
 			if(np.abs(np.dot(B_avg_vector, obs_vector) - 1) < 1e-7):
 				xi_avg = np.pi/4. #choose it arbitrarily; emission/absorption will be zero anyway		 
@@ -434,6 +466,13 @@ for x in range(0, number_of_points):
 			                       sp.STOKES_V, theta_e, power_law_p,
 			                       gamma_min, gamma_max, gamma_cutoff,
 			                       kappa, kappa_width)
+
+			if(avgs_I == 0):
+				avgs_lin  = 0.
+				avgs_circ = 0.
+			else:
+				avgs_lin = np.sqrt(avgs_Q**2. + avgs_U**2.) / avgs_I
+				avgs_circ = np.abs(avgs_V) / avgs_I
 		
 	#		relative_difference_I[y][x] = np.fabs((exact_avg_I - avgs_I)/exact_avg_I)
 	#		exact_avg_only_I[y][x]      = exact_avg_I
@@ -461,9 +500,19 @@ for x in range(0, number_of_points):
 	                        exact_avg_only_Q_TOT[y][x]      += exact_avg_Q / cone_resolution
 	                        avgs_only_Q_TOT[y][x]           += avgs_Q / cone_resolution
 	
-				relative_difference_U_TOT[y][x] += np.fabs((exact_avg_U - avgs_U)/exact_avg_U) / cone_resolution
-	                        exact_avg_only_U_TOT[y][x]      += exact_avg_U / cone_resolution
-	                        avgs_only_U_TOT[y][x]           += avgs_U / cone_resolution
+
+				relative_difference_lin[y][x] += np.fabs((exact_avg_lin - avgs_lin)/exact_avg_lin) / cone_resolution
+                                exact_avg_only_lin[y][x]      += exact_avg_lin / cone_resolution
+                                avgs_only_lin[y][x]           += avgs_lin / cone_resolution
+
+				relative_difference_circ[y][x] += np.fabs((exact_avg_circ - avgs_circ)/exact_avg_circ) / cone_resolution
+                                exact_avg_only_circ[y][x]      += exact_avg_circ / cone_resolution
+                                avgs_only_circ[y][x]           += avgs_circ / cone_resolution
+
+
+			#	relative_difference_U_TOT[y][x] += np.fabs((exact_avg_U - avgs_U)/exact_avg_U) / cone_resolution
+	                #        exact_avg_only_U_TOT[y][x]      += exact_avg_U / cone_resolution
+	                #        avgs_only_U_TOT[y][x]           += avgs_U / cone_resolution
 	
 				relative_difference_V_TOT[y][x] += np.fabs((exact_avg_V - avgs_V)/exact_avg_V) / cone_resolution
 	                        exact_avg_only_V_TOT[y][x]      += exact_avg_V / cone_resolution
@@ -589,16 +638,31 @@ if (rank == 0):
    figure.colorbar(plot3, ax=ax[0,2])
    ax[0,2].set_title('$|\mathrm{Error}|$')
    
-   plot4 = ax[1,0].contourf(np.log10(X), Y, exact_avg_only_Q_TOT, 200)
-   figure.colorbar(plot4, ax=ax[1,0])
-   
-   plot5 = ax[1,1].contourf(np.log10(X), Y, avgs_only_Q_TOT, 200)
-   figure.colorbar(plot5, ax=ax[1,1])
-   
-   
-   relative_difference_Q_TOT = np.ma.array(relative_difference_Q_TOT, mask=relative_difference_Q_TOT > mask_tolerance)
-   plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_Q_TOT, 200)
+#   plot4 = ax[1,0].contourf(np.log10(X), Y, exact_avg_only_Q_TOT, 200)
+#   figure.colorbar(plot4, ax=ax[1,0])
+#   
+#   plot5 = ax[1,1].contourf(np.log10(X), Y, avgs_only_Q_TOT, 200)
+#   figure.colorbar(plot5, ax=ax[1,1])
+#   
+#   
+#   relative_difference_Q_TOT = np.ma.array(relative_difference_Q_TOT, mask=relative_difference_Q_TOT > mask_tolerance)
+#   plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_Q_TOT, 200)
+#   figure.colorbar(plot6, ax=ax[1,2])
+   v = np.linspace(0., 1., 100)
+   plot4 = ax[1,0].contourf(np.log10(X), Y, exact_avg_only_lin, v)
+   cbar4 = figure.colorbar(plot4, ax=ax[1,0])
+#   cbar4.set_clim(0., 0.9)
+
+   plot5 = ax[1,1].contourf(np.log10(X), Y, avgs_only_lin, v)
+   cbar5 = figure.colorbar(plot5, ax=ax[1,1])
+#   cbar5.set_clim(0., 0.9)
+
+   relative_difference_lin = np.ma.array(relative_difference_lin, mask=relative_difference_lin > mask_tolerance)
+   plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_lin, 200)
    figure.colorbar(plot6, ax=ax[1,2])
+
+
+
    
 #   plot7 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_U_TOT, 200)
 #   figure.colorbar(plot7, ax=ax[2,0])
@@ -610,22 +674,44 @@ if (rank == 0):
 #   plot9 = ax[2,2].contourf(np.log10(X), Y, relative_difference_U_TOT, 200)
 #   figure.colorbar(plot9, ax=ax[2,2])
    
-   plot10 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_V_TOT, 200)
-   figure.colorbar(plot10, ax=ax[2,0])
-   
-   plot11 = ax[2,1].contourf(np.log10(X), Y, avgs_only_V_TOT, 200)
-   figure.colorbar(plot11, ax=ax[2,1])
-   
-   relative_difference_V_TOT = np.ma.array(relative_difference_V_TOT, mask=relative_difference_V_TOT > mask_tolerance)
-   plot12 = ax[2,2].contourf(np.log10(X), Y, relative_difference_V_TOT, 200)
+#   plot10 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_V_TOT, 200)
+#   figure.colorbar(plot10, ax=ax[2,0])
+#   
+#   plot11 = ax[2,1].contourf(np.log10(X), Y, avgs_only_V_TOT, 200)
+#   figure.colorbar(plot11, ax=ax[2,1])
+#   
+#   relative_difference_V_TOT = np.ma.array(relative_difference_V_TOT, mask=relative_difference_V_TOT > mask_tolerance)
+#   plot12 = ax[2,2].contourf(np.log10(X), Y, relative_difference_V_TOT, 200)
+#   figure.colorbar(plot12, ax=ax[2,2])
+
+#   exact_avg_only_circ = np.ma.array(exact_avg_only_circ, mask=exact_avg_only_circ > 1.)
+
+   #errors in the Stokes V formulae allow for Stokes V > Stokes I as theta->0; 
+   # in this case Stokes V = Stokes I, so circ. pol. frac. = 1.
+   exact_avg_only_circ[exact_avg_only_circ > 1.] = 1.
+   avgs_only_circ[avgs_only_circ > 1.] = 1.
+
+   plot10 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_circ, v)
+   cbar10 = figure.colorbar(plot10, ax=ax[2,0])
+#   cbar10.set_clim(0., 1.)
+#   avgs_only_circ = np.ma.array(avgs_only_circ, mask=avgs_only_circ > 1.)
+   plot11 = ax[2,1].contourf(np.log10(X), Y, avgs_only_circ, v)
+   cbar11 = figure.colorbar(plot11, ax=ax[2,1])
+#   cbar11.set_clim(0., 1.)
+
+   relative_difference_circ = np.ma.array(relative_difference_circ, mask=relative_difference_circ > mask_tolerance)
+   plot12 = ax[2,2].contourf(np.log10(X), Y, relative_difference_circ, 200)
    figure.colorbar(plot12, ax=ax[2,2])
+
    
    figure.add_subplot(111, frameon=False)
    pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
    pl.xlabel('$\\log_{10}(\\nu/\\overline{\\nu}_c)$', fontsize='large')
    pl.ylabel('$\\theta$ (deg)', fontsize='large')
    pl.tight_layout()
-   pl.show()
+#   pl.show()
+   figure.savefig('PL_10_10_5.png')
+   pl.close(figure)
 
 
    #print error at position where j_nu or alpha_nu is maximal

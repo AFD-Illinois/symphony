@@ -7,11 +7,12 @@
 # If a different compiler than the one cmake detects is needed, then the
 # recommended way is to do the following:
 #
-# cmake -D CMAKE_C_COMPILER=mpicc -D CMAKE_CXX_COMPILER=mpic++ /location/to/symphony/src 
+# cmake -D CMAKE_C_COMPILER=mpicc -D CMAKE_CXX_COMPILER=mpic++ /location/to/symphony/src
 
 cmake_minimum_required(VERSION 2.8)
 
 project(symphony)
+set(LIBRARY_VERSION 0.1)
 
 # ------------------------------USER OPTIONS----------------------------------#
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3 -g")
@@ -35,6 +36,21 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 # System libraries
 find_library(MATH_LIBRARIES m REQUIRED)
+find_package(PythonInterp)
+
+# Derive the Python site-packages directory.
+# http://stackoverflow.com/questions/1242904/
+set(_cmd
+  "from distutils.sysconfig import get_python_lib"
+  "print(get_python_lib(plat_specific=True, prefix=''))")
+execute_process(
+  COMMAND "${PYTHON_EXECUTABLE}" "-c" "${_cmd}"
+  OUTPUT_VARIABLE PYTHON_SITE_DIR
+  ERROR_VARIABLE _pyerr
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(_pyerr)
+  message(FATAL_ERROR "Python command failed:\n${_pyerr}")
+endif(_pyerr)
 
 # External packages
 find_package(GSL REQUIRED)
@@ -83,15 +99,39 @@ cython_add_module(symphonyPy symphonyPy.pyx)
 target_link_libraries(symphonyPy symphony
   ${GSL_LIBRARIES} ${CBLAS_LIBRARIES})
 
+set_target_properties(
+  symphony
+  PROPERTIES
+    VERSION ${LIBRARY_VERSION}
+    SOVERSION ${LIBRARY_VERSION}
+    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+)
+
+install(TARGETS symphony
+  LIBRARY DESTINATION lib)
+
+set_target_properties(
+  symphonyPy
+  PROPERTIES
+    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+)
+
+install(TARGETS symphonyPy
+  LIBRARY DESTINATION ${PYTHON_SITE_DIR})
+
 message("")
 message("#################")
 message("# Build options #")
 message("#################")
 message("")
-message("C Compiler       : " ${CMAKE_C_COMPILER})
-message("C_FLAGS          : " ${CMAKE_C_FLAGS})
-message("GSL Libraries    : " ${GSL_LIBRARIES})
-message("CBLAS Libraries  : " ${CBLAS_LIBRARIES})
-message("NumPy dir        : " ${PYTHON_NUMPY_INCLUDE_DIR})
-message("Cython           : " ${CYTHON_EXECUTABLE})
+message("C Compiler          : " ${CMAKE_C_COMPILER})
+message("C_FLAGS             : " ${CMAKE_C_FLAGS})
+message("GSL Libraries       : " ${GSL_LIBRARIES})
+message("CBLAS Libraries     : " ${CBLAS_LIBRARIES})
+message("NumPy dir           : " ${PYTHON_NUMPY_INCLUDE_DIR})
+message("Cython              : " ${CYTHON_EXECUTABLE})
+message("Library install dir : " ${CMAKE_INSTALL_PREFIX})
+message("Python install dir  : " ${CMAKE_INSTALL_PREFIX}/${PYTHON_SITE_DIR})
 message("")
