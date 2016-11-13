@@ -54,7 +54,6 @@ endif(_pyerr)
 
 # External packages
 find_package(GSL REQUIRED)
-find_package(CBLAS REQUIRED)
 find_package(Cython REQUIRED)
 find_package(NumPy REQUIRED)
 
