@@ -9,7 +9,7 @@
 #
 # cmake -D CMAKE_C_COMPILER=mpicc -D CMAKE_CXX_COMPILER=mpic++ /location/to/symphony/src
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.2)
 
 project(symphony)
 set(LIBRARY_VERSION 0.1)
