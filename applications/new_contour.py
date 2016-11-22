@@ -3,6 +3,11 @@ symphony_build_path = '../build'
 sys.path.append(symphony_build_path)
 import symphonyPy as sp
 import numpy as np
+
+#PREVENT SSH LOGOFF FROM STOPPING PLOT
+#import matplotlib
+#matplotlib.use('Agg')
+
 import pylab as pl
 import numpy.ma
 from mpi4py import MPI
@@ -16,7 +21,7 @@ EMISS                 = True                    #True = j_nu, False = alpha_nu
 IN_PLANE              = True		        #True = obs_angle in plane
 mask_tolerance        = 1.			#error > tolerance is white
 number_of_points      = 10
-cone_resolution       = 1
+cone_resolution       = 5
 max_nuratio           = 1e6
 figure_title          = ''
 
