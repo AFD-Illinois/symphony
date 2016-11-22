@@ -68,11 +68,11 @@ double maxwell_juettner_f(double gamma, struct parameters * params)
 /*differential_of_maxwell_juettner: The integrand for the absorptivity
  *                                  calculation ([1] eq. 12) depends on
  *                                  a differential of the distribution 
- *                                  function ([1] eq. 13).  For the Maxwell-
- *                                  Juettner distribution, this is evaluated
- *                                  analytically for speed and accuracy. 
- *                                  TODO: numerical derivative calculator
- *                                  for any gyrotropic distribution function.
+ *                                  function ([1] eq. 13).  This is done
+ *                                  numerically, but this term can also
+ *                                  be done analytically for the MJ
+ *                                  distribution, and is left here as
+ *                                  a potential test of the code.
  *
  *@params: Lorentz factor gamma, struct of parameters params
  *@returns: the differential of the Maxwell-Juettner distribution function

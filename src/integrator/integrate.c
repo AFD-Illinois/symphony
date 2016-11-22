@@ -113,10 +113,13 @@ double n_integration(double n_minus,
   double n_start = (int)(params->n_max + n_minus + 1.);
 
   /*For the MAXWELL_JUETTNER distribution, the n-space peak location is known
-    analytically; this speeds up evaluation of MAXWELL_JUETTNER until
-    nu/nu_c = 1e6, where the approximation breaks down and the adaptive 
-    procedure works better.*/
-  if (params->use_n_peak == 1 && params->nu/nu_c < 1e6) 
+    analytically; this speeds up evaluation of MAXWELL_JUETTNER for frequencies
+    below nu/nu_c = 1e6, above which the adaptive procedure works better.
+    Integration using n_peak fails for small frequency and low observer angles,
+    so we use the adaptive integration routine in these cases too.*/
+  if (params->use_n_peak == 1 && params->nu/nu_c < 1e6
+      && params->observer_angle > 0.175
+      && params->nu > 10. * nu_c) 
   {
     double ans = n_integral(n_start, params->C * n_peak(params), params);
     return ans;
@@ -127,16 +130,27 @@ double n_integration(double n_minus,
     double contrib = 0.;
 
     /*set parameters on adaptive n integration routine*/
-    double delta_n = 1.e5;
+    double delta_n   = 1.e5;
     double deriv_tol = 1.e-5;
     double tolerance = 1.e5;
+    double incr_step_factor = 100.;
+
+    /*For the MAXWELL_JUETTNER distribution at low frequency, low observer
+      angle, the above n_peak integration fails.  It is possible to evaluate
+      the integrals in these cases, but we have to use the adaptive routine
+      with different integration parameters for increased resolution. */
+    if (params->use_n_peak == 1 && params->nu/nu_c < 1e6)
+    {
+      delta_n = 1e0;
+      incr_step_factor = 2.;
+    }
 
     /*keep taking steps and integrating in n until the integral stops giving
       contributions greater than tolerance */
     while (fabs(contrib) >= fabs(ans/tolerance)) 
     {
       double deriv = derivative_of_n(n_start, params);
-      if(fabs(deriv) < deriv_tol) delta_n = 100. * delta_n;
+      if(fabs(deriv) < deriv_tol) delta_n = incr_step_factor * delta_n;
 
       contrib = n_integral(n_start, (n_start + delta_n), params);
       ans = ans + contrib;
