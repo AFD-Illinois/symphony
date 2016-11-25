@@ -135,11 +135,9 @@ double n_integration(double n_minus,
     double tolerance = 1.e5;
     double incr_step_factor = 100.;
 
-    /*For the MAXWELL_JUETTNER distribution at low frequency, low observer
-      angle, the above n_peak integration fails.  It is possible to evaluate
-      the integrals in these cases, but we have to use the adaptive routine
-      with different integration parameters for increased resolution. */
-    if (params->use_n_peak == 1 && params->nu/nu_c < 1e6)
+    /*At low frequency, low observer angle, we need to use a higher resolution
+      in the n-space scan in order to resolve the peak. */
+    if (params->nu/nu_c < 1e1)
     {
       delta_n = 1e0;
       incr_step_factor = 2.;
