@@ -114,12 +114,8 @@ double n_integration(double n_minus,
 
   /*For the MAXWELL_JUETTNER distribution, the n-space peak location is known
     analytically; this speeds up evaluation of MAXWELL_JUETTNER for frequencies
-    below nu/nu_c = 1e6, above which the adaptive procedure works better.
-    Integration using n_peak fails for small frequency and low observer angles,
-    so we use the adaptive integration routine in these cases too.*/
-  if (params->use_n_peak == 1 && params->nu/nu_c < 1e6
-      && params->observer_angle > 0.175
-      && params->nu > 10. * nu_c) 
+    below nu/nu_c = 1e6, above which the adaptive procedure works better. */
+  if (params->use_n_peak == 1 && params->nu/nu_c < 1e6)
   {
     double ans = n_integral(n_start, params->C * n_peak(params), params);
     return ans;
@@ -137,7 +133,7 @@ double n_integration(double n_minus,
 
     /*At low frequency, low observer angle, we need to use a higher resolution
       in the n-space scan in order to resolve the peak. */
-    if (params->nu/nu_c < 1e1)
+    if (params->nu/nu_c <= 1e3 && params->observer_angle < 40. * params->pi / 180.)
     {
       delta_n = 1e0;
       incr_step_factor = 2.;
