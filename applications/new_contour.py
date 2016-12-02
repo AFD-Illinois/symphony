@@ -5,8 +5,8 @@ import symphonyPy as sp
 import numpy as np
 
 #PREVENT SSH LOGOFF FROM STOPPING PLOT
-#import matplotlib
-#matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
 
 import pylab as pl
 import numpy.ma
@@ -17,29 +17,29 @@ from mpi4py import MPI
 
 num_skip              = 128                      #sample every nth point
 distribution_function = sp.POWER_LAW	#distribution function
-EMISS                 = True                    #True = j_nu, False = alpha_nu
+EMISS                 = False                    #True = j_nu, False = alpha_nu
 IN_PLANE              = True		        #True = obs_angle in plane
-mask_tolerance        = 1.			#error > tolerance is white
+mask_tolerance        = 2.			#error > tolerance is white
 number_of_points      = 10
 cone_resolution       = 5
-max_nuratio           = 1e6
+max_nuratio           = 1e4
 figure_title          = ''
 
 #--------------------set constant parameters for the calculation--------------#
 
-m = 9.1093826e-28
-c = 2.99792458e10
+m               = 9.1093826e-28
+c               = 2.99792458e10
 electron_charge = 4.80320680e-10
-theta_e = 10.
-h = 6.6260693e-27
-gamma_min = 1.
-gamma_max = 1000.
-gamma_cutoff = 1e10
-power_law_p = 3.
-kappa = 2.5
-kappa_width = 10.
-B_scale = 30.
-nu = 230e9
+theta_e         = 10.
+h               = 6.6260693e-27
+gamma_min       = 1.
+gamma_max       = 1000.
+gamma_cutoff    = 1e10
+power_law_p     = 3.
+kappa           = 2.5
+kappa_width     = 10.
+B_scale         = 30.
+#nu              = 230e9
 
 #---------------------------import data from Dr. Kunz's simulation------------#
 comm = MPI.COMM_WORLD
@@ -51,8 +51,8 @@ N1, N2 = 1152/num_skip, 1152/num_skip #TODO: figure out way to avoid hardcoding 
 
 comm.Barrier()
 if (rank == 0):
-#   datafiles_path = ''
-   datafiles_path = '/home/alex/Documents/Spring_2016/'
+   datafiles_path = ''
+#   datafiles_path = '/home/alex/Documents/Spring_2016/'
    B_x = np.loadtxt(datafiles_path + 'mirror_bx.out')[::num_skip, ::num_skip] * B_scale
    B_y = np.loadtxt(datafiles_path + 'mirror_by.out')[::num_skip, ::num_skip] * B_scale
    B_z = np.loadtxt(datafiles_path + 'mirror_bz.out')[::num_skip, ::num_skip] * B_scale
@@ -128,7 +128,7 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 		     gamma_max, gamma_cutoff, kappa, kappa_width):
 
 	#symphony's integrator breaks down for very low theta; TODO: fix this
-	if(obs_angle < 1e-3):
+	if(obs_angle < 5.5 * np.pi / 180.):
 		return 0.
 	#symphony's integrator breaks down at theta = pi/2; TODO: fix
 	if(np.abs(obs_angle - np.pi/2.) < 1e-3):
@@ -137,7 +137,6 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 	if(np.abs(obs_angle - np.pi/6.) < 1e-3):
 		obs_angle = 29.9 * np.pi/180.
 
-
 	if(EMISS == True):
 
 		#dimensional prefactor from j_nu, to be divided out
@@ -145,7 +144,8 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 				 electron_charge * B_mag_avg 
 				 / (2. * np.pi * m * c) / c)
 
-		return sp.j_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
+#		print nu, B, obs_angle * 180. / np.pi
+		return sp.j_nu_py(nu, B, n_e, obs_angle, distribution_function,
                      polarization, theta_e, power_law_p, gamma_min,
                      gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
 
@@ -155,7 +155,8 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 		dim_prefactor = n_e_avg * electron_charge**2. / (nu * 
 				m * c)
 
-		return sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
+		print nu/nu_c_avg, obs_angle * 180./np.pi
+		return sp.alpha_nu_py(nu, B, n_e, obs_angle, distribution_function,
                      polarization, theta_e, power_law_p, gamma_min,
                      gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor 
 
@@ -187,9 +188,12 @@ avgs_circ = 0.
 
 for x in range(0, number_of_points):
 	nu = nu_c_avg * 10.**(1.*x / (number_of_points - 1) * np.log10(max_nuratio))
-	if (rank == 0):
-		print 100.0*x/(number_of_points - 1), '% complete'
+#	if (rank == 0):
+#		print 100.0*x/(number_of_points - 1), '% complete'  
 	for y in range(0, number_of_points):
+		if (rank == 0):
+			print 100.*(number_of_points*x+y)/(number_of_points**2.-1.), '% complete'
+
 
 		if(IN_PLANE == True):
 			#rotates observer vector in plane
@@ -221,7 +225,7 @@ for x in range(0, number_of_points):
 		#angle to the mean B field.  We average over these equivalent wavevectors.
 		for cone_point in range(cone_resolution):
 #			if(rank == 0):
-#				print 'cone point: ', cone_point			
+#				print '.%f', (cone_point+1.)/cone_resolution			
 
 			#cone rotation angle, varies from 0 to 2*pi	
 			cone_rot = (1.0 * cone_point / cone_resolution * 2.*np.pi)
@@ -565,6 +569,6 @@ if (rank == 0):
    pl.xlabel('$\\log_{10}(\\nu/\\overline{\\nu}_c)$', fontsize='large')
    pl.ylabel('$\\theta$ (deg)', fontsize='large')
    pl.tight_layout()
-   pl.show()
-#   figure.savefig('PL_10_10_5.png')
-#   pl.close(figure)
+#   pl.show()
+   figure.savefig('PL_integrated_alphanu.png')
+   pl.close(figure)

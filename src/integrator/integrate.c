@@ -133,7 +133,7 @@ double n_integration(double n_minus,
 
     /*At low frequency, low observer angle, we need to use a higher resolution
       in the n-space scan in order to resolve the peak. */
-    if (params->nu/nu_c <= 1e3 && params->observer_angle < 40. * params->pi / 180.)
+    if (params->nu/nu_c <= 1e3 && params->observer_angle < 45. * params->pi / 180.)
     {
       delta_n = 1e0;
       incr_step_factor = 2.;
