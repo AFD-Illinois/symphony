@@ -114,8 +114,8 @@ double n_integration(double n_minus,
 
   /*For the MAXWELL_JUETTNER distribution, the n-space peak location is known
     analytically; this speeds up evaluation of MAXWELL_JUETTNER for frequencies
-    below nu/nu_c = 1e6, above which the adaptive procedure works better. */
-  if (params->use_n_peak == 1 && params->nu/nu_c < 1e6)
+    1e1 < nu/nu_c < 1e6, outside which the adaptive procedure works better. */
+  if (params->use_n_peak == 1 && params->nu/nu_c < 1e6 && params->nu/nu_c > 1e1)
   {
     double ans = n_integral(n_start, params->C * n_peak(params), params);
     return ans;
@@ -131,11 +131,11 @@ double n_integration(double n_minus,
     double tolerance = 1.e5;
     double incr_step_factor = 100.;
 
-    /*At low frequency, low observer angle, we need to use a higher resolution
+    /*At low frequency, higher resolution is necessary
       in the n-space scan in order to resolve the peak. */
-    if (params->nu/nu_c <= 1e3 && params->observer_angle < 45. * params->pi / 180.)
+    if(params->nu/nu_c < 1e1)
     {
-      delta_n = 1e0;
+      delta_n = 1.;
       incr_step_factor = 2.;
     }
 
@@ -196,16 +196,23 @@ double n_summation(struct parameters *params)
   params->stokes_v_switch = 0;
 
   /*add result of n sum from 1 to n_max to an integral over n from n_max to
-    the point where the integral no longer gives appreciable contributions*/
-  ans += n_integration(n_minus, params->n_peak, params);
+    the point where the integral no longer gives appreciable contributions.
+    For low nu, low observer angle, all contributions to j_nu and alpha_nu 
+    come in the sum to n_max, and the n_integral gives NAN; in these cases, 
+    we just take the result from the sum.*/
+  double n_integral_contrib = n_integration(n_minus, params->n_peak, params);
+  if(isnan(n_integral_contrib) == 0) ans += n_integral_contrib;
 
   /*if doing Stokes V, must perform two n integrals: one over the positive
     part of gamma integrand and one over the negative part; this helps GSL QAG
-    resolve the n integrals*/
+    resolve the n integrals.  Again, if the n integral returns NAN (which 
+    should only occur if the n integral is basically zero), we just take
+    the result from the sum.*/
   if(params->polarization == params->STOKES_V)
   {
     params->stokes_v_switch = 1;
-    ans += n_integration(n_minus, params->n_peak, params);
+    n_integral_contrib = n_integration(n_minus, params->n_peak, params); 
+    if(isnan(n_integral_contrib) == 0) ans += n_integral_contrib;
   }
   
   return ans;
@@ -257,11 +264,13 @@ double gamma_integral(double min,
     will quit the program.  This problem only occurs for portions of
     the gamma integrand that produce negligible contributions, so it 
     is better to turn off the error handler to prevent it from spontaneously
-    quitting.*/
-  if(params->nu/nu_c >= 1.e6)
+    quitting.  The same phenomenon can occur at small observer angle, 
+    typically below 5deg (approx 0.09 rad).*/
+  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.09)
   {
      prev_handler = gsl_set_error_handler_off();
-  }
+  } 
+
 
   double result, error;
 
@@ -273,8 +282,8 @@ double gamma_integral(double min,
 
   /* Integrator parameters */
   double absolute_error  = 0.;
-  double relative_error  = 1.e-3;
-  size_t limit           = 1000;
+  double relative_error  = 1.e-3; 
+  size_t limit           = 1000; 
   int gauss_kronrod_rule = 3;
 
   gsl_integration_qag(&F, min, max, absolute_error, relative_error, limit,
@@ -282,7 +291,7 @@ double gamma_integral(double min,
 
   gsl_integration_workspace_free (w);
 
-  if(params->nu/nu_c >= 1.e6)
+  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.09)
   {
      gsl_set_error_handler(prev_handler);
   }
@@ -313,11 +322,12 @@ double n_integral(double min,
     will quit the program.  This problem only occurs for portions of
     the gamma integrand that produce negligible contributions, so it 
     is better to turn off the error handler to prevent it from spontaneously
-    quitting.*/
-  if(params->nu/nu_c >= 1.e6)
+    quitting.  The same phenomenon can occur at small observer angle, 
+    typically below 5deg (approx 0.09 rad).*/
+  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.09)
   {
     prev_handler = gsl_set_error_handler_off();
-  }
+  } 
 
   double result, error;
 
@@ -338,7 +348,7 @@ double n_integral(double min,
 
   gsl_integration_workspace_free (w);
 
-  if(params->nu/nu_c >= 1.e6)
+  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.09)
   {
     gsl_set_error_handler(prev_handler);
   }

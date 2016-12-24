@@ -16,13 +16,13 @@ from mpi4py import MPI
 #----------------------set important parameters--------------------------------#
 
 num_skip              = 128                      #sample every nth point
-distribution_function = sp.POWER_LAW	#distribution function
+distribution_function = sp.KAPPA_DIST	#distribution function
 EMISS                 = False                    #True = j_nu, False = alpha_nu
 IN_PLANE              = True		        #True = obs_angle in plane
-mask_tolerance        = 2.			#error > tolerance is white
-number_of_points      = 10
+mask_tolerance        = 1.			#error > tolerance is white
+number_of_points      = 16
 cone_resolution       = 5
-max_nuratio           = 1e4
+max_nuratio           = 1e6
 figure_title          = ''
 
 #--------------------set constant parameters for the calculation--------------#
@@ -39,7 +39,6 @@ power_law_p     = 3.
 kappa           = 2.5
 kappa_width     = 10.
 B_scale         = 30.
-#nu              = 230e9
 
 #---------------------------import data from Dr. Kunz's simulation------------#
 comm = MPI.COMM_WORLD
@@ -127,15 +126,9 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 	             polarization, theta_e, power_law_p, gamma_min,
 		     gamma_max, gamma_cutoff, kappa, kappa_width):
 
-	#symphony's integrator breaks down for very low theta; TODO: fix this
-	if(obs_angle < 5.5 * np.pi / 180.):
+	if(obs_angle == 0.):
 		return 0.
-	#symphony's integrator breaks down at theta = pi/2; TODO: fix
-	if(np.abs(obs_angle - np.pi/2.) < 1e-3):
-		obs_angle = 89.9 * np.pi / 180.
-	#for some reason, it also breaks down at exactly theta = pi/3; TODO: fix
-	if(np.abs(obs_angle - np.pi/6.) < 1e-3):
-		obs_angle = 29.9 * np.pi/180.
+
 
 	if(EMISS == True):
 
@@ -144,8 +137,27 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 				 electron_charge * B_mag_avg 
 				 / (2. * np.pi * m * c) / c)
 
-#		print nu, B, obs_angle * 180. / np.pi
-		return sp.j_nu_py(nu, B, n_e, obs_angle, distribution_function,
+		#symphony's integrator breaks down for very low theta; TODO: fix this
+	        if((obs_angle < 25. * np.pi / 180. and obs_angle > 5.5 * np.pi / 180.)
+                   or (obs_angle > 77. * np.pi / 180. and obs_angle < 85. * np.pi / 180.)):
+#		if(nu/nu_c_avg < 1e2 and obs_angle > 5.5 * np.pi / 180.):
+
+
+
+			ans = sp.j_nu_py(nu, B, n_e, obs_angle, distribution_function,
+                                              polarization, theta_e, power_law_p, gamma_min,
+                                              gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
+
+        	        return ans
+
+	 	#symphony's integrator breaks down at theta = pi/2; TODO: fix
+#        	if(np.abs(obs_angle - np.pi/2.) < 1e-3):
+#                	obs_angle = 89.9 * np.pi / 180.
+        	#for some reason, it also breaks down at exactly theta = pi/3; TODO: fix
+#        	if(np.abs(obs_angle - np.pi/6.) < 1e-3):
+#                	obs_angle = 29.9 * np.pi/180.
+
+		return sp.j_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
                      polarization, theta_e, power_law_p, gamma_min,
                      gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
 
@@ -155,8 +167,19 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 		dim_prefactor = n_e_avg * electron_charge**2. / (nu * 
 				m * c)
 
-		print nu/nu_c_avg, obs_angle * 180./np.pi
-		return sp.alpha_nu_py(nu, B, n_e, obs_angle, distribution_function,
+
+#		if((obs_angle < 25. * np.pi / 180. and obs_angle > 5.5 * np.pi / 180.)
+#                   or (obs_angle > 77. * np.pi / 180. and obs_angle < 85. * np.pi / 180.)):
+
+		if(nu/nu_c_avg < 1e2 and obs_angle > 5.5 * np.pi / 180. and obs_angle < 30. * np.pi / 180.):
+
+                        ans = sp.alpha_nu_py(nu, B, n_e, obs_angle, distribution_function,
+                                              polarization, theta_e, power_law_p, gamma_min,
+                                              gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
+
+                        return ans
+
+		return sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
                      polarization, theta_e, power_law_p, gamma_min,
                      gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor 
 
@@ -487,88 +510,110 @@ for x in range(0, number_of_points):
 #------------------------make contour plots------------------------------------#
 
 if (rank == 0):
-   # Set plot parameters to make beautiful plots
-   pl.rcParams['figure.figsize']  = 12, 7.5
-   pl.rcParams['lines.linewidth'] = 1.5
-   pl.rcParams['font.family']     = 'serif'
-#   pl.rcParams['font.weight']     = 'bold'
-   pl.rcParams['font.size']       = 15
-   pl.rcParams['font.sans-serif'] = 'serif'
-   pl.rcParams['text.usetex']     = False
-   pl.rcParams['axes.linewidth']  = 1.5
-   pl.rcParams['axes.titlesize']  = 'medium'
-   pl.rcParams['axes.labelsize']  = 'medium'
-   
-   pl.rcParams['xtick.major.size'] = 8
-   pl.rcParams['xtick.minor.size'] = 4
-   pl.rcParams['xtick.major.pad']  = 8
-   pl.rcParams['xtick.minor.pad']  = 8
-   pl.rcParams['xtick.color']      = 'k'
-   pl.rcParams['xtick.labelsize']  = 'medium'
-   pl.rcParams['xtick.direction']  = 'in'
-   
-   pl.rcParams['ytick.major.size'] = 8
-   pl.rcParams['ytick.minor.size'] = 4
-   pl.rcParams['ytick.major.pad']  = 8
-   pl.rcParams['ytick.minor.pad']  = 8
-   pl.rcParams['ytick.color']      = 'k'
-   pl.rcParams['ytick.labelsize']  = 'medium'
-   pl.rcParams['ytick.direction']  = 'in'
-   
-   X, Y = np.meshgrid(nu_used, obs_angle_used)
 
-   figure, ax = pl.subplots(3, 3, figsize=(10, 10))
-   figure.suptitle(figure_title)
-   
-   plot1 = ax[0,0].contourf(np.log10(X), Y, exact_avg_only_I, 200)
-   figure.colorbar(plot1, ax=ax[0,0])
-   ax[0,0].set_title('$<j_\\nu(n, \mathbf{B})>$')
-   
-   
-   plot2 = ax[0,1].contourf(np.log10(X), Y, avgs_only_I, 200)
-   figure.colorbar(plot2, ax=ax[0,1])
-   ax[0,1].set_title('$j_\\nu(<n>, <\mathbf{B}>)$')
-   
-   if(EMISS == False):
-           ax[0,0].set_title('$<\\alpha_\\nu(n, \mathbf{B})>$')
-           ax[0,1].set_title('$\\alpha_\\nu(<n>, <\mathbf{B}>)$')
-   
-   relative_difference_I = np.ma.array(relative_difference_I, mask=relative_difference_I > mask_tolerance)
-   plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
-   figure.colorbar(plot3, ax=ax[0,2])
-   ax[0,2].set_title('$|\mathrm{Error}|$')
-   
-   v = np.linspace(0., 1., 100)
-   plot4 = ax[1,0].contourf(np.log10(X), Y, exact_avg_only_lin, v)
-   cbar4 = figure.colorbar(plot4, ax=ax[1,0])
+   emiss_or_abs = ''
+   if(EMISS):
+        emiss_or_abs = 'jnu'
+   else:
+        emiss_or_abs = 'alphanu'
 
-   plot5 = ax[1,1].contourf(np.log10(X), Y, avgs_only_lin, v)
-   cbar5 = figure.colorbar(plot5, ax=ax[1,1])
+   np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'nu.txt', nu_used)
+   np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'theta.txt', obs_angle_used)
 
-   relative_difference_lin = np.ma.array(relative_difference_lin, mask=relative_difference_lin > mask_tolerance)
-   plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_lin, 200)
-   figure.colorbar(plot6, ax=ax[1,2])
-
-   #errors in the Stokes V formulae allow for Stokes V > Stokes I as theta->0; 
-   # in this case Stokes V = Stokes I, so circ. pol. frac. = 1.
-   exact_avg_only_circ[exact_avg_only_circ > 1.] = 1.
-   avgs_only_circ[avgs_only_circ > 1.] = 1.
-
-   plot10 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_circ, v)
-   cbar10 = figure.colorbar(plot10, ax=ax[2,0])
+   np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'reldiffI.txt', relative_difference_I)
+   np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'exactI.txt', exact_avg_only_I)
+   np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'avgsI.txt', avgs_only_I)
    
-   plot11 = ax[2,1].contourf(np.log10(X), Y, avgs_only_circ, v)
-   cbar11 = figure.colorbar(plot11, ax=ax[2,1])
-
-   relative_difference_circ = np.ma.array(relative_difference_circ, mask=relative_difference_circ > mask_tolerance)
-   plot12 = ax[2,2].contourf(np.log10(X), Y, relative_difference_circ, 200)
-   figure.colorbar(plot12, ax=ax[2,2])
+   np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'reldifflin.txt', relative_difference_lin)
+   np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'exactlin.txt', exact_avg_only_lin)
+   np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'avgslin.txt', avgs_only_lin)
    
-   figure.add_subplot(111, frameon=False)
-   pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
-   pl.xlabel('$\\log_{10}(\\nu/\\overline{\\nu}_c)$', fontsize='large')
-   pl.ylabel('$\\theta$ (deg)', fontsize='large')
-   pl.tight_layout()
-#   pl.show()
-   figure.savefig('PL_integrated_alphanu.png')
-   pl.close(figure)
+   np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'reldiffV.txt', relative_difference_circ)
+   np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'exactV.txt', exact_avg_only_circ)
+   np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'avgsV.txt', avgs_only_circ)
+
+#   # Set plot parameters to make beautiful plots
+#   pl.rcParams['figure.figsize']  = 12, 7.5
+#   pl.rcParams['lines.linewidth'] = 1.5
+#   pl.rcParams['font.family']     = 'serif'
+##   pl.rcParams['font.weight']     = 'bold'
+#   pl.rcParams['font.size']       = 15
+#   pl.rcParams['font.sans-serif'] = 'serif'
+#   pl.rcParams['text.usetex']     = False
+#   pl.rcParams['axes.linewidth']  = 1.5
+#   pl.rcParams['axes.titlesize']  = 'medium'
+#   pl.rcParams['axes.labelsize']  = 'medium'
+#   
+#   pl.rcParams['xtick.major.size'] = 8
+#   pl.rcParams['xtick.minor.size'] = 4
+#   pl.rcParams['xtick.major.pad']  = 8
+#   pl.rcParams['xtick.minor.pad']  = 8
+#   pl.rcParams['xtick.color']      = 'k'
+#   pl.rcParams['xtick.labelsize']  = 'medium'
+#   pl.rcParams['xtick.direction']  = 'in'
+#   
+#   pl.rcParams['ytick.major.size'] = 8
+#   pl.rcParams['ytick.minor.size'] = 4
+#   pl.rcParams['ytick.major.pad']  = 8
+#   pl.rcParams['ytick.minor.pad']  = 8
+#   pl.rcParams['ytick.color']      = 'k'
+#   pl.rcParams['ytick.labelsize']  = 'medium'
+#   pl.rcParams['ytick.direction']  = 'in'
+#   
+#   X, Y = np.meshgrid(nu_used, obs_angle_used)
+#
+#   figure, ax = pl.subplots(3, 3, figsize=(10, 10))
+#   figure.suptitle(figure_title)
+#   
+#   plot1 = ax[0,0].contourf(np.log10(X), Y, exact_avg_only_I, 200)
+#   figure.colorbar(plot1, ax=ax[0,0])
+#   ax[0,0].set_title('$<j_\\nu(n, \mathbf{B})>$')
+#   
+#   
+#   plot2 = ax[0,1].contourf(np.log10(X), Y, avgs_only_I, 200)
+#   figure.colorbar(plot2, ax=ax[0,1])
+#   ax[0,1].set_title('$j_\\nu(<n>, <\mathbf{B}>)$')
+#   
+#   if(EMISS == False):
+#           ax[0,0].set_title('$<\\alpha_\\nu(n, \mathbf{B})>$')
+#           ax[0,1].set_title('$\\alpha_\\nu(<n>, <\mathbf{B}>)$')
+#   
+#   relative_difference_I = np.ma.array(relative_difference_I, mask=relative_difference_I > mask_tolerance)
+#   plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
+#   figure.colorbar(plot3, ax=ax[0,2])
+#   ax[0,2].set_title('$|\mathrm{Error}|$')
+#   
+#   v = np.linspace(0., 1., 100)
+#   plot4 = ax[1,0].contourf(np.log10(X), Y, exact_avg_only_lin, v)
+#   cbar4 = figure.colorbar(plot4, ax=ax[1,0])
+#
+#   plot5 = ax[1,1].contourf(np.log10(X), Y, avgs_only_lin, v)
+#   cbar5 = figure.colorbar(plot5, ax=ax[1,1])
+#
+#   relative_difference_lin = np.ma.array(relative_difference_lin, mask=relative_difference_lin > mask_tolerance)
+#   plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_lin, 200)
+#   figure.colorbar(plot6, ax=ax[1,2])
+#
+#   #errors in the Stokes V formulae allow for Stokes V > Stokes I as theta->0; 
+#   # in this case Stokes V = Stokes I, so circ. pol. frac. = 1.
+#   exact_avg_only_circ[exact_avg_only_circ > 1.] = 1.
+#   avgs_only_circ[avgs_only_circ > 1.] = 1.
+#
+#   plot10 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_circ, v)
+#   cbar10 = figure.colorbar(plot10, ax=ax[2,0])
+#   
+#   plot11 = ax[2,1].contourf(np.log10(X), Y, avgs_only_circ, v)
+#   cbar11 = figure.colorbar(plot11, ax=ax[2,1])
+#
+#   relative_difference_circ = np.ma.array(relative_difference_circ, mask=relative_difference_circ > mask_tolerance)
+#   plot12 = ax[2,2].contourf(np.log10(X), Y, relative_difference_circ, 200)
+#   figure.colorbar(plot12, ax=ax[2,2])
+#   
+#   figure.add_subplot(111, frameon=False)
+#   pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+#   pl.xlabel('$\\log_{10}(\\nu/\\overline{\\nu}_c)$', fontsize='large')
+#   pl.ylabel('$\\theta$ (deg)', fontsize='large')
+#   pl.tight_layout()
+##   pl.show()
+#   figure.savefig('PL_integrated_alphanu.png')
+#   pl.close(figure)

@@ -118,6 +118,10 @@ double gamma_integrand(double gamma, void * paramsGSLInput)
 
   }
 
+  /*if ans is NaN or inf (usually because of small numerical errors
+    that do not contribute to the integral result) return 0.*/
+  if(isfinite(ans) == 0) return 0.;
+
   return ans;
 
 }
