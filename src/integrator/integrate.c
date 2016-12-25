@@ -265,8 +265,8 @@ double gamma_integral(double min,
     the gamma integrand that produce negligible contributions, so it 
     is better to turn off the error handler to prevent it from spontaneously
     quitting.  The same phenomenon can occur at small observer angle, 
-    typically below 5deg (approx 0.09 rad).*/
-  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.09)
+    typically below 9deg (approx 0.15 rad).*/
+  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.15)
   {
      prev_handler = gsl_set_error_handler_off();
   } 
@@ -291,7 +291,7 @@ double gamma_integral(double min,
 
   gsl_integration_workspace_free (w);
 
-  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.09)
+  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.15)
   {
      gsl_set_error_handler(prev_handler);
   }
@@ -323,8 +323,8 @@ double n_integral(double min,
     the gamma integrand that produce negligible contributions, so it 
     is better to turn off the error handler to prevent it from spontaneously
     quitting.  The same phenomenon can occur at small observer angle, 
-    typically below 5deg (approx 0.09 rad).*/
-  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.09)
+    typically below 9deg (approx 0.15 rad).*/
+  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.15)
   {
     prev_handler = gsl_set_error_handler_off();
   } 
@@ -348,7 +348,7 @@ double n_integral(double min,
 
   gsl_integration_workspace_free (w);
 
-  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.09)
+  if(params->nu/nu_c >= 1.e6 || params->observer_angle < 0.15)
   {
     gsl_set_error_handler(prev_handler);
   }

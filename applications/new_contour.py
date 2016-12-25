@@ -16,8 +16,8 @@ from mpi4py import MPI
 #----------------------set important parameters--------------------------------#
 
 num_skip              = 128                      #sample every nth point
-distribution_function = sp.KAPPA_DIST	#distribution function
-EMISS                 = False                    #True = j_nu, False = alpha_nu
+distribution_function = sp.MAXWELL_JUETTNER	#distribution function
+EMISS                 = True                    #True = j_nu, False = alpha_nu
 IN_PLANE              = True		        #True = obs_angle in plane
 mask_tolerance        = 1.			#error > tolerance is white
 number_of_points      = 16
@@ -129,6 +129,10 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 	if(obs_angle == 0.):
 		return 0.
 
+	if(obs_angle == 90. * np.pi / 180.):
+		obs_angle = 89.999 * np.pi / 180.
+
+	nu_c_local = electron_charge * B / (2. * np.pi * m * c)
 
 	if(EMISS == True):
 
@@ -137,25 +141,19 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 				 electron_charge * B_mag_avg 
 				 / (2. * np.pi * m * c) / c)
 
-		#symphony's integrator breaks down for very low theta; TODO: fix this
-	        if((obs_angle < 25. * np.pi / 180. and obs_angle > 5.5 * np.pi / 180.)
-                   or (obs_angle > 77. * np.pi / 180. and obs_angle < 85. * np.pi / 180.)):
-#		if(nu/nu_c_avg < 1e2 and obs_angle > 5.5 * np.pi / 180.):
+		#use symphony's integrator where fits are inaccurate
+	        if((obs_angle < 40. * np.pi / 180. and nu/nu_c_local < 1.e2)
+                   or nu/nu_c_local < 0.9e1):
 
-
-
-			ans = sp.j_nu_py(nu, B, n_e, obs_angle, distribution_function,
-                                              polarization, theta_e, power_law_p, gamma_min,
-                                              gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
+			try:
+				ans = sp.j_nu_py(nu, B, n_e, obs_angle, distribution_function,
+                               	               polarization, theta_e, power_law_p, gamma_min,
+                               	               gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
+			except:
+				print nu/nu_c_local, obs_angle * 180./np.pi, polarization
+				ans = 0.
 
         	        return ans
-
-	 	#symphony's integrator breaks down at theta = pi/2; TODO: fix
-#        	if(np.abs(obs_angle - np.pi/2.) < 1e-3):
-#                	obs_angle = 89.9 * np.pi / 180.
-        	#for some reason, it also breaks down at exactly theta = pi/3; TODO: fix
-#        	if(np.abs(obs_angle - np.pi/6.) < 1e-3):
-#                	obs_angle = 29.9 * np.pi/180.
 
 		return sp.j_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
                      polarization, theta_e, power_law_p, gamma_min,
@@ -211,12 +209,9 @@ avgs_circ = 0.
 
 for x in range(0, number_of_points):
 	nu = nu_c_avg * 10.**(1.*x / (number_of_points - 1) * np.log10(max_nuratio))
-#	if (rank == 0):
-#		print 100.0*x/(number_of_points - 1), '% complete'  
 	for y in range(0, number_of_points):
 		if (rank == 0):
 			print 100.*(number_of_points*x+y)/(number_of_points**2.-1.), '% complete'
-
 
 		if(IN_PLANE == True):
 			#rotates observer vector in plane
@@ -247,9 +242,6 @@ for x in range(0, number_of_points):
 		#wavevectors connecting the observer and simulation, each with the same observer
 		#angle to the mean B field.  We average over these equivalent wavevectors.
 		for cone_point in range(cone_resolution):
-#			if(rank == 0):
-#				print '.%f', (cone_point+1.)/cone_resolution			
-
 			#cone rotation angle, varies from 0 to 2*pi	
 			cone_rot = (1.0 * cone_point / cone_resolution * 2.*np.pi)
 	
@@ -531,89 +523,3 @@ if (rank == 0):
    np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'reldiffV.txt', relative_difference_circ)
    np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'exactV.txt', exact_avg_only_circ)
    np.savetxt(str(distribution_function) + '_' + emiss_or_abs + 'avgsV.txt', avgs_only_circ)
-
-#   # Set plot parameters to make beautiful plots
-#   pl.rcParams['figure.figsize']  = 12, 7.5
-#   pl.rcParams['lines.linewidth'] = 1.5
-#   pl.rcParams['font.family']     = 'serif'
-##   pl.rcParams['font.weight']     = 'bold'
-#   pl.rcParams['font.size']       = 15
-#   pl.rcParams['font.sans-serif'] = 'serif'
-#   pl.rcParams['text.usetex']     = False
-#   pl.rcParams['axes.linewidth']  = 1.5
-#   pl.rcParams['axes.titlesize']  = 'medium'
-#   pl.rcParams['axes.labelsize']  = 'medium'
-#   
-#   pl.rcParams['xtick.major.size'] = 8
-#   pl.rcParams['xtick.minor.size'] = 4
-#   pl.rcParams['xtick.major.pad']  = 8
-#   pl.rcParams['xtick.minor.pad']  = 8
-#   pl.rcParams['xtick.color']      = 'k'
-#   pl.rcParams['xtick.labelsize']  = 'medium'
-#   pl.rcParams['xtick.direction']  = 'in'
-#   
-#   pl.rcParams['ytick.major.size'] = 8
-#   pl.rcParams['ytick.minor.size'] = 4
-#   pl.rcParams['ytick.major.pad']  = 8
-#   pl.rcParams['ytick.minor.pad']  = 8
-#   pl.rcParams['ytick.color']      = 'k'
-#   pl.rcParams['ytick.labelsize']  = 'medium'
-#   pl.rcParams['ytick.direction']  = 'in'
-#   
-#   X, Y = np.meshgrid(nu_used, obs_angle_used)
-#
-#   figure, ax = pl.subplots(3, 3, figsize=(10, 10))
-#   figure.suptitle(figure_title)
-#   
-#   plot1 = ax[0,0].contourf(np.log10(X), Y, exact_avg_only_I, 200)
-#   figure.colorbar(plot1, ax=ax[0,0])
-#   ax[0,0].set_title('$<j_\\nu(n, \mathbf{B})>$')
-#   
-#   
-#   plot2 = ax[0,1].contourf(np.log10(X), Y, avgs_only_I, 200)
-#   figure.colorbar(plot2, ax=ax[0,1])
-#   ax[0,1].set_title('$j_\\nu(<n>, <\mathbf{B}>)$')
-#   
-#   if(EMISS == False):
-#           ax[0,0].set_title('$<\\alpha_\\nu(n, \mathbf{B})>$')
-#           ax[0,1].set_title('$\\alpha_\\nu(<n>, <\mathbf{B}>)$')
-#   
-#   relative_difference_I = np.ma.array(relative_difference_I, mask=relative_difference_I > mask_tolerance)
-#   plot3 = ax[0,2].contourf(np.log10(X), Y, relative_difference_I, 200)
-#   figure.colorbar(plot3, ax=ax[0,2])
-#   ax[0,2].set_title('$|\mathrm{Error}|$')
-#   
-#   v = np.linspace(0., 1., 100)
-#   plot4 = ax[1,0].contourf(np.log10(X), Y, exact_avg_only_lin, v)
-#   cbar4 = figure.colorbar(plot4, ax=ax[1,0])
-#
-#   plot5 = ax[1,1].contourf(np.log10(X), Y, avgs_only_lin, v)
-#   cbar5 = figure.colorbar(plot5, ax=ax[1,1])
-#
-#   relative_difference_lin = np.ma.array(relative_difference_lin, mask=relative_difference_lin > mask_tolerance)
-#   plot6 = ax[1,2].contourf(np.log10(X), Y, relative_difference_lin, 200)
-#   figure.colorbar(plot6, ax=ax[1,2])
-#
-#   #errors in the Stokes V formulae allow for Stokes V > Stokes I as theta->0; 
-#   # in this case Stokes V = Stokes I, so circ. pol. frac. = 1.
-#   exact_avg_only_circ[exact_avg_only_circ > 1.] = 1.
-#   avgs_only_circ[avgs_only_circ > 1.] = 1.
-#
-#   plot10 = ax[2,0].contourf(np.log10(X), Y, exact_avg_only_circ, v)
-#   cbar10 = figure.colorbar(plot10, ax=ax[2,0])
-#   
-#   plot11 = ax[2,1].contourf(np.log10(X), Y, avgs_only_circ, v)
-#   cbar11 = figure.colorbar(plot11, ax=ax[2,1])
-#
-#   relative_difference_circ = np.ma.array(relative_difference_circ, mask=relative_difference_circ > mask_tolerance)
-#   plot12 = ax[2,2].contourf(np.log10(X), Y, relative_difference_circ, 200)
-#   figure.colorbar(plot12, ax=ax[2,2])
-#   
-#   figure.add_subplot(111, frameon=False)
-#   pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
-#   pl.xlabel('$\\log_{10}(\\nu/\\overline{\\nu}_c)$', fontsize='large')
-#   pl.ylabel('$\\theta$ (deg)', fontsize='large')
-#   pl.tight_layout()
-##   pl.show()
-#   figure.savefig('PL_integrated_alphanu.png')
-#   pl.close(figure)
