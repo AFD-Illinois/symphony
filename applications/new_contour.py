@@ -16,13 +16,14 @@ from mpi4py import MPI
 #----------------------set important parameters--------------------------------#
 
 num_skip              = 128                      #sample every nth point
-distribution_function = sp.MAXWELL_JUETTNER	#distribution function
+distribution_function = sp.KAPPA_DIST	#distribution function
 EMISS                 = True                    #True = j_nu, False = alpha_nu
 IN_PLANE              = True		        #True = obs_angle in plane
 mask_tolerance        = 1.			#error > tolerance is white
-number_of_points      = 16
+number_of_points_x    = 16
+number_of_points_y    = 1
 cone_resolution       = 5
-max_nuratio           = 1e6
+max_nuratio           = 1e6  
 figure_title          = ''
 
 #--------------------set constant parameters for the calculation--------------#
@@ -142,22 +143,18 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 				 / (2. * np.pi * m * c) / c)
 
 		#use symphony's integrator where fits are inaccurate
-	        if((obs_angle < 40. * np.pi / 180. and nu/nu_c_local < 1.e2)
-                   or nu/nu_c_local < 0.9e1):
-
-			try:
-				ans = sp.j_nu_py(nu, B, n_e, obs_angle, distribution_function,
-                               	               polarization, theta_e, power_law_p, gamma_min,
+		try:
+			ans = sp.j_nu_py(nu, B, n_e, obs_angle, distribution_function,
+                      	               polarization, theta_e, power_law_p, gamma_min,
                                	               gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
-			except:
-				print nu/nu_c_local, obs_angle * 180./np.pi, polarization
-				ans = 0.
+		except:
+			print nu/nu_c_local, obs_angle * 180./np.pi, polarization
+			ans = 0.
 
-        	        return ans
+		if(np.isnan(ans) == True):
+			ans = 0.
 
-		return sp.j_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
-                     polarization, theta_e, power_law_p, gamma_min,
-                     gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
+	        return ans
 
 
 	else:
@@ -166,37 +163,33 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
 				m * c)
 
 
-#		if((obs_angle < 25. * np.pi / 180. and obs_angle > 5.5 * np.pi / 180.)
-#                   or (obs_angle > 77. * np.pi / 180. and obs_angle < 85. * np.pi / 180.)):
-
-		if(nu/nu_c_avg < 1e2 and obs_angle > 5.5 * np.pi / 180. and obs_angle < 30. * np.pi / 180.):
-
+		try:
                         ans = sp.alpha_nu_py(nu, B, n_e, obs_angle, distribution_function,
-                                              polarization, theta_e, power_law_p, gamma_min,
-                                              gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
+                                       polarization, theta_e, power_law_p, gamma_min,
+                                               gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
+                except:
+                        print nu/nu_c_local, obs_angle * 180./np.pi, polarization
+                        ans = 0.
 
-                        return ans
+                return ans
 
-		return sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, distribution_function,
-                     polarization, theta_e, power_law_p, gamma_min,
-                     gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor 
 
 #-------------------------set up nu-theta space scan--------------------------#
 
-relative_difference_I = np.zeros([number_of_points, number_of_points])
-exact_avg_only_I      = np.zeros([number_of_points, number_of_points])
-avgs_only_I           = np.zeros([number_of_points, number_of_points])
+relative_difference_I = np.zeros([number_of_points_y, number_of_points_x])
+exact_avg_only_I      = np.zeros([number_of_points_y, number_of_points_x])
+avgs_only_I           = np.zeros([number_of_points_y, number_of_points_x])
 
-relative_difference_lin = np.zeros([number_of_points, number_of_points])
-exact_avg_only_lin      = np.zeros([number_of_points, number_of_points])
-avgs_only_lin           = np.zeros([number_of_points, number_of_points])
+relative_difference_lin = np.zeros([number_of_points_y, number_of_points_x])
+exact_avg_only_lin      = np.zeros([number_of_points_y, number_of_points_x])
+avgs_only_lin           = np.zeros([number_of_points_y, number_of_points_x])
 
-relative_difference_circ = np.zeros([number_of_points, number_of_points])
-exact_avg_only_circ      = np.zeros([number_of_points, number_of_points])
-avgs_only_circ           = np.zeros([number_of_points, number_of_points])
+relative_difference_circ = np.zeros([number_of_points_y, number_of_points_x])
+exact_avg_only_circ      = np.zeros([number_of_points_y, number_of_points_x])
+avgs_only_circ           = np.zeros([number_of_points_y, number_of_points_x])
 
-nu_used             = np.empty([number_of_points])
-obs_angle_used      = np.empty([number_of_points])
+nu_used             = np.empty([number_of_points_x])
+obs_angle_used      = np.empty([number_of_points_y])
 
 avgs_I = 0.
 avgs_Q = 0.
@@ -207,11 +200,11 @@ avgs_lin  = 0.
 avgs_circ = 0.
 
 
-for x in range(0, number_of_points):
-	nu = nu_c_avg * 10.**(1.*x / (number_of_points - 1) * np.log10(max_nuratio))
-	for y in range(0, number_of_points):
+for x in range(0, number_of_points_x):
+	nu = nu_c_avg * 10.**(1.*x / (number_of_points_x - 1) * np.log10(max_nuratio))
+	for y in range(0, number_of_points_y):
 		if (rank == 0):
-			print 100.*(number_of_points*x+y)/(number_of_points**2.-1.), '% complete'
+			print 100.*(number_of_points_y*x+y)/(number_of_points_x*number_of_points_y-1.), '% complete'
 
 		if(IN_PLANE == True):
 			#rotates observer vector in plane
@@ -223,7 +216,10 @@ for x in range(0, number_of_points):
 			axis_of_rot = axis_of_rot / np.linalg.norm(axis_of_rot)
 		
 		#desired angle between observer vector and mean B
-		theta       = (1.0*y/number_of_points * np.pi/2.)
+#		theta       = (1.0*y/number_of_points_y * (87. * np.pi / 180.)) + 2. * np.pi / 180.
+#		theta_array = [2., 30.546875, 60.453125, 87.640625]
+		theta_array = [10.15625]
+		theta       = theta_array[y] * np.pi / 180.
 
 		#vector from sim. point to observer; wavevector		
 		obs_vector  = np.dot(rotation_matrix(axis_of_rot, theta), 
