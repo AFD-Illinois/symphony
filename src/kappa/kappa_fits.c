@@ -120,7 +120,13 @@ double kappa_V(struct parameters * params)
               * pow(1.+pow(X_k, x * (3.*params->kappa-4.)/6.)
               * pow(Nlow/Nhigh, x), -1./x);
 
-  return ans;
+  /*The Stokes V absorption coefficient changes sign at observer_angle
+    equals 90deg, but this formula does not.  This discrepancy is a 
+    bug in this formula, and is patched by the term below.*/
+  double sign_bug_patch = cos(params->observer_angle) /
+                          fabs(cos(params->observer_angle));
+
+  return ans * sign_bug_patch;
 
 }
 
@@ -300,5 +306,11 @@ double kappa_V_abs(struct parameters * params)
                * pow(1.+pow(X_k, x * (3. * params->kappa-1.) / 6.)
                * pow(Nlow/Nhigh, x), -1./x);
 
-  return ans;
+  /*The Stokes V absorption coefficient changes sign at observer_angle
+    equals 90deg, but this formula does not.  This discrepancy is a 
+    bug in this formula, and is patched by the term below.*/
+  double sign_bug_patch = cos(params->observer_angle) /
+                          fabs(cos(params->observer_angle));
+
+  return ans * sign_bug_patch;
 }

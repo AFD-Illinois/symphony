@@ -134,7 +134,9 @@ double power_law_Q_abs(struct parameters * params)
 
 /*power_law_V_abs: fitting formula to the absorptivity, in Stokes V, from
  *                 by a power-law distribution of electrons (without any 
- *                 exponential cutoff).  Uses eq. 30, 34 of [1].
+ *                 exponential cutoff).  Uses eq. 30, 34 of [1], but
+ *                 is modified slightly for increased accuracy at the
+ *                 cost of a more complicated function.
  *
  *@params: struct of parameters params
  *@returns: fitting formula to power-law absorptivity polarized in Stokes V
@@ -166,6 +168,12 @@ double power_law_V_abs(struct parameters * params)
  
   double ans = prefactor*term1/term2*term3*term4*term5*term6*term7;
 
-  return ans;
+  /*The Stokes V absorption coefficient changes sign at observer_angle
+    equals 90deg, but this formula does not.  This discrepancy is a 
+    bug in this formula, and is patched by the term below.*/
+  double sign_bug_patch = cos(params->observer_angle) / 
+                          fabs(cos(params->observer_angle));
+
+  return ans * sign_bug_patch;
 }
 
