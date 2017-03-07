@@ -48,5 +48,6 @@ j_nu_py(): j_nu_py(230e9, 30, 1, 1.047, symphonyPy.MAXWELL_JUETTNER, symphonyPy.
 * Note: All parameters with units are in CGS.
 * Note: In `C`, the keys `symphonyPy.MAXWELL_JUETTNER` and `symphonyPy.STOKES_I` are members of a struct called `params`.  They can be used with: `params->MAXWELL_JUETTNER` and `params->STOKES_I`.
 
-###To add a new gyrotropic distribution function:
-[This will be added soon.]
+### TODO
+1. Add an anisotropic DF
+2. Put in warnings for frequencies outside the intended frequency regime (much greater than the plasma, relativistic cyclotron frequencies)
