@@ -59,9 +59,10 @@ double gamma_integration_result(double n, void * paramsInput)
     4.2 of [1].  We split the sinusoid-like integrand into a positive and 
     negative part (determined by variable stokes_v_switch) and integrate
     these parts separately over gamma and n.  We then sum them at the end.
-    In this case, the variable stokes_v_switch takes values -1 for the 
+    In this case, the variable stokes_v_switch takes values 0 for the 
     first lobe and +1 for the second lobe of the sinusoid-like gamma
-    integrand.*/
+    integrand. If stokes_v_switch is negative, we do not use the split 
+    technique. */
   if(params->polarization == params->STOKES_V && params->stokes_v_switch >= 0) 
   {
     double neg_result = gamma_integral(gamma_minus_high, gamma_peak, n, params);
@@ -181,9 +182,10 @@ double n_summation(struct parameters *params)
     4.2 of [1].  We split the sinusoid-like integrand into a positive and 
     negative part (determined by variable stokes_v_switch) and integrate
     these parts separately over gamma and n.  We then sum them at the end.
-    In this case, the variable stokes_v_switch takes values -1 for the 
+    In this case, the variable stokes_v_switch takes values 0 for the 
     first lobe and +1 for the second lobe of the sinusoid-like gamma
-    integrand.*/
+    integrand. When stokes_v_switch is negative, we do not use the split
+    technique, which is what we do for small n. */
   params->stokes_v_switch = -1;  
 
   /*perform n summation by summing the result of the gamma integral for 
