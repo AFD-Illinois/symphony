@@ -22,6 +22,9 @@ double power_law_to_be_normalized(double gamma, void * paramsInput)
 
   double norm_term = 4. * params->pi;
 
+  if (gamma < params->gamma_min || gamma > params->gamma_max)
+      return 0;
+
   double prefactor = (params->power_law_p - 1.) / 
                      (pow(params->gamma_min, 1. - params->power_law_p) 
                       - pow(params->gamma_max, 1. 
@@ -68,6 +71,9 @@ double power_law_f(double gamma, struct parameters * params)
     previous_gamma_cutoff = params->gamma_cutoff;
   }
 
+  if (gamma < params->gamma_min || gamma > params->gamma_max)
+      return 0;
+
   double beta = sqrt(1. - 1./(gamma*gamma));
 
   double prefactor = params->electron_density * (params->power_law_p - 1.) 
@@ -100,6 +106,11 @@ double power_law_f(double gamma, struct parameters * params)
 
 double differential_of_power_law(double gamma, struct parameters * params)
 {
+  /* There's a discontinuity in `f` at gamma_{min,max} that we're not going
+   * to handle correctly, so it seems best to insist that any integration
+   * not go beyond those bounds. */
+  if (gamma <= params->gamma_min || gamma >= params->gamma_max)
+      return NAN;
 
   double pl_norm = 1./(normalize_f(&power_law_to_be_normalized, params));
 
