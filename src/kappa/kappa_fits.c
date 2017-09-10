@@ -126,7 +126,11 @@ double kappa_V(struct parameters * params)
   double sign_bug_patch = cos(params->observer_angle) /
                           fabs(cos(params->observer_angle));
 
-  return ans * sign_bug_patch;
+  /*NOTE: Sign corrected; the sign in Leung et al. (2011)
+    and Pandya et al. (2016) for Stokes V transfer coefficients
+    does not follow the convention the papers describe (IEEE/IAU);
+    the sign has been corrected here.*/
+  return -ans * sign_bug_patch;
 
 }
 
@@ -312,5 +316,9 @@ double kappa_V_abs(struct parameters * params)
   double sign_bug_patch = cos(params->observer_angle) /
                           fabs(cos(params->observer_angle));
 
-  return ans * sign_bug_patch;
+  /*NOTE: Sign corrected; the sign in Leung et al. (2011)
+    and Pandya et al. (2016) for Stokes V transfer coefficients
+    does not follow the convention the papers describe (IEEE/IAU);
+    the sign has been corrected here.*/
+  return -ans * sign_bug_patch;
 }

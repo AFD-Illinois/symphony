@@ -94,7 +94,11 @@ double maxwell_juettner_V(struct parameters * params)
 
   double ans = prefactor*term1*term2*exp(-pow(X, 1./3.));
 
-  return -ans;
+  /*NOTE: Sign corrected; the sign in Leung et al. (2011)
+    and Pandya et al. (2016) for Stokes V transfer coefficients
+    does not follow the convention the papers describe (IEEE/IAU);
+    the sign has been corrected here.*/
+  return ans;
 }
 
 /*planck_func: The Planck function (used in eq. 25 of [1]) can be used to

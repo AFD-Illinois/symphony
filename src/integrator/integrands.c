@@ -60,7 +60,13 @@ double polarization_term(double gamma, double n,
 
   else if(params->polarization == params->STOKES_V)
   {
-    ans = -2.*M*N*my_Bessel_J(n, z)*my_Bessel_dJ(n, z);
+
+    /*NOTE: The sign in Leung et al. (2011) of this term
+      is different due to an error.  The sign below
+      corresponds to the Stokes V convention described 
+      in Leung et al. and Pandya et al. (2016), namely
+      the IEEE/IAU convention.*/
+    ans = 2.*M*N*my_Bessel_J(n, z)*my_Bessel_dJ(n, z);
   }
 
   return ans;

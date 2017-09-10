@@ -66,8 +66,12 @@ double power_law_V(struct parameters * params)
                        /(3.*nu_c*sin(params->observer_angle)), -1./2.);
   
   double ans = term1*term2*power_law_I(params);
-  
-  return ans;
+ 
+  /*NOTE: Sign corrected; the sign in Leung et al. (2011)
+    and Pandya et al. (2016) for Stokes V transfer coefficients
+    does not follow the convention the papers describe (IEEE/IAU);
+    the sign has been corrected here.*/ 
+  return -ans;
 }
 
 /*power_law_I_abs: fitting formula to the absorptivity, in Stokes I, from
@@ -174,6 +178,10 @@ double power_law_V_abs(struct parameters * params)
   double sign_bug_patch = cos(params->observer_angle) / 
                           fabs(cos(params->observer_angle));
 
-  return ans * sign_bug_patch;
+  /*NOTE: Sign corrected; the sign in Leung et al. (2011)
+    and Pandya et al. (2016) for Stokes V transfer coefficients
+    does not follow the convention the papers describe (IEEE/IAU);
+    the sign has been corrected here.*/
+  return -ans * sign_bug_patch;
 }
 
