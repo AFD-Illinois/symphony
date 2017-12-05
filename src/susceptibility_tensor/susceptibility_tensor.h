@@ -51,6 +51,14 @@ double tau_integrator(double gamma, void * parameters);
 double gamma_integrator(struct paramsS * p);
 double end_approx(struct paramsS * p);
 
+int set_params(struct paramsS * p);
+double alpha_I(struct paramsS * p);
+double alpha_Q(struct paramsS * p);
+double alpha_V(struct paramsS * p);
+double rho_Q(struct paramsS * p);
+double rho_V(struct paramsS * p);
+double plotter(struct paramsS p);
+
 double chi_11(struct paramsS * p);
 double chi_22(struct paramsS * p);
 double chi_33(struct paramsS * p);

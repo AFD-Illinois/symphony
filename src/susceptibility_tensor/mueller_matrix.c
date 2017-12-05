@@ -124,6 +124,9 @@ double alpha_V(struct paramsS *p)
 	double prefactor   = 4. * M_PI * p->epsilon0 * p->omega / p->c;
 	double term1     = (chi_12(p) * cos(p->theta) - chi_32(p) * sin(p->theta));
 	double ans       = prefactor * term1;
+	
+        printf("\nprefactor: %e term1:  %e ans: %e", prefactor, term1, ans);
+
 	return ans;
 }
 

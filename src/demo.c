@@ -49,16 +49,14 @@ int main(int argc, char *argv[])
 
   struct paramsS p;
 
-        /*set parameters*/
-        set_params(&p);
-        p.omega = 1. * p.omega_c;
-        p.real  = 1;
+  /*set parameters*/
+  set_params(&p);
+  p.omega = 1. * p.omega_c;
+  p.real  = 1;
         
-        /*print gamma   gamma_integrand(gamma) with the function plotter(params)*/
-//      plotter(p);
+  /*print omega/omega_c   alpha_I(params)*/ 
 
-        /*print omega/omega_c   alpha_I(params)*/ 
-        printf("\n%e    %e\n", p.omega/p.omega_c, alpha_V(&p));
+  printf("\n%e    %e\n", p.omega/p.omega_c, alpha_V(&p));
 
 
   for (int index=0; index <= max_index; index++) 
