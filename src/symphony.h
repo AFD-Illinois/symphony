@@ -5,6 +5,7 @@
 #include "params.h"
 #include "fits.h"
 #include "integrator/integrate.h"
+#include "susceptibility_tensor/susceptibility_tensor.h"
 
 double j_nu(double nu,
             double magnetic_field,

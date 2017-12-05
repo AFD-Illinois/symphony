@@ -12,6 +12,7 @@
 #include "fits.h"
 #include "params.h"
 #include "distribution_function_common_routines.h"
+#include "susceptibility_tensor/susceptibility_tensor.h"
 
 /* main: runs through a demo of symphony's capabilities; currently
  * sets parameters to sample values and outputs nu/nu_c 
@@ -44,43 +45,57 @@ int main(int argc, char *argv[])
   int max_index = (int) log10(max_nuratio)*points_per_pow_10;
   char *error_message = NULL;
 
-  printf("\nnu/nu_c         j_nu()          j_nu_fit()");
+  printf("\nnu/nu_c         j_nu()          j_nu_fit()"); 
+
+  struct paramsS p;
+
+        /*set parameters*/
+        set_params(&p);
+        p.omega = 1. * p.omega_c;
+        p.real  = 1;
+        
+        /*print gamma   gamma_integrand(gamma) with the function plotter(params)*/
+//      plotter(p);
+
+        /*print omega/omega_c   alpha_I(params)*/ 
+        printf("\n%e    %e\n", p.omega/p.omega_c, alpha_V(&p));
+
 
   for (int index=0; index <= max_index; index++) 
   {
 
     paramsM.nu = pow(10., (double)index/(double)points_per_pow_10) * nu_c;
 
-    printf("\n%e	%e	%e", paramsM.nu/nu_c, 
-                                     j_nu(paramsM.nu, 
-                                          paramsM.magnetic_field, 
-                                          paramsM.electron_density, 
-                                          paramsM.observer_angle, 
-                                          paramsM.distribution, 
-                                          paramsM.polarization,
-                                          paramsM.theta_e,            
-                                          paramsM.power_law_p,        
-                                          paramsM.gamma_min,          
-                                          paramsM.gamma_max,        
-                                          paramsM.gamma_cutoff,      
-                                          paramsM.kappa,              
-                                          paramsM.kappa_width,
-                                          &error_message
-                                          ), 
-                                 j_nu_fit(paramsM.nu,
-                                          paramsM.magnetic_field,
-                                          paramsM.electron_density,
-                                          paramsM.observer_angle,
-                                          paramsM.distribution,
-                                          paramsM.polarization,
-                                          paramsM.theta_e,           
-                                          paramsM.power_law_p,       
-                                          paramsM.gamma_min,         
-                                          paramsM.gamma_max,       
-                                          paramsM.gamma_cutoff,     
-                                          paramsM.kappa,             
-                                          paramsM.kappa_width
-				          ));
+//    printf("\n%e	%e	%e", paramsM.nu/nu_c, 
+//                                     j_nu(paramsM.nu, 
+//                                          paramsM.magnetic_field, 
+//                                          paramsM.electron_density, 
+//                                          paramsM.observer_angle, 
+//                                          paramsM.distribution, 
+//                                          paramsM.polarization,
+//                                          paramsM.theta_e,            
+//                                          paramsM.power_law_p,        
+//                                          paramsM.gamma_min,          
+//                                          paramsM.gamma_max,        
+//                                          paramsM.gamma_cutoff,      
+//                                          paramsM.kappa,              
+//                                          paramsM.kappa_width,
+//                                          &error_message
+//                                          ), 
+//                                 j_nu_fit(paramsM.nu,
+//                                          paramsM.magnetic_field,
+//                                          paramsM.electron_density,
+//                                          paramsM.observer_angle,
+//                                          paramsM.distribution,
+//                                          paramsM.polarization,
+//                                          paramsM.theta_e,           
+//                                          paramsM.power_law_p,       
+//                                          paramsM.gamma_min,         
+//                                          paramsM.gamma_max,       
+//                                          paramsM.gamma_cutoff,     
+//                                          paramsM.kappa,             
+//                                          paramsM.kappa_width
+//				          ));
 
   }
   printf("\n");
