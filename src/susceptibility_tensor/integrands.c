@@ -14,7 +14,7 @@
  *
  *@returns: MJ(params->gamma, params->theta_e)
  */
-double MJ(struct paramsS * params)
+double MJ(struct parameters * params)
 {
 	double ans = exp(-params->gamma/params->theta_e) 
 		   / (4. * M_PI * params->theta_e*params->theta_e 
@@ -32,7 +32,7 @@ double MJ(struct paramsS * params)
  *@returns: PL(params->gamma, params->power_law_p, params->gamma_min,
  *             params->gamma_max)
  */
-double PL(struct paramsS * params)
+double PL(struct parameters * params)
 {
 	if(params->gamma > params->gamma_max || params->gamma < params->gamma_min)
 	{
@@ -61,7 +61,7 @@ double PL(struct paramsS * params)
  */
 double kappa_to_be_normalized(double gamma, void * parameters)
 {
-	struct paramsS * params = (struct paramsS*) parameters;
+	struct parameters * params = (struct parameters*) parameters;
 
         double beta = sqrt(1. - 1./pow(gamma, 2.));
 
@@ -82,7 +82,7 @@ double kappa_to_be_normalized(double gamma, void * parameters)
  *@returns: 1 over the normalization constant for the chosen distribution
  */
 double normalize_f(double (*distribution)(double, void *),
-                   struct paramsS * params
+                   struct parameters * params
                   )
 {
   
@@ -121,7 +121,7 @@ double normalize_f(double (*distribution)(double, void *),
  *@returns: PL(params->gamma, params->power_law_p, params->gamma_min,
  *             params->gamma_max)
  */
-double kappa(struct paramsS * params)
+double kappa(struct parameters * params)
 {
 	static double norm                  = 0.;
 	static double previous_kappa        = 0.;
@@ -155,7 +155,7 @@ double kappa(struct paramsS * params)
  *
  *@returns: MJ(params), PL(params), or kappa(params), depending on params->dist
  */
-double Df(struct paramsS * params)
+double Df(struct parameters * params)
 {
 	if(params->dist == 0)
 	{
@@ -304,7 +304,7 @@ double I_3_limit(double alpha, double delta)
  */
 double chi_11_integrand(double tau_prime, void * parameters)
 {
-	struct paramsS * params = (struct paramsS*) parameters;
+	struct parameters * params = (struct parameters*) parameters;
 
 	double prefactor  = 1.; //should be 1j
 	double beta       = sqrt(1. - pow(params->gamma, -2.));
@@ -338,7 +338,7 @@ double chi_11_integrand(double tau_prime, void * parameters)
  */
 double chi_12_integrand(double tau_prime, void * parameters)
 {
-	struct paramsS * params = (struct paramsS*) parameters;
+	struct parameters * params = (struct parameters*) parameters;
 
 	double prefactor  = 1.; //should be 1j
 	double beta       = sqrt(1. - pow(params->gamma, -2.));
@@ -372,7 +372,7 @@ double chi_12_integrand(double tau_prime, void * parameters)
  */
 double chi_13_integrand(double tau_prime, void * parameters)
 {
-	struct paramsS * params = (struct paramsS*) parameters;
+	struct parameters * params = (struct parameters*) parameters;
 
 	double prefactor  = 1.; //should be 1j
 	double beta       = sqrt(1. - pow(params->gamma, -2.));
@@ -410,7 +410,7 @@ double chi_13_integrand(double tau_prime, void * parameters)
  */
 double chi_22_integrand(double tau_prime, void * parameters)
 {
-	struct paramsS * params = (struct paramsS*) parameters;
+	struct parameters * params = (struct parameters*) parameters;
 
 	if(params->real == 1)
 	{
@@ -439,7 +439,7 @@ double chi_22_integrand(double tau_prime, void * parameters)
  */
 double chi_22_integrand_real(double tau_prime, void * parameters)
 {
-	struct paramsS * params = (struct paramsS*) parameters;
+	struct parameters * params = (struct parameters*) parameters;
 
 	double prefactor  = 1.; //should be 1j
 	double beta       = sqrt(1. - pow(params->gamma, -2.));
@@ -473,7 +473,7 @@ double chi_22_integrand_real(double tau_prime, void * parameters)
  */
 double chi_22_integrand_p1(double tau_prime, void * parameters)
 {
-        struct paramsS * params = (struct paramsS*) parameters;
+        struct parameters * params = (struct parameters*) parameters;
 
         double prefactor  = 1.; //should be 1j
         double beta       = sqrt(1. - pow(params->gamma, -2.));
@@ -507,7 +507,7 @@ double chi_22_integrand_p1(double tau_prime, void * parameters)
  */
 double chi_22_integrand_p2(double tau_prime, void * parameters)
 {
-        struct paramsS * params = (struct paramsS*) parameters;
+        struct parameters * params = (struct parameters*) parameters;
 
         double prefactor  = 1.; //should be 1j
         double beta       = sqrt(1. - pow(params->gamma, -2.));
@@ -542,7 +542,7 @@ double chi_22_integrand_p2(double tau_prime, void * parameters)
  */
 double chi_32_integrand(double tau_prime, void * parameters)
 {
-	struct paramsS * params = (struct paramsS*) parameters;
+	struct parameters * params = (struct parameters*) parameters;
 
 	double prefactor  = 1.; // should be 1j 
 	double beta       = sqrt(1. - pow(params->gamma, -2.));
@@ -575,7 +575,7 @@ double chi_32_integrand(double tau_prime, void * parameters)
  */
 double chi_33_integrand(double tau_prime, void * parameters)
 {
-	struct paramsS * params = (struct paramsS*) parameters;
+	struct parameters * params = (struct parameters*) parameters;
 
 	double prefactor  = 1.; //should be 1j
 	double beta       = sqrt(1. - pow(params->gamma, -2.));

@@ -8,7 +8,7 @@
  *
  *@returns: the component chi_11, evaluated using the parameters in struct p
  */
-double chi_11(struct paramsS * p)
+double chi_11(struct parameters * p)
 {
 	p->tau_integrand = &chi_11_integrand;
         p->gamma_integrand = &tau_integrator;
@@ -22,7 +22,7 @@ double chi_11(struct paramsS * p)
  *
  *@returns: the component chi_12, evaluated using the parameters in struct p
  */
-double chi_12(struct paramsS * p)
+double chi_12(struct parameters * p)
 {
         p->tau_integrand = &chi_12_integrand;
 	p->gamma_integrand = &tau_integrator;
@@ -36,7 +36,7 @@ double chi_12(struct paramsS * p)
  *
  *@returns: the component chi_32, evaluated using the parameters in struct p
  */
-double chi_32(struct paramsS * p)
+double chi_32(struct parameters * p)
 {
         p->tau_integrand = &chi_32_integrand;
 	p->gamma_integrand = &tau_integrator;
@@ -50,7 +50,7 @@ double chi_32(struct paramsS * p)
  *
  *@returns: the component chi_13, evaluated using the parameters in struct p
  */
-double chi_13(struct paramsS * p)
+double chi_13(struct parameters * p)
 {
         p->tau_integrand = &chi_13_integrand;
         p->gamma_integrand = &tau_integrator;
@@ -64,7 +64,7 @@ double chi_13(struct paramsS * p)
  *
  *@returns: the component chi_22, evaluated using the parameters in struct p
  */
-double chi_22(struct paramsS * p)
+double chi_22(struct parameters * p)
 {
 	double ans = 0.;
         p->gamma_integrand = &tau_integrator;
@@ -91,7 +91,7 @@ double chi_22(struct paramsS * p)
  *
  *@returns: the component chi_33, evaluated using the parameters in struct p
  */
-double chi_33(struct paramsS * p)
+double chi_33(struct parameters * p)
 {
         p->tau_integrand = &chi_33_integrand;
         p->gamma_integrand = &tau_integrator;
@@ -105,7 +105,7 @@ double chi_33(struct paramsS * p)
  *
  *@returns: the component chi_21, evaluated using the parameters in struct p
  */
-double chi_21(struct paramsS * p)
+double chi_21(struct parameters * p)
 {
         return -chi_12(p);
 }
@@ -116,7 +116,7 @@ double chi_21(struct paramsS * p)
  *
  *@returns: the component chi_23, evaluated using the parameters in struct p
  */
-double chi_23(struct paramsS * p)
+double chi_23(struct parameters * p)
 {
         return -chi_32(p);
 }
@@ -127,7 +127,7 @@ double chi_23(struct paramsS * p)
  *
  *@returns: the component chi_31, evaluated using the parameters in struct p
  */
-double chi_31(struct paramsS * p)
+double chi_31(struct parameters * p)
 {
         return chi_13(p);
 }

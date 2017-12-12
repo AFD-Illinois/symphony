@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
   printf("\nnu/nu_c         j_nu()          j_nu_fit()"); 
 
-  struct paramsS p;
+  struct parameters p;
 
   /*set parameters*/
   set_params(&p);

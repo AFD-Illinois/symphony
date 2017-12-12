@@ -19,7 +19,7 @@
  */
 double tau_integrator(double gamma, void * parameters)
 {
-	struct paramsS * params = (struct paramsS*) parameters;
+	struct parameters * params = (struct parameters*) parameters;
 
 	if(gamma == 1.)
 	{
@@ -134,7 +134,7 @@ double tau_integrator(double gamma, void * parameters)
  *@returns: gamma integral for a given component of chi_ij, evaluated using
  *          a trapezoidal rule integrator
  */
-double trapezoidal(struct paramsS *p, double start, double end, int samples)
+double trapezoidal(struct parameters *p, double start, double end, int samples)
 {
 
         int i = 0;
@@ -174,7 +174,7 @@ double trapezoidal(struct paramsS *p, double start, double end, int samples)
  *@returns: gamma integral for a given component of chi_ij, evaluated using
  *          an adaptive trapezoidal rule integrator
  */
-double trapezoidal_adaptive(struct paramsS *p, double start, double step)
+double trapezoidal_adaptive(struct parameters *p, double start, double step)
 {
 
         int i = 0;
@@ -209,7 +209,7 @@ double trapezoidal_adaptive(struct paramsS *p, double start, double step)
  *
  *@returns: approximate end location for gamma integral
  */
-double end_approx(struct paramsS *p)
+double end_approx(struct parameters *p)
 {
 	double end;
 
@@ -255,7 +255,7 @@ double end_approx(struct paramsS *p)
  *@returns: gamma integral for a given component of chi_ij, evaluated using
  *          a GSL adaptive integrator
  */
-double gsl_integrator(struct paramsS *p, double start, double end)
+double gsl_integrator(struct parameters *p, double start, double end)
 {
 	gsl_function F;
         F.function = p->gamma_integrand;
@@ -291,7 +291,7 @@ double gsl_integrator(struct paramsS *p, double start, double end)
  *
  *@returns: gamma integral for a given component of chi_ij
  */
-double gamma_integrator(struct paramsS *p)
+double gamma_integrator(struct parameters *p)
 {
         double prefactor = 2. * M_PI * p->omega_p*p->omega_p / (p->omega * p->omega);
 

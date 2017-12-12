@@ -12,7 +12,7 @@
  * 
  *@returns: 1 to indicate success //TODO: should we just make this return nothing? 
  */
-int set_params(struct paramsS *p)
+int set_params(struct parameters *p)
 {
 	p->epsilon0  = 1./(4. * M_PI); //permittivity of free space, CGS units
 	p->e         = 4.80320680e-10; //electron charge
@@ -56,7 +56,7 @@ int set_params(struct paramsS *p)
  *
  *@returns: absorption coefficient for total intensity (Stokes I) 
  */
-double alpha_I(struct paramsS *p)
+double alpha_I(struct parameters *p)
 {
 	p->real          = 0;
         double prefactor = 2. * M_PI * p->epsilon0 * p->omega / p->c;
@@ -76,7 +76,7 @@ double alpha_I(struct paramsS *p)
  *
  *@returns: absorption coefficient for linearly polarized light (Stokes Q) 
  */
-double alpha_Q(struct paramsS *p)
+double alpha_Q(struct parameters *p)
 {
         p->real          = 0;
         double prefactor = 2. * M_PI * p->epsilon0 * p->omega / p->c;
@@ -97,7 +97,7 @@ double alpha_Q(struct paramsS *p)
  *
  *@returns: Faraday conversion coefficient rho_Q 
  */
-double rho_Q(struct paramsS *p)
+double rho_Q(struct parameters *p)
 {
         p->real          = 1;
         double prefactor = 2. * M_PI * p->epsilon0 * p->omega / p->c;
@@ -118,7 +118,7 @@ double rho_Q(struct paramsS *p)
  *
  *@returns: absorption coefficient for circularly polarized light (Stokes V) 
  */
-double alpha_V(struct paramsS *p)
+double alpha_V(struct parameters *p)
 {
 	p->real            = 1;
 	double prefactor   = 4. * M_PI * p->epsilon0 * p->omega / p->c;
@@ -138,7 +138,7 @@ double alpha_V(struct paramsS *p)
  *
  *@returns: Faraday rotation coefficient rho_V 
  */
-double rho_V(struct paramsS *p)
+double rho_V(struct parameters *p)
 {
         p->real          = 0;
         double prefactor = 4. * M_PI * p->epsilon0 * p->omega / p->c;
@@ -159,7 +159,7 @@ double rho_V(struct paramsS *p)
  *@returns: 0 when completed and prints the gamma integrand to a file for
  *          plotting //TODO: make this function return nothing? 
  */
-double plotter(struct paramsS p)
+double plotter(struct parameters p)
 {
 	FILE *fp;
 	fp = fopen("output.txt", "w");
@@ -193,7 +193,7 @@ int main(void)
 {
 	/*start timer*/
 	clock_t start = clock(), diff;
-        struct paramsS p;
+        struct parameters p;
 
 	/*set parameters*/
 	set_params(&p);

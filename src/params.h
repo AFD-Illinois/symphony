@@ -63,6 +63,31 @@ struct parameters
   int stokes_v_switch;
 
   char *error_message; /* if not NULL, records source of error in current calculation */
+
+  /*susceptibility tensor paramsS */
+  double epsilon0;
+  double epsilon;
+  double e;
+  double m;
+  double c;
+  double B;
+  double n_e;
+  double theta;
+//  double theta_e;
+  double pl_p;
+//  double gamma_min;
+//  double gamma_max;
+//  double kappa;
+//  double kappa_width;
+//  double gamma_cutoff;
+  double omega_c;
+  double omega_p;
+  double omega;
+  double gamma;
+  int real;
+  int dist;
+  double (*tau_integrand)(double, void * parameters);
+  double (*gamma_integrand)(double, void * parameters);
 };
 
 struct parametersGSL
