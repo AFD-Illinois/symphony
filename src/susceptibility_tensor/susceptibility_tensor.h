@@ -31,6 +31,22 @@
 //	double (*gamma_integrand)(double, void * parameters);
 //};
 
+double chi_11_symphony(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int polarization,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width,
+            char **error_message
+           );
+
 double I_1_of_2(double alpha, double delta);
 double I_1_analytic(double alpha, double delta);
 double I_2_analytic(double alpha, double delta);

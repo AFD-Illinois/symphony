@@ -48,6 +48,75 @@ int set_params(struct parameters *p)
 	return 1;
 }
 
+double chi_11_symphony(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int polarization,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width,
+            char **error_message
+           )
+{
+//  gsl_error_handler_t *prev_handler;
+  double retval;
+
+/*fill the struct with values*/
+  struct parameters params;
+  setConstParams(&params);
+
+  set_params(&params);
+  params.omega = 2. * M_PI * nu;
+  params.real  = 1;
+
+  params.nu                 = nu;
+  params.magnetic_field     = magnetic_field;
+  params.observer_angle     = observer_angle;
+  params.electron_density   = electron_density;
+  params.distribution       = distribution;
+  params.polarization       = polarization;
+  params.mode               = params.EMISSIVITY;
+  params.theta_e            = theta_e;
+  params.power_law_p        = power_law_p;
+  params.gamma_min          = gamma_min;
+  params.gamma_max          = gamma_max;
+  params.gamma_cutoff       = gamma_cutoff;
+  params.kappa              = kappa;
+  params.kappa_width        = kappa_width;
+
+//  if (error_message != NULL)
+//    *error_message = NULL; /* Initialize the user's error message. */
+//
+//  global_gsl_error_message = &params.error_message;
+//  prev_handler = gsl_set_error_handler (_handle_gsl_error);
+//  set_distribution_function(&params);
+
+//  retval = n_summation(&params);
+  retval = chi_11(&params);
+
+//  gsl_set_error_handler (prev_handler);
+//  global_gsl_error_message = NULL;
+
+  /* Success? */
+
+  if (params.error_message == NULL)
+    return retval;
+
+  /* Something went wrong. Give the caller the error message if they
+   * provided us with a place to save it. */
+
+  if (error_message != NULL)
+    *error_message = params.error_message;
+
+  return NAN;
+}
+
 /*alpha_I: returns the absorption coefficient alpha_I, for the total intensity
  *         of light along the ray in question, for the given values of 
  *         parameters within the struct p.
