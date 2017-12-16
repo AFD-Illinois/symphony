@@ -14,7 +14,7 @@
  */
 int set_params(struct parameters *p)
 {
-	p->epsilon0  = 1./(4. * M_PI); //permittivity of free space, CGS units
+	p->epsilon0  = 1./(4. * p->pi); //permittivity of free space, CGS units
 	p->e         = 4.80320680e-10; //electron charge
 	p->m         = 9.1093826e-28;  //electron mass
 	p->c         = 2.99792458e10;  //speed of light
@@ -23,7 +23,7 @@ int set_params(struct parameters *p)
 	//parameters
 	p->B       = 1.;          //background B strength
 	p->n_e     = 1.;          //electron number density cm^-3
-	p->theta   = M_PI/3.;     //observer angle
+	p->theta   = p->pi/3.;     //observer angle
 
 	//derived quantities
 	p->omega_p = sqrt(p->n_e * p->e*p->e / (p->m * p->epsilon0));//plasma frequency    
@@ -72,7 +72,7 @@ double chi_11_symphony(double nu,
   setConstParams(&params);
 
   set_params(&params);
-  params.omega = 2. * M_PI * nu;
+  params.omega = 2. * params.pi * nu;
   params.real  = 1;
 
   params.nu                 = nu;
@@ -128,7 +128,7 @@ double chi_11_symphony(double nu,
 double alpha_I(struct parameters *p)
 {
 	p->real          = 0;
-        double prefactor = 2. * M_PI * p->epsilon0 * p->omega / p->c;
+        double prefactor = 2. * p->pi * p->epsilon0 * p->omega / p->c;
         double term11    = (chi_11(p) * pow(cos(p->theta), 2.)  
 			  + chi_33(p) * pow(sin(p->theta), 2.)
 			  - 2. * chi_13(p) * sin(p->theta) * cos(p->theta));
@@ -148,7 +148,7 @@ double alpha_I(struct parameters *p)
 double alpha_Q(struct parameters *p)
 {
         p->real          = 0;
-        double prefactor = 2. * M_PI * p->epsilon0 * p->omega / p->c;
+        double prefactor = 2. * p->pi * p->epsilon0 * p->omega / p->c;
         double term11    = (chi_11(p) * pow(cos(p->theta), 2.)
                           + chi_33(p) * pow(sin(p->theta), 2.)
                           - 2. * chi_13(p) * sin(p->theta) * cos(p->theta));
@@ -169,7 +169,7 @@ double alpha_Q(struct parameters *p)
 double rho_Q(struct parameters *p)
 {
         p->real          = 1;
-        double prefactor = 2. * M_PI * p->epsilon0 * p->omega / p->c;
+        double prefactor = 2. * p->pi * p->epsilon0 * p->omega / p->c;
         double term11    = (chi_11(p) * pow(cos(p->theta), 2.)
                           + chi_33(p) * pow(sin(p->theta), 2.)
                           - 2. * chi_13(p) * sin(p->theta) * cos(p->theta));
@@ -190,7 +190,7 @@ double rho_Q(struct parameters *p)
 double alpha_V(struct parameters *p)
 {
 	p->real            = 1;
-	double prefactor   = 4. * M_PI * p->epsilon0 * p->omega / p->c;
+	double prefactor   = 4. * p->pi * p->epsilon0 * p->omega / p->c;
 	double term1     = (chi_12(p) * cos(p->theta) - chi_32(p) * sin(p->theta));
 	double ans       = prefactor * term1;
 	
@@ -210,7 +210,7 @@ double alpha_V(struct parameters *p)
 double rho_V(struct parameters *p)
 {
         p->real          = 0;
-        double prefactor = 4. * M_PI * p->epsilon0 * p->omega / p->c;
+        double prefactor = 4. * p->pi * p->epsilon0 * p->omega / p->c;
         double term1     = (chi_12(p) * cos(p->theta) - chi_32(p) * sin(p->theta));
         double ans       = prefactor * term1;
         return ans;

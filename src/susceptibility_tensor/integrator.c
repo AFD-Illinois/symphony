@@ -53,12 +53,12 @@ double tau_integrator(double gamma, void * parameters)
 
 	if(params->tau_integrand == &chi_33_integrand)
         {
-                step = 2. * M_PI / gamma;
+                step = 2. * params->pi / gamma;
                 sign_correction = 1.;
         }
         else
         {
-                step     = M_PI/gamma;
+                step     = params->pi/gamma;
         }
 
 	gsl_integration_qawo_table * table =
@@ -293,7 +293,7 @@ double gsl_integrator(struct parameters *p, double start, double end)
  */
 double gamma_integrator(struct parameters *p)
 {
-        double prefactor = 2. * M_PI * p->omega_p*p->omega_p / (p->omega * p->omega);
+        double prefactor = 2. * p->pi * p->omega_p*p->omega_p / (p->omega * p->omega);
 
         double start  = 1.;
         double end = end_approx(p);

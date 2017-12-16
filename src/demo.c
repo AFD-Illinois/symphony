@@ -47,16 +47,16 @@ int main(int argc, char *argv[])
 
   printf("\nnu/nu_c         j_nu()          j_nu_fit()"); 
 
-  struct parameters p;
+//  struct parameters p;
 
   /*set parameters*/
-  set_params(&p);
-  p.omega = 1. * p.omega_c;
-  p.real  = 1;
+  set_params(&paramsM);
+  paramsM.omega = 1. * paramsM.omega_c;
+  paramsM.real  = 1;
         
   /*print omega/omega_c   alpha_I(params)*/ 
 
-  printf("\n%e    %e\n", p.omega/p.omega_c, alpha_V(&p));
+  printf("\n%e    %e\n", paramsM.omega/paramsM.omega_c, alpha_V(&paramsM));
 
 
   for (int index=0; index <= max_index; index++) 

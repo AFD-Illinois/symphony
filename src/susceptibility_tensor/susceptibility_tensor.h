@@ -3,33 +3,7 @@
 
 #include "../params.h"
 
-#define M_PI 3.1415926535897932384
-//struct paramsS
-//{
-//        double epsilon0;
-//	double epsilon;
-//	double e;
-//	double m;
-//	double c;
-//	double B;
-//	double n_e;
-//	double theta;
-//	double theta_e;
-//	double pl_p;
-//	double gamma_min;
-//	double gamma_max;
-//	double kappa;
-//	double kappa_width;
-//	double gamma_cutoff;
-//	double omega_c;
-//	double omega_p;
-//        double omega;
-//        double gamma;
-//	int real;
-//	int dist;
-//	double (*tau_integrand)(double, void * parameters);
-//	double (*gamma_integrand)(double, void * parameters);
-//};
+//#define M_PI 3.1415926535897932384
 
 double chi_11_symphony(double nu,
             double magnetic_field,

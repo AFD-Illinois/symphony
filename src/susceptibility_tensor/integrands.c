@@ -17,7 +17,7 @@
 double MJ(struct parameters * params)
 {
 	double ans = exp(-params->gamma/params->theta_e) 
-		   / (4. * M_PI * params->theta_e*params->theta_e 
+		   / (4. * params->pi * params->theta_e*params->theta_e 
 	  	      * gsl_sf_bessel_Kn(2, 1./params->theta_e));
 	return ans;
 }
@@ -43,7 +43,7 @@ double PL(struct parameters * params)
 
 	double ans = (params->pl_p - 1.) * (-1 + 2. * params->gamma * params->gamma 
 					 + params->pl_p * (params->gamma*params->gamma - 1.))
-		    / (4. * M_PI * (pow(params->gamma_min, -1. - params->pl_p) - pow(params->gamma_max, -1. - params->pl_p))
+		    / (4. * params->pi * (pow(params->gamma_min, -1. - params->pl_p) - pow(params->gamma_max, -1. - params->pl_p))
 			* beta * (params->gamma*params->gamma - 1.)) * pow(params->gamma, -3. - params->pl_p);
 	return ans;	
 }
@@ -67,7 +67,7 @@ double kappa_to_be_normalized(double gamma, void * parameters)
 
         double body = pow((1. + (gamma - 1.)/(params->kappa * params->kappa_width)), -1. - params->kappa);
 
-	double d3p = 4. * M_PI * gamma*gamma * beta;
+	double d3p = 4. * params->pi * gamma*gamma * beta;
 
         double ans = body * d3p;
 
