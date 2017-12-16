@@ -214,7 +214,7 @@ double end_approx(struct parameters *p)
 	double end;
 
         double MJ_max        = 0.5 * (3. * p->theta_e + sqrt(4. + 9. * p->theta_e * p->theta_e));
-        double PL_max_real   = sqrt((1. + p->pl_p)/p->pl_p);
+        double PL_max_real   = sqrt((1. + p->power_law_p)/p->power_law_p);
 	double PL_max_moving = 50./sqrt(p->omega/p->omega_c) + 9. * pow(p->omega/p->omega_c, 1./3.);
 	double kappa_max     = (-3. + 3. * p->kappa_width * p->kappa 
 			      + sqrt(1. - 4. * p->kappa 
@@ -223,15 +223,15 @@ double end_approx(struct parameters *p)
                                      + 9. * pow(p->kappa_width * p->kappa, 2.))) 
 			   / (2. * (p->kappa - 2.));
 
-        if(p->dist == 0)
+        if(p->distribution == p->MAXWELL_JUETTNER)
         {
                 end = 7. * MJ_max;
         }
-        else if(p->dist == 1)
+        else if(p->distribution == p->POWER_LAW)
         {
 		end = PL_max_moving;
         }
-        else if(p->dist == 2)
+        else if(p->distribution == p->KAPPA_DIST)
 	{
 		end = 7. * kappa_max;
 	}
@@ -302,7 +302,7 @@ double gamma_integrator(struct parameters *p)
 	/*for power-law, there is a singularity at low frequency at gamma = 1,
           which cannot be resolved by a trapezoidal integrator.  We are forced
           to use the (much slower) GSL integrator QAGS in these cases. */
-	if(p->dist == 1 && p->omega/p->omega_c < 5.)
+	if(p->distribution == p->POWER_LAW && p->omega/p->omega_c < 5.)
 	{
 		ans_tot = gsl_integrator(p, start, end);
 	}

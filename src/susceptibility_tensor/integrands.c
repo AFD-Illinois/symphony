@@ -41,10 +41,10 @@ double PL(struct parameters * params)
 
 	double beta = sqrt(1. - 1./pow(params->gamma, 2.));
 
-	double ans = (params->pl_p - 1.) * (-1 + 2. * params->gamma * params->gamma 
-					 + params->pl_p * (params->gamma*params->gamma - 1.))
-		    / (4. * params->pi * (pow(params->gamma_min, -1. - params->pl_p) - pow(params->gamma_max, -1. - params->pl_p))
-			* beta * (params->gamma*params->gamma - 1.)) * pow(params->gamma, -3. - params->pl_p);
+	double ans = (params->power_law_p - 1.) * (-1 + 2. * params->gamma * params->gamma 
+					 + params->power_law_p * (params->gamma*params->gamma - 1.))
+		    / (4. * params->pi * (pow(params->gamma_min, -1. - params->power_law_p) - pow(params->gamma_max, -1. - params->power_law_p))
+			* beta * (params->gamma*params->gamma - 1.)) * pow(params->gamma, -3. - params->power_law_p);
 	return ans;	
 }
 
@@ -157,15 +157,15 @@ double kappa(struct parameters * params)
  */
 double Df(struct parameters * params)
 {
-	if(params->dist == 0)
+	if(params->distribution == params->MAXWELL_JUETTNER)
 	{
 		return MJ(params);
 	}
-	else if(params->dist == 1)
+	else if(params->distribution == params->POWER_LAW)
 	{
 		return PL(params);
 	}
-	else if(params->dist == 2)
+	else if(params->distribution == params->KAPPA_DIST)
 	{
 		return kappa(params);
 	}
@@ -308,9 +308,9 @@ double chi_11_integrand(double tau_prime, void * parameters)
 
 	double prefactor  = 1.; //should be 1j
 	double beta       = sqrt(1. - pow(params->gamma, -2.));
-	double alpha      = beta * cos(params->theta) * tau_prime * params->gamma;
+	double alpha      = beta * cos(params->observer_angle) * tau_prime * params->gamma;
 	double delta      = 2. * params->omega/(params->epsilon * params->omega_c) 
-			   * sin(params->theta) * params->gamma * beta 
+			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
 	double gamma_term = beta*beta * params->gamma * Df(params);
@@ -342,9 +342,9 @@ double chi_12_integrand(double tau_prime, void * parameters)
 
 	double prefactor  = 1.; //should be 1j
 	double beta       = sqrt(1. - pow(params->gamma, -2.));
-	double alpha      = beta * cos(params->theta) * tau_prime * params->gamma;
+	double alpha      = beta * cos(params->observer_angle) * tau_prime * params->gamma;
 	double delta      = 2. * params->omega/(params->epsilon * params->omega_c) 
-			   * sin(params->theta) * params->gamma * beta 
+			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
 	double gamma_term = beta*beta * params->gamma * Df(params);
@@ -376,9 +376,9 @@ double chi_13_integrand(double tau_prime, void * parameters)
 
 	double prefactor  = 1.; //should be 1j
 	double beta       = sqrt(1. - pow(params->gamma, -2.));
-	double alpha      = beta * cos(params->theta) * tau_prime * params->gamma;
+	double alpha      = beta * cos(params->observer_angle) * tau_prime * params->gamma;
 	double delta      = 2. * params->omega/(params->epsilon * params->omega_c) 
-			   * sin(params->theta) * params->gamma * beta 
+			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
 	double gamma_term = beta*beta * params->gamma * Df(params);//* exp(-params->gamma/params->theta_e);
@@ -443,9 +443,9 @@ double chi_22_integrand_real(double tau_prime, void * parameters)
 
 	double prefactor  = 1.; //should be 1j
 	double beta       = sqrt(1. - pow(params->gamma, -2.));
-	double alpha      = beta * cos(params->theta) * tau_prime * params->gamma;
+	double alpha      = beta * cos(params->observer_angle) * tau_prime * params->gamma;
 	double delta      = 2. * params->omega/(params->epsilon * params->omega_c) 
-			   * sin(params->theta) * params->gamma * beta 
+			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
 	double gamma_term = beta*beta * params->gamma * Df(params);
@@ -477,9 +477,9 @@ double chi_22_integrand_p1(double tau_prime, void * parameters)
 
         double prefactor  = 1.; //should be 1j
         double beta       = sqrt(1. - pow(params->gamma, -2.));
-        double alpha      = beta * cos(params->theta) * tau_prime * params->gamma;
+        double alpha      = beta * cos(params->observer_angle) * tau_prime * params->gamma;
         double delta      = 2. * params->omega/(params->epsilon * params->omega_c)
-                           * sin(params->theta) * params->gamma * beta 
+                           * sin(params->observer_angle) * params->gamma * beta 
                            * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
         double gamma_term = beta*beta * params->gamma * Df(params);
@@ -511,9 +511,9 @@ double chi_22_integrand_p2(double tau_prime, void * parameters)
 
         double prefactor  = 1.; //should be 1j
         double beta       = sqrt(1. - pow(params->gamma, -2.));
-        double alpha      = beta * cos(params->theta) * tau_prime * params->gamma;
+        double alpha      = beta * cos(params->observer_angle) * tau_prime * params->gamma;
         double delta      = 2. * params->omega/(params->epsilon * params->omega_c)
-                           * sin(params->theta) * params->gamma * beta 
+                           * sin(params->observer_angle) * params->gamma * beta 
                            * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
         double gamma_term = beta*beta * params->gamma * Df(params);
@@ -546,9 +546,9 @@ double chi_32_integrand(double tau_prime, void * parameters)
 
 	double prefactor  = 1.; // should be 1j 
 	double beta       = sqrt(1. - pow(params->gamma, -2.));
-	double alpha      = beta * cos(params->theta) * tau_prime * params->gamma;
+	double alpha      = beta * cos(params->observer_angle) * tau_prime * params->gamma;
 	double delta      = 2. * params->omega/(params->epsilon * params->omega_c) 
-			   * sin(params->theta) * params->gamma * beta 
+			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
 	double gamma_term = beta*beta * params->gamma * Df(params);//* exp(-params->gamma/params->theta_e);
@@ -579,9 +579,9 @@ double chi_33_integrand(double tau_prime, void * parameters)
 
 	double prefactor  = 1.; //should be 1j
 	double beta       = sqrt(1. - pow(params->gamma, -2.));
-	double alpha      = beta * cos(params->theta) * tau_prime * params->gamma;
+	double alpha      = beta * cos(params->observer_angle) * tau_prime * params->gamma;
 	double delta      = 2. * params->omega/(params->epsilon * params->omega_c) 
-			   * sin(params->theta) * params->gamma * beta 
+			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
 	double gamma_term = beta*beta * params->gamma * Df(params);

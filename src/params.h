@@ -65,27 +65,13 @@ struct parameters
   char *error_message; /* if not NULL, records source of error in current calculation */
 
   /*susceptibility tensor paramsS */
+  double gamma;
   double epsilon0;
   double epsilon;
-  double e;
-  double m;
-  double c;
-  double B;
-  double n_e;
-  double theta;
-//  double theta_e;
-  double pl_p;
-//  double gamma_min;
-//  double gamma_max;
-//  double kappa;
-//  double kappa_width;
-//  double gamma_cutoff;
+  double omega;
   double omega_c;
   double omega_p;
-  double omega;
-  double gamma;
-  int real;
-  int dist;
+  double real;
   double (*tau_integrand)(double, void * parameters);
   double (*gamma_integrand)(double, void * parameters);
 };
@@ -98,5 +84,6 @@ struct parametersGSL
 
 void setConstParams(struct parameters *params);
 double get_nu_c(struct parameters params);
+double get_omega_p(struct parameters params);
 
 #endif /* SYMPHONY_PARAMS_H_ */

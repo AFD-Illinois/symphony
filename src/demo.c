@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
   setConstParams(&paramsM);
 
 //set some the parameters
-  paramsM.magnetic_field     = 30.;
+  paramsM.magnetic_field     = 1.; //TODO: change this
   paramsM.electron_density   = 1.;
   paramsM.observer_angle     = paramsM.pi/3.;
   paramsM.distribution       = paramsM.MAXWELL_JUETTNER;
@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
   paramsM.kappa_width        = 10.;
 
   double nu_c = get_nu_c(paramsM);
+  double omega_p = get_omega_p(paramsM);
 
   double max_nuratio = 1e6;
   int points_per_pow_10 = 1;
@@ -50,7 +51,9 @@ int main(int argc, char *argv[])
 //  struct parameters p;
 
   /*set parameters*/
-  set_params(&paramsM);
+//  set_params(&paramsM);
+  paramsM.omega_c = 2. * paramsM.pi * nu_c;
+  paramsM.omega_p = omega_p;
   paramsM.omega = 1. * paramsM.omega_c;
   paramsM.real  = 1;
         
