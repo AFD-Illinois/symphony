@@ -59,7 +59,7 @@ double PL(struct parameters * params)
  *
  *@returns: kappa_to_be_normalized(gamma, void * parameters)
  */
-double kappa_to_be_normalized(double gamma, void * parameters)
+double kappa_unnormalized(double gamma, void * parameters)
 {
 	struct parameters * params = (struct parameters*) parameters;
 
@@ -72,7 +72,6 @@ double kappa_to_be_normalized(double gamma, void * parameters)
         double ans = body * d3p;
 
         return ans;
-
 }
 
 /*normalize_f: normalizes the distribution function using GSL's 
@@ -99,7 +98,7 @@ double normalize_f(double (*distribution)(double, void *),
 	F.function = distribution;
 	
 	F.params = params;
-	
+
 	gsl_integration_qagiu(&F, lower_bound, absolute_error, 
 	                      relative_error, limit, w, &result, &error
 	                     );
@@ -118,7 +117,7 @@ double normalize_f(double (*distribution)(double, void *),
  *
  *@params: pointer to struct of parameters *params
  *
- *@returns: PL(params->gamma, params->power_law_p, params->gamma_min,
+ *@returns: kappa(params->gamma, params->power_law_p, params->gamma_min,
  *             params->gamma_max)
  */
 double kappa(struct parameters * params)
@@ -130,7 +129,7 @@ double kappa(struct parameters * params)
 	if(norm == 0. || previous_kappa_width != params->kappa_width
 	              || previous_kappa       != params->kappa)
 	{
-	  norm                  = 1./normalize_f(&kappa_to_be_normalized, params);
+	  norm                  = 1./normalize_f(&kappa_unnormalized, params);
 	  previous_kappa        = params->kappa;
 	  previous_kappa_width  = params->kappa_width;
 	  previous_gamma_cutoff = params->gamma_cutoff;

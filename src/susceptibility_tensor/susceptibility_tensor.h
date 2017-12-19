@@ -8,7 +8,135 @@ double chi_11_symphony(double nu,
             double electron_density,
             double observer_angle,
             int distribution,
-            int polarization,
+	    int real_part,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width,
+            char **error_message
+           );
+
+double chi_12_symphony(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int real_part,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width,
+            char **error_message
+           );
+
+double chi_13_symphony(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int real_part,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width,
+            char **error_message
+           );
+
+double chi_21_symphony(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int real_part,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width,
+            char **error_message
+           );
+
+double chi_22_symphony(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int real_part,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width,
+            char **error_message
+           );
+
+double chi_23_symphony(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int real_part,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width,
+            char **error_message
+           );
+
+double chi_31_symphony(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int real_part,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width,
+            char **error_message
+           );
+
+double chi_32_symphony(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int real_part,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width,
+            char **error_message
+           );
+
+double chi_33_symphony(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int real_part,
             double theta_e,
             double power_law_p,
             double gamma_min,
@@ -23,6 +151,11 @@ double I_1_of_2(double alpha, double delta);
 double I_1_analytic(double alpha, double delta);
 double I_2_analytic(double alpha, double delta);
 double MJ(struct parameters * params);
+double PL(struct parameters * params);
+double kappa_unnormalized(double gamma, void * parameters);
+double normalize_f(double (*distribution)(double, void *),
+                   struct parameters * params);
+double kappa(struct parameters * params);
 double Df(struct parameters * params);
 
 double chi_11_integrand(double tau_prime, void * parameters);

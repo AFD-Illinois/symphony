@@ -28,10 +28,10 @@ int main(int argc, char *argv[])
   paramsM.magnetic_field     = 1.; //TODO: change this
   paramsM.electron_density   = 1.;
   paramsM.observer_angle     = paramsM.pi/3.;
-  paramsM.distribution       = paramsM.MAXWELL_JUETTNER;
+  paramsM.distribution       = paramsM.KAPPA_DIST;
   paramsM.polarization       = paramsM.STOKES_I;
   paramsM.theta_e            = 10.;
-  paramsM.power_law_p        = 3.5;
+  paramsM.power_law_p        = 3.;
   paramsM.gamma_min          = 1.;
   paramsM.gamma_max          = 1000.;
   paramsM.gamma_cutoff       = 10000000000.;
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
   int max_index = (int) log10(max_nuratio)*points_per_pow_10;
   char *error_message = NULL;
 
-  printf("\nnu/nu_c         j_nu()          j_nu_fit()"); 
+//  printf("\nnu/nu_c         j_nu()          j_nu_fit()"); 
 
 //  struct parameters p;
 
@@ -58,14 +58,14 @@ int main(int argc, char *argv[])
   paramsM.real  = 1;
         
   /*print omega/omega_c   alpha_I(params)*/ 
-
 //  printf("\n%e    %e\n", paramsM.omega/paramsM.omega_c, chi_11(&paramsM));
-  printf("\n%e    %e\n", paramsM.omega/paramsM.omega_c, chi_11_symphony(paramsM.omega/(2. * paramsM.pi),
+//  printf("\n%e\n", kappa_to_be_normalized(paramsM.gamma, &paramsM));
+  printf("\n%e    %e\n", paramsM.omega/paramsM.omega_c, chi_12_symphony(paramsM.omega/(2. * paramsM.pi),
 									paramsM.magnetic_field,
 									paramsM.electron_density,
 									paramsM.observer_angle,
 									paramsM.distribution,
-									paramsM.polarization,
+									paramsM.real,
 									paramsM.theta_e,
 									paramsM.power_law_p,
 									paramsM.gamma_min,
