@@ -213,6 +213,8 @@ double end_approx(struct parameters *p)
 {
 	double end;
 
+	printf("\n%e	%e	%e	%e	%e	%e\n", p->theta_e, p->power_law_p, p->omega, p->omega_c, p->kappa, p->kappa_width);
+
         double MJ_max        = 0.5 * (3. * p->theta_e + sqrt(4. + 9. * p->theta_e * p->theta_e));
         double PL_max_real   = sqrt((1. + p->power_law_p)/p->power_law_p);
 	double PL_max_moving = 50./sqrt(p->omega/p->omega_c) + 9. * pow(p->omega/p->omega_c, 1./3.);
@@ -293,7 +295,7 @@ double gsl_integrator(struct parameters *p, double start, double end)
  */
 double gamma_integrator(struct parameters *p)
 {
-        double prefactor = 2. * p->pi * p->omega_p*p->omega_p / (p->omega * p->omega);
+	double prefactor = 2. * p->pi * p->omega_p*p->omega_p / (p->omega * p->omega);
 
         double start  = 1.;
         double end = end_approx(p);

@@ -45,6 +45,12 @@ double chi_11_symphony(double nu,
   params.kappa              = kappa;
   params.kappa_width        = kappa_width;
 
+  double nu_c = get_nu_c(params);
+  double omega_p = get_omega_p(params);
+
+  params.omega_c = 2. * params.pi * nu_c;
+  params.omega_p = omega_p;
+
 //  if (error_message != NULL)
 //    *error_message = NULL; /* Initialize the user's error message. */
 //
@@ -53,6 +59,7 @@ double chi_11_symphony(double nu,
 //  set_distribution_function(&params);
 
 //  retval = n_summation(&params);
+  
   retval = chi_11(&params);
 
 //  gsl_set_error_handler (prev_handler);
@@ -171,68 +178,68 @@ double rho_V(struct parameters *p)
         return ans;
 }
 
-/*plotter: prints the values of the gamma integrand for the component of chi_ij
- *         determined by p.tau_integrand, from gamma=start to gamma=end, in
- *         increments of step.  These values are printed to a file called
- *         output.txt, and can be plotted easily by an external plotting
- *         software to determine if the gamma integrand is being properly
- *         resolved.
- *
- *@params: struct of parameters p
- *
- *@returns: 0 when completed and prints the gamma integrand to a file for
- *          plotting //TODO: make this function return nothing? 
- */
-double plotter(struct parameters p)
-{
-	FILE *fp;
-	fp = fopen("output.txt", "w");
-
-	double start = 1.;
-	double end   = 1.01;
-	double i     = start;
-	double step  = 0.00001;
-
-	p.tau_integrand = &chi_12_integrand;
-
-        while(i < end)
-        {
-
-		fprintf(fp, "\n%e    %e", i, tau_integrator(i, &p));
-		printf("\n%e", i);
-                i = i + step;
-        }
-        printf("\n");
-
-	return 0.;
-}
-
-/*main: sets parameters, runs some calculation, and prints the CPU time elapsed
- *
- *@params: none
- *
- *@returns: nothing
- */
-int main(void)
-{
-	/*start timer*/
-	clock_t start = clock(), diff;
-        struct parameters p;
-
-	/*set parameters*/
-        setConstParams(&p);
-	//set_params(&p);
-	p.omega = 1. * p.omega_c;
-	p.real  = 1;
-
-	/*print gamma	gamma_integrand(gamma) with the function plotter(params)*/
-//	plotter(p);
-
-	/*print omega/omega_c	alpha_I(params)*/
-	printf("\n%e    %e\n", p.omega/p.omega_c, alpha_V(&p));
-
-	/*calculate and print elapsed time*/
-	diff = clock() - start;
-	int msec = diff * 1000 / CLOCKS_PER_SEC;
-	printf("Time taken %d seconds %d milliseconds\n", msec/1000, msec%1000);
-}
+///*plotter: prints the values of the gamma integrand for the component of chi_ij
+// *         determined by p.tau_integrand, from gamma=start to gamma=end, in
+// *         increments of step.  These values are printed to a file called
+// *         output.txt, and can be plotted easily by an external plotting
+// *         software to determine if the gamma integrand is being properly
+// *         resolved.
+// *
+// *@params: struct of parameters p
+// *
+// *@returns: 0 when completed and prints the gamma integrand to a file for
+// *          plotting //TODO: make this function return nothing? 
+// */
+//double plotter(struct parameters p)
+//{
+//	FILE *fp;
+//	fp = fopen("output.txt", "w");
+//
+//	double start = 1.;
+//	double end   = 1.01;
+//	double i     = start;
+//	double step  = 0.00001;
+//
+//	p.tau_integrand = &chi_12_integrand;
+//
+//        while(i < end)
+//        {
+//
+//		fprintf(fp, "\n%e    %e", i, tau_integrator(i, &p));
+//		printf("\n%e", i);
+//                i = i + step;
+//        }
+//        printf("\n");
+//
+//	return 0.;
+//}
+//
+///*main: sets parameters, runs some calculation, and prints the CPU time elapsed
+// *
+// *@params: none
+// *
+// *@returns: nothing
+// */
+//int main(void)
+//{
+//	/*start timer*/
+//	clock_t start = clock(), diff;
+//        struct parameters p;
+//
+//	/*set parameters*/
+//        setConstParams(&p);
+//	//set_params(&p);
+//	p.omega = 1. * p.omega_c;
+//	p.real  = 1;
+//
+//	/*print gamma	gamma_integrand(gamma) with the function plotter(params)*/
+////	plotter(p);
+//
+//	/*print omega/omega_c	alpha_I(params)*/
+//	printf("\n%e    %e\n", p.omega/p.omega_c, alpha_V(&p));
+//
+//	/*calculate and print elapsed time*/
+//	diff = clock() - start;
+//	int msec = diff * 1000 / CLOCKS_PER_SEC;
+//	printf("Time taken %d seconds %d milliseconds\n", msec/1000, msec%1000);
+//}

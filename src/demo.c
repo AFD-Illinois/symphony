@@ -59,8 +59,21 @@ int main(int argc, char *argv[])
         
   /*print omega/omega_c   alpha_I(params)*/ 
 
-  printf("\n%e    %e\n", paramsM.omega/paramsM.omega_c, alpha_V(&paramsM));
-
+//  printf("\n%e    %e\n", paramsM.omega/paramsM.omega_c, chi_11(&paramsM));
+  printf("\n%e    %e\n", paramsM.omega/paramsM.omega_c, chi_11_symphony(paramsM.omega/(2. * paramsM.pi),
+									paramsM.magnetic_field,
+									paramsM.electron_density,
+									paramsM.observer_angle,
+									paramsM.distribution,
+									paramsM.polarization,
+									paramsM.theta_e,
+									paramsM.power_law_p,
+									paramsM.gamma_min,
+									paramsM.gamma_max,
+									paramsM.gamma_cutoff,
+									paramsM.kappa,
+									paramsM.kappa_width,
+									&error_message));
 
   for (int index=0; index <= max_index; index++) 
   {
