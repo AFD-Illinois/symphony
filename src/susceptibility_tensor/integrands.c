@@ -5,16 +5,17 @@
 #include <gsl/gsl_errno.h>
 #include "susceptibility_tensor.h"
 
-/*MJ: returns the value of the Maxwell-Juettner (relativistic thermal)
- *    distribution function for the parameters in the struct p.
+/*dMJ_dgamma: returns the value of df/d\gamma, where f is the Maxwell-Juettner 
+ *    (relativistic thermal) distribution function, for the parameters in 
+ *    the struct p.
  *    TODO: I think a minus sign and other parts of Df are absorbed
  *          into the integrands themselves, and should be moved here.
  *
  *@params: pointer to struct of parameters *params
  *
- *@returns: MJ(params->gamma, params->theta_e)
+ *@returns: d/dgamma MJ(params->gamma, params->theta_e)
  */
-double MJ(struct parameters * params)
+double dMJ_dgamma(struct parameters * params)
 {
 	double ans = exp(-params->gamma/params->theta_e) 
 		   / (4. * params->pi * params->theta_e*params->theta_e 
@@ -22,17 +23,17 @@ double MJ(struct parameters * params)
 	return ans;
 }
 
-/*PL: returns the value of the power-law distribution function for 
- *    the parameters in the struct p.
+/*dPL_dgamma: returns the value of df/d/gamma, where f is the power-law 
+ *    distribution function, for the parameters in the struct p.
  *    TODO: I think a minus sign and other parts of Df are absorbed
  *          into the integrands themselves, and should be moved here.
  *
  *@params: pointer to struct of parameters *params
  *
- *@returns: PL(params->gamma, params->power_law_p, params->gamma_min,
+ *@returns: d/dgamma PL(params->gamma, params->power_law_p, params->gamma_min,
  *             params->gamma_max)
  */
-double PL(struct parameters * params)
+double dPL_dgamma(struct parameters * params)
 {
 	if(params->gamma > params->gamma_max || params->gamma < params->gamma_min)
 	{
@@ -48,8 +49,9 @@ double PL(struct parameters * params)
 	return ans;	
 }
 
-/*kappa_to_be_normalized: returns the value of the unnormalized relativistic
- *                        kappa distribution for the parameters in the struct p.
+/*dkappa_dgamma_to_be_normalized: returns the value of df/d\gamma, where f is the 
+ *                        unnormalized relativistic kappa distribution, 
+ *                        for the parameters in the struct p.
  *                        This function is integrated over gamma to determine
  *                        the normalization constant in normalize_f(), below.
  *    TODO: I think a minus sign and other parts of Df are absorbed
@@ -57,9 +59,9 @@ double PL(struct parameters * params)
  *
  *@params: pointer to struct of parameters *params
  *
- *@returns: kappa_to_be_normalized(gamma, void * parameters)
+ *@returns: dkappa_dgamma_to_be_normalized(gamma, void * parameters)
  */
-double kappa_unnormalized(double gamma, void * parameters)
+double dkappa_dgamma_unnormalized(double gamma, void * parameters)
 {
 	struct parameters * params = (struct parameters*) parameters;
 
@@ -109,18 +111,18 @@ double normalize_f(double (*distribution)(double, void *),
 	return result;
 }
 
-/*kappa: returns the value of the relativistic kappa distribution function for 
- *    the parameters in the struct p, with the normalization handled
- *    numerically by normalize_f().
+/*dkappa_dgamma: returns the value of df/d\gamma, where f is the relativistic
+ *    kappa distribution function, for the parameters in the struct p, 
+ *    with the normalization handled numerically by normalize_f().
  *    TODO: I think a minus sign and other parts of Df are absorbed
  *          into the integrands themselves, and should be moved here.
  *
  *@params: pointer to struct of parameters *params
  *
- *@returns: kappa(params->gamma, params->power_law_p, params->gamma_min,
- *             params->gamma_max)
+ *@returns: d/dgamma kappa(params->gamma, params->power_law_p, 
+ *          params->gamma_min, params->gamma_max)
  */
-double kappa(struct parameters * params)
+double dkappa_dgamma(struct parameters * params)
 {
 	static double norm                  = 0.;
 	static double previous_kappa        = 0.;
@@ -129,7 +131,7 @@ double kappa(struct parameters * params)
 	if(norm == 0. || previous_kappa_width != params->kappa_width
 	              || previous_kappa       != params->kappa)
 	{
-	  norm                  = 1./normalize_f(&kappa_unnormalized, params);
+	  norm                  = 1./normalize_f(&dkappa_dgamma_unnormalized, params);
 	  previous_kappa        = params->kappa;
 	  previous_kappa_width  = params->kappa_width;
 	  previous_gamma_cutoff = params->gamma_cutoff;
@@ -146,27 +148,28 @@ double kappa(struct parameters * params)
 
 }
 
-/*Df: chooses the distribution function given by the parameter params->dist,
+/*df_dgamma: chooses the distribution function given by the parameter params->dist,
  *    and returns that distribution function evaluated with the given
  *    parameters in the struct params.
  *
  *@params: pointer to struct of parameters *params
  *
- *@returns: MJ(params), PL(params), or kappa(params), depending on params->dist
+ *@returns: dMJ_dgamma(params), dPL_dgamma(params), or 
+ *          dkappa_dgamma(params), depending on params->dist
  */
-double Df(struct parameters * params)
+double df_dgamma(struct parameters * params)
 {
 	if(params->distribution == params->MAXWELL_JUETTNER)
 	{
-		return MJ(params);
+		return dMJ_dgamma(params);
 	}
 	else if(params->distribution == params->POWER_LAW)
 	{
-		return PL(params);
+		return dPL_dgamma(params);
 	}
 	else if(params->distribution == params->KAPPA_DIST)
 	{
-		return kappa(params);
+		return dkappa_dgamma(params);
 	}
 
 	return 0.;
@@ -312,7 +315,7 @@ double chi_11_integrand(double tau_prime, void * parameters)
 			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
-	double gamma_term = beta*beta * params->gamma * Df(params);
+	double gamma_term = beta*beta * params->gamma * df_dgamma(params);
 //	double tau_term   = exp(1j * tau_prime * gamma) * sin((epsilon * omega_c / omega) * tau_prime);
 //	double tau_term   = -sin(tau_prime * params->gamma) 
 //			    * sin((epsilon * params->omega_c / params->omega) * tau_prime);
@@ -346,7 +349,7 @@ double chi_12_integrand(double tau_prime, void * parameters)
 			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
-	double gamma_term = beta*beta * params->gamma * Df(params);
+	double gamma_term = beta*beta * params->gamma * df_dgamma(params);
 //	double tau_term   = exp(1j * tau_prime * gamma) * sin((epsilon * omega_c / omega) * tau_prime);
 //	double tau_term   = -sin(tau_prime * params->gamma) 
 //			    * sin((epsilon * params->omega_c / params->omega) * tau_prime);
@@ -380,7 +383,7 @@ double chi_13_integrand(double tau_prime, void * parameters)
 			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
-	double gamma_term = beta*beta * params->gamma * Df(params);//* exp(-params->gamma/params->theta_e);
+	double gamma_term = beta*beta * params->gamma * df_dgamma(params);//* exp(-params->gamma/params->theta_e);
 				//explicit imag part
 //	double tau_term   = cos(tau_prime * params->gamma) * cos((params->epsilon * params->omega_c / params->omega) * tau_prime/2.);
 
@@ -447,7 +450,7 @@ double chi_22_integrand_real(double tau_prime, void * parameters)
 			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
-	double gamma_term = beta*beta * params->gamma * Df(params);
+	double gamma_term = beta*beta * params->gamma * df_dgamma(params);
 //	double tau_term   = exp(1j * tau_prime * gamma) * sin((epsilon * omega_c / omega) * tau_prime);
 //	double tau_term   = -sin(tau_prime * params->gamma) 
 //			    * sin((epsilon * params->omega_c / params->omega) * tau_prime);
@@ -481,7 +484,7 @@ double chi_22_integrand_p1(double tau_prime, void * parameters)
                            * sin(params->observer_angle) * params->gamma * beta 
                            * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
-        double gamma_term = beta*beta * params->gamma * Df(params);
+        double gamma_term = beta*beta * params->gamma * df_dgamma(params);
 //      double tau_term   = exp(1j * tau_prime * gamma) * sin((epsilon * omega_c / omega) * tau_prime);
 //      double tau_term   = -sin(tau_prime * params->gamma) 
 //                          * sin((epsilon * params->omega_c / params->omega) * tau_prime);
@@ -515,7 +518,7 @@ double chi_22_integrand_p2(double tau_prime, void * parameters)
                            * sin(params->observer_angle) * params->gamma * beta 
                            * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
-        double gamma_term = beta*beta * params->gamma * Df(params);
+        double gamma_term = beta*beta * params->gamma * df_dgamma(params);
 //      double tau_term   = exp(1j * tau_prime * gamma) * sin((epsilon * omega_c / omega) * tau_prime);
 //      double tau_term   = -sin(tau_prime * params->gamma) 
 //                          * sin((epsilon * params->omega_c / params->omega) * tau_prime);
@@ -550,7 +553,7 @@ double chi_32_integrand(double tau_prime, void * parameters)
 			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
-	double gamma_term = beta*beta * params->gamma * Df(params);//* exp(-params->gamma/params->theta_e);
+	double gamma_term = beta*beta * params->gamma * df_dgamma(params);//* exp(-params->gamma/params->theta_e);
 //	double tau_term   = exp(1j * tau_prime * gamma) * sin((epsilon * omega_c / omega) * tau_prime);
 //	double tau_term   = sin(tau_prime * params->gamma) 
 //			    * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / 2.);
@@ -583,7 +586,7 @@ double chi_33_integrand(double tau_prime, void * parameters)
 			   * sin(params->observer_angle) * params->gamma * beta 
 			   * sin((params->epsilon * params->omega_c / params->omega) * tau_prime / (2.));
 
-	double gamma_term = beta*beta * params->gamma * Df(params);
+	double gamma_term = beta*beta * params->gamma * df_dgamma(params);
 //	double tau_term   = exp(1j * tau_prime * gamma) * sin((epsilon * omega_c / omega) * tau_prime);
 //	double tau_term   = -sin(tau_prime * params->gamma) 
 //			    * sin((epsilon * params->omega_c / params->omega) * tau_prime);

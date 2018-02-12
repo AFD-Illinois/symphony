@@ -152,7 +152,7 @@ double trapezoidal(struct parameters *p, double start, double end, int samples)
 
                 ans_step = step * (p1 + p2)/2.;
 
-		printf("\nSTART: %e     END: %e", start+i*step, start + (i+1)*step);
+//		printf("\nSTART: %e     END: %e", start+i*step, start + (i+1)*step);
 
                 ans_tot += ans_step;
                 i++;
@@ -190,7 +190,7 @@ double trapezoidal_adaptive(struct parameters *p, double start, double step)
 
                 ans_step = step * (p1 + p2)/2.;
 
-                printf("\nSTART: %e     END: %e", start+i*step, start + (i+1)*step);
+//                printf("\nSTART: %e     END: %e", start+i*step, start + (i+1)*step);
 
                 ans_tot += ans_step;
                 i++;
@@ -212,8 +212,6 @@ double trapezoidal_adaptive(struct parameters *p, double start, double step)
 double end_approx(struct parameters *p)
 {
 	double end;
-
-	printf("\n%e	%e	%e\n", p->gamma_cutoff, p->kappa, p->kappa_width);
 
         double MJ_max        = 0.5 * (3. * p->theta_e + sqrt(4. + 9. * p->theta_e * p->theta_e));
         double PL_max_real   = sqrt((1. + p->power_law_p)/p->power_law_p);
@@ -271,9 +269,6 @@ double gsl_integrator(struct parameters *p, double start, double end)
         double epsabs = 0.;
         double epsrel = 1e-5;
         int gsl_key   = 1;
-
-        printf("\n%e\n", end);
-
 
 	gsl_integration_qags(&F, start, end, epsabs, epsrel, limit, w, &ans, &error);
 
