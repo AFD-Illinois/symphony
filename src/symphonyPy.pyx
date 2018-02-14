@@ -46,7 +46,8 @@ def alpha_nu_py(double nu,
                 double gamma_max,
                 double gamma_cutoff,
                 double kappa,
-                double kappa_width):
+                double kappa_width,
+		int chi_method):
 
   """Returns alpha_nu(nu, magnetic_field, electron_density, observer_angle,
                       distribution, polarization, theta_e, power_law_p, 
@@ -63,7 +64,7 @@ def alpha_nu_py(double nu,
   result = alpha_nu(nu, magnetic_field, electron_density,
                     observer_angle, distribution, polarization,
                     theta_e, power_law_p, gamma_min, gamma_max,
-                    gamma_cutoff, kappa, kappa_width, &error_message)
+                    gamma_cutoff, kappa, kappa_width, chi_method, &error_message)
   if error_message:
     raise RuntimeError (error_message)
   return result

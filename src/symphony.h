@@ -34,5 +34,6 @@ double alpha_nu(double nu,
                 double gamma_cutoff,
                 double kappa,
                 double kappa_width,
+		int chi_method,
                 char **error_message);
 #endif /* SYMPHONY_H_ */

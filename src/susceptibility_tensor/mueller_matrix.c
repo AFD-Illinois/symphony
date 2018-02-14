@@ -650,6 +650,38 @@ double chi_31_symphony(double nu,
   return NAN;
 }
 
+//TODO: write documentation for this function
+double alpha_nu_suscept(struct parameters * params)
+{
+  /*this method has only been tested for 1 <= nu/nu_c <= 1000*/
+  double nu_c = get_nu_c(*params);
+  if(params->nu/nu_c >= 1000)
+  {
+    printf("\nFrequency out of range for this method");
+    return 0.;
+  }
+
+  if(params->polarization == params->STOKES_I)
+  {
+    return alpha_I(params);
+  }
+  else if(params->polarization == params->STOKES_Q)
+  {
+    return alpha_Q(params);
+  }
+  else if(params->polarization == params->STOKES_U)
+  {
+    return 0.; /*alpha_U is exactly zero in this basis; see paper*/
+  }
+  else
+  {
+    return alpha_V(params);
+  }
+
+  printf("\nERROR IN alpha_nu_suscept()\n");
+  return 0.;
+}
+
 /*alpha_I: returns the absorption coefficient alpha_I, for the total intensity
  *         of light along the ray in question, for the given values of 
  *         parameters within the struct p.

@@ -28,6 +28,7 @@ cdef extern from "symphony.h":
                     double gamma_cutoff,
                     double kappa,
                     double kappa_width,
+		    int chi_method,
                     char **error_message)
 
     double j_nu_fit(double nu,

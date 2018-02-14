@@ -31,9 +31,12 @@ void setConstParams(struct parameters *params)
   /* Keys for the mode: absorptivity or emissivity */
   params->ABSORPTIVITY     = 10;
   params->EMISSIVITY       = 11;
-  /*Default: find n-space peak adaptively */
+  /* Default: find n-space peak adaptively */
   params->use_n_peak       = 0;
   params->error_message    = NULL;
+  /* Key for approach to compute coefficients */
+  params->SYMPHONY_METHOD  = 20;
+  params->SUSCEPT_METHOD   = 21;
 
   params->epsilon0  = 1./(4. * params->pi); //permittivity of free space, CGS units
   params->epsilon   = -1.;            //sign of electron charge

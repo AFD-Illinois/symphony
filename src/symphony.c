@@ -135,6 +135,7 @@ double alpha_nu(double nu,
                 double gamma_cutoff,
                 double kappa,
                 double kappa_width,
+		int chi_method,
 		char **error_message
                )
 {
@@ -165,7 +166,21 @@ double alpha_nu(double nu,
   global_gsl_error_message = &params.error_message;
   prev_handler = gsl_set_error_handler (_handle_gsl_error);
   set_distribution_function(&params);
-  retval = n_summation(&params);
+
+  /* Choose method to compute alpha_nu */
+  if(chi_method == params.SUSCEPT_METHOD)
+  {
+    params.omega   = 2. * params.pi * params.nu;
+    params.omega_c = 2. * params.pi * get_nu_c(params);
+    params.omega_p = get_omega_p(params);
+    params.real    = 1;
+
+    retval = alpha_nu_suscept(&params);
+  }
+  else
+  {
+    retval = n_summation(&params);
+  }
   gsl_set_error_handler (prev_handler);
   global_gsl_error_message = NULL;
 

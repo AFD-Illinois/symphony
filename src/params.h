@@ -26,6 +26,9 @@ struct parameters
   /*Keys for the mode: absorptivity or emissivity*/
   int    ABSORPTIVITY;
   int    EMISSIVITY;
+  /*Keys for alpha_nu computation method*/
+  int SYMPHONY_METHOD;
+  int SUSCEPT_METHOD;
 
   /*USER PARAMS:*/
   double nu;               /* GHz */
