@@ -175,6 +175,8 @@ double gamma_integrator(struct parameters * p);
 double end_approx(struct parameters * p);
 
 double alpha_nu_suscept(struct parameters * params);
+double rho_nu_suscept(struct parameters * params);
+
 double alpha_I(struct parameters * p);
 double alpha_Q(struct parameters * p);
 double alpha_V(struct parameters * p);

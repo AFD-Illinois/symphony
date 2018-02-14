@@ -1,4 +1,4 @@
-from symphonyHeaders cimport j_nu, alpha_nu, j_nu_fit, alpha_nu_fit, rho_nu_fit
+from symphonyHeaders cimport j_nu, alpha_nu, rho_nu, j_nu_fit, alpha_nu_fit, rho_nu_fit
 
 def j_nu_py(double nu,
             double magnetic_field,
@@ -51,6 +51,43 @@ def alpha_nu_py(double nu,
 
   """Returns alpha_nu(nu, magnetic_field, electron_density, observer_angle,
                       distribution, polarization, theta_e, power_law_p, 
+                      gamma_min, gamma_max, gamma_cutoff, kappa, kappa_width,
+                      chi_method).
+     Keys for distribution functions: symphonyPy.MAXWELL_JUETTNER, 
+                                      symphonyPy.POWER_LAW, 
+                                      symphonyPy.KAPPA_DIST
+     Keys for Stokes parameter: symphonyPy.STOKES_I,
+                                symphonyPy.STOKES_Q,
+                                symphonyPy.STOKES_U,
+                                symphonyPy.STOKES_V
+     Keys for chi_method: symphonyPy.SYMPHONY_METHOD
+			  symphonyPy.SUSCEPT_METHOD"""
+
+  cdef char* error_message = NULL
+  result = alpha_nu(nu, magnetic_field, electron_density,
+                    observer_angle, distribution, polarization,
+                    theta_e, power_law_p, gamma_min, gamma_max,
+                    gamma_cutoff, kappa, kappa_width, chi_method, &error_message)
+  if error_message:
+    raise RuntimeError (error_message)
+  return result
+
+def rho_nu_py(double nu,
+              double magnetic_field,
+              double electron_density,
+              double observer_angle,
+              int distribution,
+              int polarization,
+              double theta_e,
+              double power_law_p,
+              double gamma_min,
+              double gamma_max,
+              double gamma_cutoff,
+              double kappa,
+              double kappa_width):
+
+  """Returns rho_nu(nu, magnetic_field, electron_density, observer_angle,
+                      distribution, polarization, theta_e, power_law_p, 
                       gamma_min, gamma_max, gamma_cutoff, kappa, kappa_width).
      Keys for distribution functions: symphonyPy.MAXWELL_JUETTNER, 
                                       symphonyPy.POWER_LAW, 
@@ -61,10 +98,10 @@ def alpha_nu_py(double nu,
                                 symphonyPy.STOKES_V"""
 
   cdef char* error_message = NULL
-  result = alpha_nu(nu, magnetic_field, electron_density,
-                    observer_angle, distribution, polarization,
-                    theta_e, power_law_p, gamma_min, gamma_max,
-                    gamma_cutoff, kappa, kappa_width, chi_method, &error_message)
+  result = rho_nu(nu, magnetic_field, electron_density,
+               observer_angle, distribution, polarization,
+               theta_e, power_law_p, gamma_min, gamma_max,
+               gamma_cutoff, kappa, kappa_width, &error_message)
   if error_message:
     raise RuntimeError (error_message)
   return result

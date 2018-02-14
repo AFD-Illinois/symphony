@@ -109,7 +109,7 @@ double j_nu(double nu,
 }
 
 /*alpha_nu: wrapper for the absorptivity calculation; takes in values of all
- *          necessary paramters and sets a struct of parameters using the input
+ *          necessary parameters and sets a struct of parameters using the input
  *          values.  It then passes this struct to n_summation(), which begins
  *          the absorptivity calculation.
  *
@@ -121,7 +121,6 @@ double j_nu(double nu,
  *          parameters (now populated with values) and
  *          performs the integration to evaluate alpha_nu().
  */
-
 double alpha_nu(double nu,
                 double magnetic_field,
                 double electron_density,
@@ -173,7 +172,6 @@ double alpha_nu(double nu,
     params.omega   = 2. * params.pi * params.nu;
     params.omega_c = 2. * params.pi * get_nu_c(params);
     params.omega_p = get_omega_p(params);
-    params.real    = 1;
 
     retval = alpha_nu_suscept(&params);
   }
@@ -181,6 +179,86 @@ double alpha_nu(double nu,
   {
     retval = n_summation(&params);
   }
+  gsl_set_error_handler (prev_handler);
+  global_gsl_error_message = NULL;
+
+  /* Success? */
+
+  if (params.error_message == NULL)
+    return retval;
+
+  /* Something went wrong. Give the caller the error message if they
+   * provided us with a place to save it. */
+
+  if (error_message != NULL)
+    *error_message = params.error_message;
+
+  return NAN;
+}
+
+/*rho_nu: wrapper for the rotativities calculation; takes in values of all
+ *          necessary parameters and sets a struct of parameters using the input
+ *          values.  It then passes this struct to n_summation(), which begins
+ *          the absorptivity calculation.
+ *
+ *@params: nu, magnetic_field, electron_density, observer_angle,
+ *         distribution, polarization, theta_e, power_law_p,
+ *         gamma_min, gamma_max, gamma_cutoff, kappa,
+ *         kappa_width
+ *@returns: n_summation(&params), which takes the struct of
+ *          parameters (now populated with values) and
+ *          performs the integration to evaluate alpha_nu().
+ */
+double rho_nu(double nu,
+                double magnetic_field,
+                double electron_density,
+                double observer_angle,
+                int distribution,
+                int polarization,
+                double theta_e,
+                double power_law_p,
+                double gamma_min,
+                double gamma_max,
+                double gamma_cutoff,
+                double kappa,
+                double kappa_width,
+		char **error_message
+               )
+{
+  gsl_error_handler_t *prev_handler;
+  double retval;
+
+/*fill the struct with values*/
+  struct parameters params;
+  setConstParams(&params);
+  params.nu                 = nu;
+  params.magnetic_field     = magnetic_field;
+  params.observer_angle     = observer_angle;
+  params.electron_density   = electron_density;
+  params.distribution       = distribution;
+  params.polarization       = polarization;
+  params.mode               = params.ABSORPTIVITY;
+  params.theta_e            = theta_e;
+  params.power_law_p        = power_law_p;
+  params.gamma_min          = gamma_min;
+  params.gamma_max          = gamma_max;
+  params.gamma_cutoff       = gamma_cutoff;
+  params.kappa              = kappa;
+  params.kappa_width        = kappa_width;
+
+  if (error_message != NULL)
+    *error_message = NULL; /* Initialize the user's error message. */
+
+  global_gsl_error_message = &params.error_message;
+  prev_handler = gsl_set_error_handler (_handle_gsl_error);
+  set_distribution_function(&params);
+
+  params.omega   = 2. * params.pi * params.nu;
+  params.omega_c = 2. * params.pi * get_nu_c(params);
+  params.omega_p = get_omega_p(params);
+
+  retval = rho_nu_suscept(&params);
+
   gsl_set_error_handler (prev_handler);
   global_gsl_error_message = NULL;
 
