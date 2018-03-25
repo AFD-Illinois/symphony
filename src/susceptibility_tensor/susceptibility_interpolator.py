@@ -1294,7 +1294,20 @@ def spline_selector(real, component, gamma, omratio, angle):
 # gamma integrand for each component.  The term that changes between components
 #is chosen via the function spline_selector, above.
 
-def chi_ij_integrand(gamma, theta_e, omratio, angle, dist_func, component, real):
+def kappa_unnormalized(gamma, kappa, kappa_width):
+    beta = np.sqrt(1. - 1./gamma**2.)
+    body = (1. + (gamma - 1.)/(kappa * kappa_width))**(-1. - kappa)
+    d3p  = 4. * np.pi * gamma*gamma * beta
+    ans  = body * d3p
+    return ans
+
+def kappa_normalized(gamma, kappa, kappa_width):
+    norm_constant = 1./quad(lambda gamma: kappa_unnormalized(gamma, kappa, kappa_width), 1., np.inf)[0]
+    body = -(1. + (gamma - 1.)/(kappa * kappa_width))**(-2. - kappa)*(-1. - kappa) / (kappa_width * kappa)
+    ans = norm_constant * body
+    return ans
+
+def chi_ij_integrand(gamma, omratio, angle, dist_func, real, component, theta_e, power_law_p, gamma_min, gamma_max, gamma_cutoff, kappa, kappa_width):
     beta = np.sqrt(1. - 1./gamma**2.)
     
     if(dist_func == 0):
@@ -1304,7 +1317,9 @@ def chi_ij_integrand(gamma, theta_e, omratio, angle, dist_func, component, real)
                 / (4. * np.pi * (gamma_min**(-1. - p) 
                 - gamma_max**(-1. - p)) * beta * (gamma**2. - 1.)) 
                 * gamma**(-3. - p) )
-        
+    elif(dist_func == 2):
+       dist = kappa_normalized(gamma, kappa, kappa_width) 
+
     gam_term = dist * gamma**3. * beta**3.
     
     spline_term = spline_selector(real, component, gamma, omratio, angle)
@@ -1326,45 +1341,50 @@ def chi_ij(nu,
            kappa,
            kappa_width,
            component):
+
+    """returns chi_ij(nu, magnetic_field, electron_density, observer_angle,
+                      distribution, real_part, theta_e, power_law_p, gamma_min
+                      gamma_max, gamma_cutoff, kappa, kappa_width, component) """
     
     omega = 2. * np.pi * nu
     omega_p = np.sqrt(electron_density * e*e / (m * epsilon0))
     omega_c = e * magnetic_field / (m * c)
     
     prefactor = 2. * np.pi * omega_p*omega_p / (omega * omega)
-    ans = quad(lambda gamma: np.vectorize(chi_ij_integrand)(gamma, theta_e, omega / omega_c, 
-                                                            observer_angle, distribution, component, real_part), 
+    ans = quad(lambda gamma: np.vectorize(chi_ij_integrand)(gamma, omega / omega_c, 
+                                                            observer_angle, distribution, real_part,
+							    component, theta_e, power_law_p, gamma_min,
+							    gamma_max, gamma_cutoff, kappa, kappa_width), 
                gamma_min, gamma_max)[0] * prefactor
     return ans
 
-def chi_11_spline(nu,
-                  magnetic_field,
-                  electron_density,
-                  observer_angle,
-                  distribution,
-	          real_part,
-                  theta_e,
-                  power_law_p,
-                  gamma_min,
-                  gamma_max,
-                  gamma_cutoff,
-                  kappa,
-                  kappa_width):
-
-     return chi_ij(nu,
-           magnetic_field,
-           electron_density,
-           observer_angle,
-           distribution,
-           real_part,
-           theta_e,
-           power_law_p,
-           gamma_min,
-           gamma_max,
-           gamma_cutoff,
-           kappa,
-           kappa_width,
-           11)
+#def chi_11_spline(nu,
+#                  magnetic_field,
+#                  electron_density,
+#                  observer_angle,
+#                  distribution,
+#	          real_part,
+#                  theta_e,
+#                  power_law_p,
+#                  gamma_min,
+#                  gamma_max,
+#                  gamma_cutoff,
+#                  kappa,
+#                  kappa_width):
+#
+#     return chi_ij(nu,
+#           magnetic_field,
+#           electron_density,
+#           observer_angle,
+#           distribution,
+#           real_part,
+#           theta_e,
+#           power_law_p,
+#           gamma_min,
+#           gamma_max,
+#           gamma_cutoff,
+#           kappa,
+#           kappa_width,
+#           11)
 
 #print chi_11_spline(2799250.54225, 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10.)
-

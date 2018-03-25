@@ -150,12 +150,12 @@ double chi_33_symphony(double nu,
 double I_1_of_2(double alpha, double delta);
 double I_1_analytic(double alpha, double delta);
 double I_2_analytic(double alpha, double delta);
-double MJ(struct parameters * params);
-double PL(struct parameters * params);
-double kappa_unnormalized(double gamma, void * parameters);
+double dMJ_dgamma(struct parameters * params);
+double dPL_dgamma(struct parameters * params);
+double dkappa_dgamma_unnormalized(double gamma, void * parameters);
+double dkappa_dgamma(struct parameters * params);
 double normalize_f(double (*distribution)(double, void *),
                    struct parameters * params);
-double kappa(struct parameters * params);
 double Df(struct parameters * params);
 
 double chi_11_integrand(double tau_prime, void * parameters);

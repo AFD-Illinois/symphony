@@ -71,9 +71,7 @@ int main(int argc, char *argv[])
 
   for (int index=0; index <= max_index; index++) 
   {
-
     paramsM.nu = pow(10., (double)index/(double)points_per_pow_10) * nu_c;
-
     printf("\n%e	%e	%e", paramsM.nu/nu_c, 
                                      alpha_nu(paramsM.nu, 
                                           paramsM.magnetic_field, 
@@ -88,7 +86,7 @@ int main(int argc, char *argv[])
                                           paramsM.gamma_cutoff,      
                                           paramsM.kappa,              
                                           paramsM.kappa_width,
-					  paramsM.SUSCEPT_METHOD,
+					  paramsM.SYMPHONY_METHOD,
                                           &error_message
                                           ), 
                                  alpha_nu_fit(paramsM.nu,
