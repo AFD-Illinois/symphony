@@ -7,7 +7,7 @@ from scipy.integrate import quad
 
 #set up spline interpolation datafiles
 
-main_directory = '/home/alex/Desktop/chi_ij_files_theta/'
+main_directory = '/home/aapandy2/chi_ij_files_theta/'
 
 gamma = np.loadtxt(main_directory + 'step_array.txt')
 
@@ -1313,10 +1313,10 @@ def chi_ij_integrand(gamma, omratio, angle, dist_func, real, component, theta_e,
     if(dist_func == 0):
         dist = np.exp(-gamma/theta_e) / (4. * np.pi * theta_e**2. * special.kn(2, 1./theta_e))
     elif(dist_func == 1):
-        dist = ( (p - 1.) * (-1 + 2. * gamma**2. + p * (gamma**2. - 1.))
-                / (4. * np.pi * (gamma_min**(-1. - p) 
-                - gamma_max**(-1. - p)) * beta * (gamma**2. - 1.)) 
-                * gamma**(-3. - p) )
+        dist = ( (power_law_p - 1.) * (-1 + 2. * gamma**2. + power_law_p * (gamma**2. - 1.))
+                / (4. * np.pi * (gamma_min**(-1. - power_law_p) 
+                - gamma_max**(-1. - power_law_p)) * beta * (gamma**2. - 1.)) 
+                * gamma**(-3. - power_law_p) )
     elif(dist_func == 2):
        dist = kappa_normalized(gamma, kappa, kappa_width) 
 
@@ -1387,4 +1387,4 @@ def chi_ij(nu,
 #           kappa_width,
 #           11)
 
-#print chi_11_spline(2799250.54225, 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10.)
+#print chi_ij(2799250.54225, 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10., 11)
