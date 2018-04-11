@@ -216,7 +216,7 @@ double n_summation(struct parameters *params)
     n_integral_contrib = n_integration(n_minus, params->n_peak, params); 
     if(isnan(n_integral_contrib) == 0) ans += n_integral_contrib;
   }
-  
+ 
   return ans;
 }
 

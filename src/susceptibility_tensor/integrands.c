@@ -137,8 +137,6 @@ double dkappa_dgamma(struct parameters * params)
 	  previous_gamma_cutoff = params->gamma_cutoff;
 	}
 
-	printf("\n NORM: %e", norm);
-
 	double beta = sqrt(1. - 1./pow(params->gamma, 2.));
 
 	double body = -pow((1. + (params->gamma - 1.)/(params->kappa * params->kappa_width)), -2. - params->kappa)

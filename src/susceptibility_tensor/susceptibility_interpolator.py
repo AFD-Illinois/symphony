@@ -3,7 +3,7 @@ import pylab as pl
 
 from scipy.interpolate import interp2d
 import scipy.special as special
-from scipy.integrate import quad
+from scipy.integrate import quad, fixed_quad
 
 #set up spline interpolation datafiles
 
@@ -1309,23 +1309,43 @@ def kappa_normalized(gamma, kappa, kappa_width):
 
 def chi_ij_integrand(gamma, omratio, angle, dist_func, real, component, theta_e, power_law_p, gamma_min, gamma_max, gamma_cutoff, kappa, kappa_width):
     beta = np.sqrt(1. - 1./gamma**2.)
-    
+
     if(dist_func == 0):
-        dist = np.exp(-gamma/theta_e) / (4. * np.pi * theta_e**2. * special.kn(2, 1./theta_e))
+        dist = np.exp(-gamma/theta_e) / (4. * np.pi * theta_e**2. * special.kn(2, 1./theta_e)) * gamma**3. * beta**3.
     elif(dist_func == 1):
         dist = ( (power_law_p - 1.) * (-1 + 2. * gamma**2. + power_law_p * (gamma**2. - 1.))
-                / (4. * np.pi * (gamma_min**(-1. - power_law_p) 
-                - gamma_max**(-1. - power_law_p)) * beta * (gamma**2. - 1.)) 
-                * gamma**(-3. - power_law_p) )
+                / (4. * np.pi * (gamma_min**(-1. - power_law_p)
+                - gamma_max**(-1. - power_law_p)) * 1. * 1.)
+                * gamma**(-3. - power_law_p) ) * gamma
     elif(dist_func == 2):
-       dist = kappa_normalized(gamma, kappa, kappa_width) 
+       dist = kappa_normalized(gamma, kappa, kappa_width) * gamma**3. * beta**3.
 
-    gam_term = dist * gamma**3. * beta**3.
-    
+    gam_term = dist #* gamma**3. * beta**3.
+
     spline_term = spline_selector(real, component, gamma, omratio, angle)
-    
+
     ans = gam_term * spline_term
     return ans
+
+#def chi_ij_integrand(gamma, omratio, angle, dist_func, real, component, theta_e, power_law_p, gamma_min, gamma_max, gamma_cutoff, kappa, kappa_width):
+#    beta = np.sqrt(1. - 1./gamma**2.)
+#    
+#    if(dist_func == 0):
+#        dist = np.exp(-gamma/theta_e) / (4. * np.pi * theta_e**2. * special.kn(2, 1./theta_e))
+#    elif(dist_func == 1):
+#        dist = ( (power_law_p - 1.) * (-1 + 2. * gamma**2. + power_law_p * (gamma**2. - 1.))
+#                / (4. * np.pi * (gamma_min**(-1. - power_law_p) 
+#                - gamma_max**(-1. - power_law_p)) * beta * (gamma**2. - 1.)) 
+#                * gamma**(-3. - power_law_p) )
+#    elif(dist_func == 2):
+#       dist = kappa_normalized(gamma, kappa, kappa_width) 
+#
+#    gam_term = dist * gamma**3. * beta**3.
+#    
+#    spline_term = spline_selector(real, component, gamma, omratio, angle)
+#    
+#    ans = gam_term * spline_term
+#    return ans
 
 def chi_ij(nu,
            magnetic_field,
@@ -1349,13 +1369,14 @@ def chi_ij(nu,
     omega = 2. * np.pi * nu
     omega_p = np.sqrt(electron_density * e*e / (m * epsilon0))
     omega_c = e * magnetic_field / (m * c)
-    
+
     prefactor = 2. * np.pi * omega_p*omega_p / (omega * omega)
     ans = quad(lambda gamma: np.vectorize(chi_ij_integrand)(gamma, omega / omega_c, 
                                                             observer_angle, distribution, real_part,
 							    component, theta_e, power_law_p, gamma_min,
 							    gamma_max, gamma_cutoff, kappa, kappa_width), 
-               gamma_min, gamma_max)[0] * prefactor
+               1., 1e4, epsabs=0, epsrel=1e-7, limit=5000)[0] * prefactor #NOTE: limits are bounds of interpolated data in gamma
+    
     return ans
 
 #def chi_11_spline(nu,
@@ -1363,7 +1384,7 @@ def chi_ij(nu,
 #                  electron_density,
 #                  observer_angle,
 #                  distribution,
-#	          real_part,
+#	           real_part,
 #                  theta_e,
 #                  power_law_p,
 #                  gamma_min,
@@ -1387,4 +1408,9 @@ def chi_ij(nu,
 #           kappa_width,
 #           11)
 
-#print chi_ij(2799250.54225, 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10., 11)
+#print chi_ij_integrand(1., 1., np.pi/3., 1, 1, 11, 10., 3., 1., 1000, 1e10, 3.5, 10.)
+
+#gamma = np.linspace(1, 3, 1000)
+#pl.plot(gamma, -chi_ij_integrand(gamma, 1., np.pi/3., 1, 1, 11, 10., 3., 1., 1000, 1e10, 3.5, 10.))
+#pl.show()
+#print chi_ij(10. * 2799250.54225, 1, 1., np.pi/3., 1, 1, 10., 3., 1., 1000., 1e10, 3.5, 10., 11)
