@@ -25,10 +25,10 @@ int main(int argc, char *argv[])
   setConstParams(&paramsM);
 
 //set some the parameters
-  paramsM.magnetic_field     = 1.; //TODO: change this
+  paramsM.magnetic_field     = 30.; //TODO: change this
   paramsM.electron_density   = 1.;
   paramsM.observer_angle     = paramsM.pi/3.;
-  paramsM.distribution       = paramsM.MAXWELL_JUETTNER;
+  paramsM.distribution       = paramsM.POWER_LAW;
   paramsM.polarization       = paramsM.STOKES_I;
   paramsM.theta_e            = 10.;
   paramsM.power_law_p        = 3.;
@@ -46,28 +46,46 @@ int main(int argc, char *argv[])
   int max_index = (int) log10(max_nuratio)*points_per_pow_10;
   char *error_message = NULL;
 
-  paramsM.nu = nu_c;
+  paramsM.nu = 10. * nu_c;
   paramsM.omega = 2. * paramsM.pi * paramsM.nu;
   paramsM.omega_c = 2. * paramsM.pi * nu_c;
   paramsM.omega_p = omega_p;
   paramsM.real = 1;
 
-//  printf("\n%e", chi_11(&paramsM));
+  printf("\n nu/nu_c        alpha_nu      alpha_nu_fit");
 
-//  printf("\n%e    %e\n", paramsM.omega/paramsM.omega_c, chi_12_symphony(nu_c,
-//									paramsM.magnetic_field,
-//									paramsM.electron_density,
-//									paramsM.observer_angle,
-//									paramsM.distribution,
-//									paramsM.real,
-//									paramsM.theta_e,
-//									paramsM.power_law_p,
-//									paramsM.gamma_min,
-//									paramsM.gamma_max,
-//									paramsM.gamma_cutoff,
-//									paramsM.kappa,
-//									paramsM.kappa_width,
-//									&error_message));
+//  printf("\n%e        %e      %e", paramsM.nu/nu_c,
+//                                     alpha_nu(paramsM.nu,
+//                                          paramsM.magnetic_field,
+//                                          paramsM.electron_density,
+//                                          paramsM.observer_angle,
+//                                          paramsM.distribution,
+//                                          paramsM.polarization,
+//                                          paramsM.theta_e,
+//                                          paramsM.power_law_p,
+//                                          paramsM.gamma_min,
+//                                          paramsM.gamma_max,
+//                                          paramsM.gamma_cutoff,
+//                                          paramsM.kappa,
+//                                          paramsM.kappa_width,
+//                                          paramsM.SYMPHONY_METHOD,
+//					  &error_message
+//                                          ),
+//                                 alpha_nu_fit(paramsM.nu,
+//                                          paramsM.magnetic_field,
+//                                          paramsM.electron_density,
+//                                          paramsM.observer_angle,
+//                                          paramsM.distribution,
+//                                          paramsM.polarization,
+//                                          paramsM.theta_e,
+//                                          paramsM.power_law_p,
+//                                          paramsM.gamma_min,
+//                                          paramsM.gamma_max,
+//                                          paramsM.gamma_cutoff,
+//                                          paramsM.kappa,
+//                                          paramsM.kappa_width
+//                                          ));
+
 
   for (int index=0; index <= max_index; index++) 
   {
@@ -103,6 +121,37 @@ int main(int argc, char *argv[])
                                           paramsM.kappa,             
                                           paramsM.kappa_width
 				          ));
+
+//printf("\n%e        %e      %e", paramsM.nu/nu_c,
+//                                     j_nu(paramsM.nu,
+//                                          paramsM.magnetic_field,
+//                                          paramsM.electron_density,
+//                                          paramsM.observer_angle,
+//                                          paramsM.distribution,
+//                                          paramsM.polarization,
+//                                          paramsM.theta_e,
+//                                          paramsM.power_law_p,
+//                                          paramsM.gamma_min,
+//                                          paramsM.gamma_max,
+//                                          paramsM.gamma_cutoff,
+//                                          paramsM.kappa,
+//                                          paramsM.kappa_width,
+//                                          &error_message
+//                                          ),
+//                                 j_nu_fit(paramsM.nu,
+//                                          paramsM.magnetic_field,
+//                                          paramsM.electron_density,
+//                                          paramsM.observer_angle,
+//                                          paramsM.distribution,
+//                                          paramsM.polarization,
+//                                          paramsM.theta_e,
+//                                          paramsM.power_law_p,
+//                                          paramsM.gamma_min,
+//                                          paramsM.gamma_max,
+//                                          paramsM.gamma_cutoff,
+//                                          paramsM.kappa,
+//                                          paramsM.kappa_width
+//                                          ));
 
   }
   printf("\n");

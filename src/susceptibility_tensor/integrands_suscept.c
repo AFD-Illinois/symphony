@@ -76,13 +76,13 @@ double dkappa_dgamma_unnormalized(double gamma, void * parameters)
         return ans;
 }
 
-/*normalize_f: normalizes the distribution function using GSL's 
- *             QAGIU integrator.   
+/*normalize_f_suscept: normalizes the distribution function using GSL's 
+ *                     QAGIU integrator.   
  *
  *@params: struct of parameters to pass to distribution function
  *@returns: 1 over the normalization constant for the chosen distribution
  */
-double normalize_f(double (*distribution)(double, void *),
+double normalize_f_suscept(double (*distribution)(double, void *),
                    struct parameters * params
                   )
 {
@@ -131,7 +131,7 @@ double dkappa_dgamma(struct parameters * params)
 	if(norm == 0. || previous_kappa_width != params->kappa_width
 	              || previous_kappa       != params->kappa)
 	{
-	  norm                  = 1./normalize_f(&dkappa_dgamma_unnormalized, params);
+	  norm                  = 1./normalize_f_suscept(&dkappa_dgamma_unnormalized, params);
 	  previous_kappa        = params->kappa;
 	  previous_kappa_width  = params->kappa_width;
 	  previous_gamma_cutoff = params->gamma_cutoff;

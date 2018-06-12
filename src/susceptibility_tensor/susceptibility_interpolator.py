@@ -1386,5 +1386,4 @@ def chi_ij(nu,
 #           kappa,
 #           kappa_width,
 #           11)
-
 #print chi_11_spline(2799250.54225, 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10.)

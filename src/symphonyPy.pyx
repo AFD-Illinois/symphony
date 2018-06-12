@@ -198,6 +198,9 @@ def rho_nu_fit_py(double nu,
                       gamma_cutoff, kappa, kappa_width)
 
 
+#DEFINE KEYS FOR ABSORPTIVITY CALCULATION APPROACHES
+SYMPHONY_METHOD = 20
+SUSCEPT_METHOD  = 21
 
 #DEFINE KEYS FOR DISTRIBUTION FUNCTIONS
 MAXWELL_JUETTNER = 0

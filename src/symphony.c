@@ -95,7 +95,6 @@ double j_nu(double nu,
   global_gsl_error_message = NULL;
 
   /* Success? */
-
   if (params.error_message == NULL)
     return retval;
 
@@ -210,20 +209,19 @@ double alpha_nu(double nu,
  *          performs the integration to evaluate alpha_nu().
  */
 double rho_nu(double nu,
-                double magnetic_field,
-                double electron_density,
-                double observer_angle,
-                int distribution,
-                int polarization,
-                double theta_e,
-                double power_law_p,
-                double gamma_min,
-                double gamma_max,
-                double gamma_cutoff,
-                double kappa,
-                double kappa_width,
-		char **error_message
-               )
+              double magnetic_field,
+              double electron_density,
+              double observer_angle,
+              int distribution,
+              int polarization,
+              double theta_e,
+              double power_law_p,
+              double gamma_min,
+              double gamma_max,
+              double gamma_cutoff,
+              double kappa,
+              double kappa_width,
+	      char **error_message)
 {
   gsl_error_handler_t *prev_handler;
   double retval;

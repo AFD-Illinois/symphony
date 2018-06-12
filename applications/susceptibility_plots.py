@@ -1,9 +1,3 @@
-
-# coding: utf-8
-
-# In[1]:
-
-get_ipython().magic(u'matplotlib inline')
 import numpy as np
 import pylab as pl
 
@@ -12,6 +6,7 @@ sys.path.insert(0, '../src/susceptibility_tensor')
 sys.path.insert(0, '../build')
 from susceptibility_interpolator import chi_ij
 import susceptibility_tensor.susceptibilityPy as susp
+import symphonyPy as sp
 
 # Set plot parameters to make beautiful plots
 pl.rcParams['figure.figsize']  = 12, 7.5
@@ -41,9 +36,6 @@ pl.rcParams['ytick.color']      = 'k'
 pl.rcParams['ytick.labelsize']  = 'large'
 pl.rcParams['ytick.direction']  = 'in'
 
-
-# In[3]:
-
 #define constants
 epsilon0  = 1./(4. * np.pi)
 e         = 4.80320680e-10
@@ -57,28 +49,128 @@ def nu_c(magnetic_field):
 
 nuratio = np.logspace(0., 1., 3)
 
-print nu_c(1.)
+magnetic_field = 30.
+nu = nu_c(magnetic_field)
+electron_density = 1.
+observer_angle = np.pi/3.
+distribution = sp.MAXWELL_JUETTNER
+polarization = sp.STOKES_I
+theta_e = 10.
+power_law_p = 3.
+gamma_min = 1.
+gamma_max = 1000.
+gamma_cutoff = 1.e10
+kappa = 3.5
+kappa_width = 10.
+chi_method = sp.SYMPHONY_METHOD
 
+symphony_result = sp.alpha_nu_py(nu, 
+				 magnetic_field, 
+		 		 electron_density, 
+		 		 observer_angle, 
+		 		 distribution, 
+		 		 polarization, 
+		 		 theta_e, 
+		 		 power_law_p, 
+		 		 gamma_min, 
+		 		 gamma_max, 
+		 		 gamma_cutoff, 
+		 		 kappa, 
+		 		 kappa_width,
+		 		 chi_method)
 
-# In[4]:
+def interp_alpha_I(nu,
+                   magnetic_field,
+                   electron_density,
+                   observer_angle,
+                   distribution,
+                   polarization,
+                   theta_e,
+                   power_law_p,
+                   gamma_min,
+                   gamma_max,
+                   gamma_cutoff,
+                   kappa,
+                   kappa_width):
+	real_part = 0
+	omega = 2. * np.pi * nu
+	prefactor = 2. * np.pi * epsilon0 * omega/c
+	chi_11 = chi_ij(nu,
+                             magnetic_field,
+                             electron_density,
+                             observer_angle,
+                             distribution,
+                             real_part,
+                             theta_e,
+                             power_law_p,
+                             gamma_min,
+                             gamma_max,
+                             gamma_cutoff,
+                             kappa,
+                             kappa_width,
+                             11)
+	chi_13 = chi_ij(nu,
+                             magnetic_field,
+                             electron_density,
+                             observer_angle,
+                             distribution,
+                             real_part,
+                             theta_e,
+                             power_law_p,
+                             gamma_min,
+                             gamma_max,
+                             gamma_cutoff,
+                             kappa,
+                             kappa_width,
+                             13)
+	chi_22 = chi_ij(nu,
+                             magnetic_field,
+                             electron_density,
+                             observer_angle,
+                             distribution,
+                             real_part,
+                             theta_e,
+                             power_law_p,
+                             gamma_min,
+                             gamma_max,
+                             gamma_cutoff,
+                             kappa,
+                             kappa_width,
+                             22)
+	chi_33 = chi_ij(nu,
+                             magnetic_field,
+                             electron_density,
+                             observer_angle,
+                             distribution,
+                             real_part,
+                             theta_e,
+                             power_law_p,
+                             gamma_min,
+                             gamma_max,
+                             gamma_cutoff,
+                             kappa,
+                             kappa_width,
+                             33)
 
-pl.loglog(nuratio, -np.vectorize(chi_ij)(nuratio * nu_c(1.), 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10., 11), label='$-\\chi_{11}$')
-pl.loglog(nuratio, np.vectorize(chi_ij)(nuratio * nu_c(1.), 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10., 12), label='$\\chi_{12}$')
-pl.loglog(nuratio, -np.vectorize(chi_ij)(nuratio * nu_c(1.), 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10., 13), label='$-\\chi_{13}$')
-pl.loglog(nuratio, -np.vectorize(chi_ij)(nuratio * nu_c(1.), 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10., 22), label='$-\\chi_{22}$')
-pl.loglog(nuratio, np.vectorize(chi_ij)(nuratio * nu_c(1.), 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10., 32), label='$\\chi_{32}$')
-pl.loglog(nuratio, -np.vectorize(chi_ij)(nuratio * nu_c(1.), 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10., 33), label='$-\\chi_{33}$')
+	term11 = (chi_11 * np.cos(observer_angle)**2. 
+		  + chi_33*np.sin(observer_angle)**2. 
+                  - 2. * chi_13 * np.sin(observer_angle) * np.cos(observer_angle))
+	term22 = chi_22
+	ans = prefactor * (term11 + term22)
+	return ans
 
-pl.legend(loc='lower left')
+interp_result = interp_alpha_I(nu,
+                               magnetic_field,
+                               electron_density,
+                               observer_angle,
+                               distribution,
+                               polarization,
+                               theta_e,
+                               power_law_p,
+                               gamma_min,
+                               gamma_max,
+                               gamma_cutoff,
+                               kappa,
+                               kappa_width)
 
-
-# In[5]:
-
-pl.loglog(nuratio, -np.vectorize(chi_ij)(nuratio * nu_c(1.), 1, 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10., 11))
-pl.loglog(nuratio, -np.vectorize(susp.chi_11_symphony_py)(nuratio * nu_c(1.), 1., 1., np.pi/3., 0, 1, 10., 3., 1., 1000., 1e10, 3.5, 10.))
-
-
-# In[ ]:
-
-
-
+print symphony_result, interp_result

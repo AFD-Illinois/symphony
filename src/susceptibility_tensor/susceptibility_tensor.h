@@ -154,7 +154,7 @@ double dMJ_dgamma(struct parameters * params);
 double dPL_dgamma(struct parameters * params);
 double dkappa_dgamma_unnormalized(double gamma, void * parameters);
 double dkappa_dgamma(struct parameters * params);
-double normalize_f(double (*distribution)(double, void *),
+double normalize_f_suscept(double (*distribution)(double, void *),
                    struct parameters * params);
 double Df(struct parameters * params);
 

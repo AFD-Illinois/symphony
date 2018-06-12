@@ -1,4 +1,4 @@
-add_library(susceptibility_tensor susceptibility_tensor.h mueller_matrix.c chi_ij.c integrands.c integrator.c ../params.c ../params.h)
+add_library(susceptibility_tensor susceptibility_tensor.h mueller_matrix.c chi_ij.c integrands_suscept.c integrator.c ../params.c ../params.h)
 
 cython_add_module(susceptibilityPy susceptibilityPy.pyx)
 
