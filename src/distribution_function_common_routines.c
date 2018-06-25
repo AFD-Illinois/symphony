@@ -101,7 +101,7 @@ double numerical_differential_of_f(double gamma, struct parameters * params)
                          *params->speed_light*params->speed_light))
                      * gyrophase_indep
                      * d3p_to_dgamma;
- 
+
   /*The if statements below are necessary because for some values of
     gamma, the quantity distribution_function(gamma+epsilon) or
     distribution_function(gamma-epsilon) is complex, and returns

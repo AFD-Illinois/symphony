@@ -791,9 +791,6 @@ double alpha_V(struct parameters *p)
 	double prefactor   = 4. * p->pi * p->epsilon0 * p->omega / p->speed_light;
 	double term1     = (chi_12(p) * cos(p->observer_angle) - chi_32(p) * sin(p->observer_angle));
 	double ans       = prefactor * term1;
-	
-        printf("\nprefactor: %e term1:  %e ans: %e", prefactor, term1, ans);
-
 	return ans;
 }
 
