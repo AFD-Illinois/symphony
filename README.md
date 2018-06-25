@@ -1,3 +1,5 @@
+TODO: add __init__.py to build/ folder and build/susceptibility_tensor/ folder
+
 #*symphony*
 
 ##Overview
