@@ -1303,7 +1303,7 @@ def kappa_unnormalized(gamma, kappa, kappa_width):
 
 def kappa_normalized(gamma, kappa, kappa_width):
     norm_constant = 1./quad(lambda gamma: kappa_unnormalized(gamma, kappa, kappa_width), 1., np.inf)[0]
-    body = -(1. + (gamma - 1.)/(kappa * kappa_width))**(-2. - kappa)*(-1. - kappa) / (kappa_width * kappa)
+    body = (1. + (gamma - 1.)/(kappa * kappa_width))**(-2. - kappa)*(-1. - kappa) / (kappa_width * kappa)
     ans = norm_constant * body
     return ans
 
@@ -1311,41 +1311,23 @@ def chi_ij_integrand(gamma, omratio, angle, dist_func, real, component, theta_e,
     beta = np.sqrt(1. - 1./gamma**2.)
 
     if(dist_func == 0):
-        dist = np.exp(-gamma/theta_e) / (4. * np.pi * theta_e**2. * special.kn(2, 1./theta_e)) * gamma**3. * beta**3.
+        dist = -np.exp(-gamma/theta_e) / (4. * np.pi * theta_e**2. * special.kn(2, 1./theta_e)) * gamma**3. * beta**3.
     elif(dist_func == 1):
-        dist = ( (power_law_p - 1.) * (-1 + 2. * gamma**2. + power_law_p * (gamma**2. - 1.))
+        dist = -( (power_law_p - 1.) * (-1 + 2. * gamma**2. + power_law_p * (gamma**2. - 1.))
                 / (4. * np.pi * (gamma_min**(-1. - power_law_p)
                 - gamma_max**(-1. - power_law_p)) * 1. * 1.)
                 * gamma**(-3. - power_law_p) ) * gamma
     elif(dist_func == 2):
        dist = kappa_normalized(gamma, kappa, kappa_width) * gamma**3. * beta**3.
 
-    gam_term = dist #* gamma**3. * beta**3.
+    gam_term = dist
 
-    spline_term = spline_selector(real, component, gamma, omratio, angle)
+    #NOTE: due to a bug, all datafiles contain a *-1 error; we correct it below.
+    #the bug is corrected throughout the code.
+    spline_term = -spline_selector(real, component, gamma, omratio, angle)
 
     ans = gam_term * spline_term
     return ans
-
-#def chi_ij_integrand(gamma, omratio, angle, dist_func, real, component, theta_e, power_law_p, gamma_min, gamma_max, gamma_cutoff, kappa, kappa_width):
-#    beta = np.sqrt(1. - 1./gamma**2.)
-#    
-#    if(dist_func == 0):
-#        dist = np.exp(-gamma/theta_e) / (4. * np.pi * theta_e**2. * special.kn(2, 1./theta_e))
-#    elif(dist_func == 1):
-#        dist = ( (power_law_p - 1.) * (-1 + 2. * gamma**2. + power_law_p * (gamma**2. - 1.))
-#                / (4. * np.pi * (gamma_min**(-1. - power_law_p) 
-#                - gamma_max**(-1. - power_law_p)) * beta * (gamma**2. - 1.)) 
-#                * gamma**(-3. - power_law_p) )
-#    elif(dist_func == 2):
-#       dist = kappa_normalized(gamma, kappa, kappa_width) 
-#
-#    gam_term = dist * gamma**3. * beta**3.
-#    
-#    spline_term = spline_selector(real, component, gamma, omratio, angle)
-#    
-#    ans = gam_term * spline_term
-#    return ans
 
 def chi_ij(nu,
            magnetic_field,
@@ -1378,32 +1360,3 @@ def chi_ij(nu,
                1., 1e4, epsabs=0, epsrel=1e-7, limit=5000)[0] * prefactor #NOTE: limits are bounds of interpolated data in gamma
     
     return ans
-
-#def chi_11_spline(nu,
-#                  magnetic_field,
-#                  electron_density,
-#                  observer_angle,
-#                  distribution,
-#	           real_part,
-#                  theta_e,
-#                  power_law_p,
-#                  gamma_min,
-#                  gamma_max,
-#                  gamma_cutoff,
-#                  kappa,
-#                  kappa_width):
-#
-#     return chi_ij(nu,
-#           magnetic_field,
-#           electron_density,
-#           observer_angle,
-#           distribution,
-#           real_part,
-#           theta_e,
-#           power_law_p,
-#           gamma_min,
-#           gamma_max,
-#           gamma_cutoff,
-#           kappa,
-#           kappa_width,
-#           11)

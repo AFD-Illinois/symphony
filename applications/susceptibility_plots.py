@@ -194,24 +194,24 @@ component = 22
 dist = 1
 real_part = 1
 
-#nu = 10.*nu_c(B)
+nu = 10.*nu_c(B)
 
-#print nu_c(B)
+print nu_c(B)
+
+print 'setup done'
+interp = chi_ij(nu, B, n_e, theta, dist, real_part, theta_e, p, gamma_min, gamma_max, gamma_cutoff, kappa, w, component)
+print 'interp done'
+integrated = susp.chi_12_symphony_py(nu, B, n_e, theta, dist, real_part, theta_e, p, gamma_min, gamma_max, gamma_cutoff, kappa, w)
+
+print 'interp    :', interp
+print 'integrated:', integrated
+print 'error     :', np.abs((interp - integrated)/integrated)
+
+#spline = np.vectorize(chi_ij)(nu, B, n_e, theta, dist, real_part, theta_e, p, gamma_min, gamma_max, gamma_cutoff, kappa, w, component)
+#integrated = np.vectorize(susp.chi_22_symphony_py)(nu, B, n_e, theta, dist, real_part, theta_e, p, gamma_min, gamma_max, gamma_cutoff, kappa, w)
+#error = np.abs((spline - integrated)/integrated)
 #
-#print 'setup done'
-#interp = chi_ij(nu, B, n_e, theta, dist, real_part, theta_e, p, gamma_min, gamma_max, gamma_cutoff, kappa, w, component)
-#print 'interp done'
-#integrated = susp.chi_12_symphony_py(nu, B, n_e, theta, dist, real_part, theta_e, p, gamma_min, gamma_max, gamma_cutoff, kappa, w)
-#
-#print 'interp    :', interp
-#print 'integrated:', integrated
-#print 'error     :', np.abs((interp - integrated)/integrated)
-
-spline = np.vectorize(chi_ij)(nu, B, n_e, theta, dist, real_part, theta_e, p, gamma_min, gamma_max, gamma_cutoff, kappa, w, component)
-integrated = np.vectorize(susp.chi_22_symphony_py)(nu, B, n_e, theta, dist, real_part, theta_e, p, gamma_min, gamma_max, gamma_cutoff, kappa, w)
-error = np.abs((spline - integrated)/integrated)
-
-np.savetxt('chi_22_real_' + '60' + 'deg_PL_error.txt', error)
+#np.savetxt('chi_22_real_' + '60' + 'deg_PL_error.txt', error)
 
 #np.savetxt('chi_11_real_' + str(angles[rank]) + 'deg_error.txt', error)
 
