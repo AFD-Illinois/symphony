@@ -725,14 +725,14 @@ double rho_nu_suscept(struct parameters * params)
  */
 double alpha_I(struct parameters *p)
 {
-	p->real          = 0;
-        double prefactor = 2. * p->pi * p->epsilon0 * p->omega / p->speed_light;
-        double term11    = (chi_11(p) * pow(cos(p->observer_angle), 2.)  
-			  + chi_33(p) * pow(sin(p->observer_angle), 2.)
-			  - 2. * chi_13(p) * sin(p->observer_angle) * cos(p->observer_angle));
-	double term22    = chi_22(p);
-        double ans       = prefactor * (term11 + term22);
-        return ans;
+  p->real          = 0;
+  double prefactor = 2. * p->pi * p->epsilon0 * p->omega / p->speed_light;
+  double term11    = (chi_11(p) * pow(cos(p->observer_angle), 2.)  
+  		    + chi_33(p) * pow(sin(p->observer_angle), 2.)
+  		  - 2.*chi_13(p)*sin(p->observer_angle)*cos(p->observer_angle));
+  double term22    = chi_22(p);
+  double ans       = prefactor * (term11 + term22);
+  return ans;
 }
 
 /*alpha_Q: returns the absorption coefficient alpha_Q, for linearly polarized
@@ -745,14 +745,14 @@ double alpha_I(struct parameters *p)
  */
 double alpha_Q(struct parameters *p)
 {
-        p->real          = 0;
-        double prefactor = 2. * p->pi * p->epsilon0 * p->omega / p->speed_light;
-        double term11    = (chi_11(p) * pow(cos(p->observer_angle), 2.)
-                          + chi_33(p) * pow(sin(p->observer_angle), 2.)
-                          - 2. * chi_13(p) * sin(p->observer_angle) * cos(p->observer_angle));
-        double term22    = chi_22(p);
-        double ans       = prefactor * (term11 - term22);
-        return ans;
+  p->real          = 0;
+  double prefactor = 2. * p->pi * p->epsilon0 * p->omega / p->speed_light;
+  double term11    = (chi_11(p) * pow(cos(p->observer_angle), 2.)
+                   + chi_33(p) * pow(sin(p->observer_angle), 2.)
+                   -2.*chi_13(p)*sin(p->observer_angle)*cos(p->observer_angle));
+  double term22    = chi_22(p);
+  double ans       = prefactor * (term11 - term22);
+  return ans;
 }
 
 /*rho_Q: returns the Faraday conversion coefficient rho_Q, which corresponds
@@ -766,14 +766,14 @@ double alpha_Q(struct parameters *p)
  */
 double rho_Q(struct parameters *p)
 {
-        p->real          = 1;
-        double prefactor = 2. * p->pi * p->epsilon0 * p->omega / p->speed_light;
-        double term11    = (chi_11(p) * pow(cos(p->observer_angle), 2.)
-                          + chi_33(p) * pow(sin(p->observer_angle), 2.)
-                          - 2. * chi_13(p) * sin(p->observer_angle) * cos(p->observer_angle));
-        double term22    = chi_22(p);
-        double ans       = prefactor * (term22 - term11);
-        return ans;
+  p->real          = 1;
+  double prefactor = 2. * p->pi * p->epsilon0 * p->omega / p->speed_light;
+  double term11    =(chi_11(p) * pow(cos(p->observer_angle), 2.)
+                   +chi_33(p) * pow(sin(p->observer_angle), 2.)
+                   -2.*chi_13(p)*sin(p->observer_angle)*cos(p->observer_angle));
+  double term22    = chi_22(p);
+  double ans       = prefactor * (term22 - term11);
+  return ans;
 }
 
 /*alpha_V: returns the absorption coefficient alpha_V, for the circularly
@@ -787,11 +787,12 @@ double rho_Q(struct parameters *p)
  */
 double alpha_V(struct parameters *p)
 {
-	p->real            = 1;
-	double prefactor   = 4. * p->pi * p->epsilon0 * p->omega / p->speed_light;
-	double term1     = (chi_12(p) * cos(p->observer_angle) - chi_32(p) * sin(p->observer_angle));
-	double ans       = prefactor * term1;
-	return ans;
+  p->real          = 1;
+  double prefactor = 4. * p->pi * p->epsilon0 * p->omega / p->speed_light;
+  double term1     = (chi_12(p) * cos(p->observer_angle) 
+                      - chi_32(p) * sin(p->observer_angle));
+  double ans       = prefactor * term1;
+  return ans;
 }
 
 /*rho_V: returns the Faraday rotation coefficient rho_V, which rotates the
@@ -804,75 +805,45 @@ double alpha_V(struct parameters *p)
  */
 double rho_V(struct parameters *p)
 {
-        p->real          = 0;
-        double prefactor = 4. * p->pi * p->epsilon0 * p->omega / p->speed_light;
-        double term1     = (chi_12(p) * cos(p->observer_angle) - chi_32(p) * sin(p->observer_angle));
-        double ans       = prefactor * term1;
-        return ans;
+  p->real          = 0;
+  double prefactor = 4. * p->pi * p->epsilon0 * p->omega / p->speed_light;
+  double term1     = (chi_12(p) * cos(p->observer_angle) 
+                      - chi_32(p) * sin(p->observer_angle));
+  double ans       = prefactor * term1;
+  return ans;
 }
 
-///*plotter: prints the values of the gamma integrand for the component of chi_ij
-// *         determined by p.tau_integrand, from gamma=start to gamma=end, in
-// *         increments of step.  These values are printed to a file called
-// *         output.txt, and can be plotted easily by an external plotting
-// *         software to determine if the gamma integrand is being properly
-// *         resolved.
-// *
-// *@params: struct of parameters p
-// *
-// *@returns: 0 when completed and prints the gamma integrand to a file for
-// *          plotting //TODO: make this function return nothing? 
-// */
-//double plotter(struct parameters p)
-//{
-//	FILE *fp;
-//	fp = fopen("output.txt", "w");
-//
-//	double start = 1.;
-//	double end   = 1.01;
-//	double i     = start;
-//	double step  = 0.00001;
-//
-//	p.tau_integrand = &chi_12_integrand;
-//
-//        while(i < end)
-//        {
-//
-//		fprintf(fp, "\n%e    %e", i, tau_integrator(i, &p));
-//		printf("\n%e", i);
-//                i = i + step;
-//        }
-//        printf("\n");
-//
-//	return 0.;
-//}
-//
-///*main: sets parameters, runs some calculation, and prints the CPU time elapsed
-// *
-// *@params: none
-// *
-// *@returns: nothing
-// */
-//int main(void)
-//{
-//	/*start timer*/
-//	clock_t start = clock(), diff;
-//        struct parameters p;
-//
-//	/*set parameters*/
-//        setConstParams(&p);
-//	//set_params(&p);
-//	p.omega = 1. * p.omega_c;
-//	p.real  = 1;
-//
-//	/*print gamma	gamma_integrand(gamma) with the function plotter(params)*/
-////	plotter(p);
-//
-//	/*print omega/omega_c	alpha_I(params)*/
-//	printf("\n%e    %e\n", p.omega/p.omega_c, alpha_V(&p));
-//
-//	/*calculate and print elapsed time*/
-//	diff = clock() - start;
-//	int msec = diff * 1000 / CLOCKS_PER_SEC;
-//	printf("Time taken %d seconds %d milliseconds\n", msec/1000, msec%1000);
-//}
+/*plotter: prints the values of the gamma integrand for the component of chi_ij
+ *         determined by p.tau_integrand, from gamma=start to gamma=end, in
+ *         increments of step.  These values are printed to a file called
+ *         output.txt, and can be plotted easily by an external plotting
+ *         software to determine if the gamma integrand is being properly
+ *         resolved.
+ *
+ *@params: struct of parameters p
+ *
+ *@returns: 0 when completed and prints the gamma integrand to a file for
+ *          plotting
+ */
+double plotter(struct parameters p)
+{
+  FILE *fp;
+  fp = fopen("output.txt", "w");
+  
+  double start = 1.;
+  double end   = 1.01;
+  double i     = start;
+  double step  = 0.00001;
+  
+  p.tau_integrand = &chi_12_integrand;
+  
+  while(i < end)
+  {
+    fprintf(fp, "\n%e    %e", i, tau_integrator(i, &p));
+    printf("\n%e", i);
+    i = i + step;
+  }
+  printf("\n");
+  
+  return 0.;
+}

@@ -6,8 +6,7 @@ import scipy.special as special
 from scipy.integrate import quad, fixed_quad
 
 #set up spline interpolation datafiles
-
-main_directory = '/home/aapandy2/chi_ij_files_theta/'
+main_directory = './kernel_samples_datafiles/'
 
 gamma = np.loadtxt(main_directory + 'step_array.txt')
 
