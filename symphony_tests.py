@@ -326,7 +326,8 @@ print 'Maxwell-Juettner Absorptivities'
 
 MJ_I_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                   sp.STOKES_I, theta_e, power_law_p, gamma_min,
-                  gamma_max, gamma_cutoff, kappa, kappa_width)
+                  gamma_max, gamma_cutoff, kappa, kappa_width, 
+		  sp.SYMPHONY_METHOD)
 if(np.abs(MJ_I_abs - MJ_I_exp_abs)/MJ_I_exp_abs > 0.01):
 	print 'STOKES_I                                     FAIL'
 else:
@@ -334,7 +335,8 @@ else:
 
 MJ_Q_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                   sp.STOKES_Q, theta_e, power_law_p, gamma_min,
-                  gamma_max, gamma_cutoff, kappa, kappa_width)
+                  gamma_max, gamma_cutoff, kappa, kappa_width,
+		  sp.SYMPHONY_METHOD)
 if(np.abs(MJ_Q_abs - MJ_Q_exp_abs)/MJ_Q_exp_abs > 0.01):
         print 'STOKES_Q                                     FAIL'
 else:
@@ -342,7 +344,8 @@ else:
 
 MJ_V_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                   sp.STOKES_V, theta_e, power_law_p, gamma_min,
-                  gamma_max, gamma_cutoff, kappa, kappa_width)
+                  gamma_max, gamma_cutoff, kappa, kappa_width,
+		  sp.SYMPHONY_METHOD)
 if(np.abs(MJ_V_abs - MJ_V_exp_abs)/MJ_V_exp_abs > 0.01):
         print 'STOKES_V                                     FAIL'
 else:
@@ -353,7 +356,8 @@ print 'Power-law Absorptivities'
 
 PL_I_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                   sp.STOKES_I, theta_e, power_law_p, gamma_min,
-                  gamma_max, gamma_cutoff, kappa, kappa_width)
+                  gamma_max, gamma_cutoff, kappa, kappa_width,
+		  sp.SYMPHONY_METHOD)
 if(np.abs(PL_I_abs - PL_I_exp_abs)/PL_I_exp_abs > 0.01):
         print 'STOKES_I                                     FAIL'
 else:
@@ -361,7 +365,8 @@ else:
 
 PL_Q_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                   sp.STOKES_Q, theta_e, power_law_p, gamma_min,
-                  gamma_max, gamma_cutoff, kappa, kappa_width)
+                  gamma_max, gamma_cutoff, kappa, kappa_width,
+		  sp.SYMPHONY_METHOD)
 if(np.abs(PL_Q_abs - PL_Q_exp_abs)/PL_Q_exp_abs > 0.01):
         print 'STOKES_Q                                     FAIL'
 else:
@@ -369,7 +374,8 @@ else:
 
 PL_V_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                   sp.STOKES_V, theta_e, power_law_p, gamma_min,
-                  gamma_max, gamma_cutoff, kappa, kappa_width)
+                  gamma_max, gamma_cutoff, kappa, kappa_width,
+		  sp.SYMPHONY_METHOD)
 if(np.abs(PL_V_abs - PL_V_exp_abs)/PL_V_exp_abs > 0.01):
         print 'STOKES_V                                     FAIL'
 else:
@@ -380,7 +386,8 @@ print 'Kappa Absorptivities'
 
 Kappa_I_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                      sp.STOKES_I, theta_e, power_law_p, gamma_min,
-                     gamma_max, gamma_cutoff, kappa, kappa_width)
+                     gamma_max, gamma_cutoff, kappa, kappa_width,
+		     sp.SYMPHONY_METHOD)
 if(np.abs(Kappa_I_abs - Kappa_I_exp_abs)/Kappa_I_exp_abs > 0.01):
         print 'STOKES_I                                     FAIL'
 else:
@@ -388,7 +395,8 @@ else:
 
 Kappa_Q_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                      sp.STOKES_Q, theta_e, power_law_p, gamma_min,
-                     gamma_max, gamma_cutoff, kappa, kappa_width)
+                     gamma_max, gamma_cutoff, kappa, kappa_width,
+		     sp.SYMPHONY_METHOD)
 if(np.abs(Kappa_Q_abs - Kappa_Q_exp_abs)/Kappa_Q_exp_abs > 0.01):
         print 'STOKES_Q                                     FAIL'
 else:
@@ -396,7 +404,8 @@ else:
 
 Kappa_V_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                      sp.STOKES_V, theta_e, power_law_p, gamma_min,
-                     gamma_max, gamma_cutoff, kappa, kappa_width)
+                     gamma_max, gamma_cutoff, kappa, kappa_width,
+		     sp.SYMPHONY_METHOD)
 if(np.abs(Kappa_V_abs - Kappa_V_exp_abs)/Kappa_V_exp_abs > 0.01):
         print 'STOKES_V                                     FAIL'
 else:

@@ -26,6 +26,9 @@ struct parameters
   /*Keys for the mode: absorptivity or emissivity*/
   int    ABSORPTIVITY;
   int    EMISSIVITY;
+  /*Keys for alpha_nu computation method*/
+  int SYMPHONY_METHOD;
+  int SUSCEPT_METHOD;
 
   /*USER PARAMS:*/
   double nu;               /* GHz */
@@ -63,6 +66,17 @@ struct parameters
   int stokes_v_switch;
 
   char *error_message; /* if not NULL, records source of error in current calculation */
+
+  /*susceptibility tensor paramsS */
+  double gamma;
+  double epsilon0;
+  double epsilon;
+  double omega;
+  double omega_c;
+  double omega_p;
+  double real;
+  double (*tau_integrand)(double, void * parameters);
+  double (*gamma_integrand)(double, void * parameters);
 };
 
 struct parametersGSL
@@ -73,5 +87,6 @@ struct parametersGSL
 
 void setConstParams(struct parameters *params);
 double get_nu_c(struct parameters params);
+double get_omega_p(struct parameters params);
 
 #endif /* SYMPHONY_PARAMS_H_ */

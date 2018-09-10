@@ -31,9 +31,16 @@ void setConstParams(struct parameters *params)
   /* Keys for the mode: absorptivity or emissivity */
   params->ABSORPTIVITY     = 10;
   params->EMISSIVITY       = 11;
-  /*Default: find n-space peak adaptively */
+  /* Default: find n-space peak adaptively */
   params->use_n_peak       = 0;
   params->error_message    = NULL;
+  /* Key for approach to compute coefficients */
+  params->SYMPHONY_METHOD  = 20;
+  params->SUSCEPT_METHOD   = 21;
+
+  params->epsilon0  = 1./(4. * params->pi); //permittivity of free space, CGS units
+  params->epsilon   = -1.;            //sign of electron charge
+  
 }
 
 /*get_nu_c: takes in values of electron_charge, magnetic_field, mass_electron,
@@ -48,4 +55,9 @@ double get_nu_c(struct parameters params)
         / (2. * params.pi * params.mass_electron * params.speed_light);
 }
 
-
+double get_omega_p(struct parameters params)
+{
+  return sqrt(params.electron_density * params.electron_charge
+              * params.electron_charge 
+              / (params.mass_electron * params.epsilon0));
+}

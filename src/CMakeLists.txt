@@ -59,7 +59,9 @@ find_package(NumPy REQUIRED)
 
 include(UseCython)
 
-include_directories(${GSL_INCLUDES}  ${PYTHON_NUMPY_INCLUDE_DIR} .)
+include_directories(${GSL_INCLUDES}  ${PYTHON_NUMPY_INCLUDE_DIR} susceptibility_tensor .)
+
+add_subdirectory(susceptibility_tensor)
 
 add_library(symphony
 bessel_mod.c
@@ -87,6 +89,7 @@ symphony.h
 )
 
 target_link_libraries(symphony
+		      susceptibility_tensor
                       ${MATH_LIBRARIES}
                       ${GSL_LIBRARIES}
                       ${CBLAS_LIBRARIES})
