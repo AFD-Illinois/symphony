@@ -23,7 +23,7 @@
  2. Type "cmake" followed by the location of the "src/" folder (in the "symphony" folder, above).  Altogether, this line should look something like: "cmake /location/to/symphony/src". You can add the argument `-DCMAKE_INSTALL_PREFIX=/name/of/dir` to set the name of the directory to install to.
  3. Type "make".
  4. Optionally, run `make install` to install the library and Python module onto your system.
- 5. In the "build" folder, navigate into the newly created "susceptibility_tensor" folder. Make an empty file called "__init__.py" and save it.
+ 5. In the "build" folder, navigate into the newly created "susceptibility_tensor" folder. Make an empty file called "\_\_init\_\_.py" and save it.
  6. Unzip the "kernel_samples_datafiles.zip" file in place within the "symphony" folder.
  7. Navigate into the "src" folder, then into the "susceptibility_tensor" folder. Open the file "susceptibilityPy.pyx" and go to the line that says "main_directory = " (line 289); after the equals sign, add the absolute directory pointing to the "kernel_samples_datafiles/" folder.
 
