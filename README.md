@@ -1,26 +1,26 @@
-TODO: add __init__.py to build/ folder and build/susceptibility_tensor/ folder
-
 # *symphony*
 
 ## Overview
 
-*symphony* calculates synchrotron emissivities and absorptivities, polarized in the Stokes basis {I, Q, U, V}, for any arbitrary gyrotropic momentum space distribution function. As of 2018, *symphony* also computes Faraday rotation coefficients in the Stokes basis, with the additional assumption that the distribution function is isotropic. Three distribution functions are built in: a relativistic thermal (Maxwell-Juettner) distribution, a nonthermal power-law distribution, and a kappa distribution.
+*symphony* calculates synchrotron emissivities and absorptivities, polarized in the Stokes basis {I, Q, U, V}, for any arbitrary gyrotropic momentum space distribution function. As of 2018, *symphony* also computes Faraday rotation coefficients in the Stokes basis and the full relativistic magnetized plasma susceptibility tensor, provided the distribution function is isotropic. Three distribution functions are built in: a relativistic thermal (Maxwell-Juettner) distribution, a nonthermal power-law distribution, and a kappa distribution.
 
-*symphony* was first described in [Pandya et al., 2016 ApJ 822 34](http://dx.doi.org/10.3847/0004-637X/822/1/34), and extended to compute Faraday rotation coefficients in [Pandya et al., 2018 (accepted by ApJ)](https://arxiv.org/abs/1810.05530). If you use this code in an academic context, cite these papers.
+*symphony* was first described in [Pandya et al., 2016 ApJ 822 34](http://dx.doi.org/10.3847/0004-637X/822/1/34), and extended to compute Faraday rotation coefficients in [Pandya et al., 2018](https://arxiv.org/abs/1810.05530). If you use this code in an academic context, cite these papers.
 
 ## Features
 
 * `C` code to calculate synchrotron emissivities via the `j_nu()` function and absorptivities via the `alpha_nu()` function.
+* `C` code to calculate Faraday rotation coefficients via the `rho_nu()` function
 * `C` code to evaluate approximate fitting function values for the emissivity and absorptivity, via the `j_nu_fit()` and `alpha_nu_fit()` functions, respectively.
 * CMake configure system, which helps during the build process to find all necessary libraries and files.
 * `Python` interface for `j_nu()`, `alpha_nu()`, `j_nu_fit()`, and `alpha_nu_fit()`.
+* `Python` interface to `rho_nu()` and spline fits
   * This combines the speed of `C` when evaluating emissivities and absorptivities with `Python`'s user-friendly syntax.  It also allows for interfacing with larger `Python` codes.
 
 ## How to use *symphony*
 
 ### To download and build *symphony*:
- 1. Clone *symphony* from github.  Navigate into the *symphony* folder, and create a folder named "build"; navigate into it.
- 2. Type "cmake" followed by the location of the "src/" folder (in the *symphony* folder, above).  Altogether, this line should look something like: "cmake /location/to/symphony/src". You can add the argument `-DCMAKE_INSTALL_PREFIX=/name/of/dir` to set the name of the directory to install to.
+ 1. Clone *symphony* from github.  Navigate into the "symphony" folder, and create a folder named "build"; navigate into it.
+ 2. Type "cmake" followed by the location of the "src/" folder (in the "symphony" folder, above).  Altogether, this line should look something like: "cmake /location/to/symphony/src". You can add the argument `-DCMAKE_INSTALL_PREFIX=/name/of/dir` to set the name of the directory to install to.
  3. Type "make".
  4. Optionally, run `make install` to install the library and Python module onto your system.
  5. In the "build" folder, navigate into the newly created "susceptibility_tensor" folder. Make an empty file called "__init__.py" and save it.
