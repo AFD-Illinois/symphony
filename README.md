@@ -4,9 +4,9 @@ TODO: add __init__.py to build/ folder and build/susceptibility_tensor/ folder
 
 ## Overview
 
-*symphony* calculates synchrotron emissivities and absorptivities, polarized in the Stokes basis {I, Q, U, V}, for any arbitrary gyrotropic momentum space distribution function.  Three distribution functions are built in: a relativistic thermal (Maxwell-Juettner) distribution, a nonthermal power-law distribution, and a kappa distribution.
+*symphony* calculates synchrotron emissivities and absorptivities, polarized in the Stokes basis {I, Q, U, V}, for any arbitrary gyrotropic momentum space distribution function. As of 2018, *symphony* also computes Faraday rotation coefficients in the Stokes basis, with the additional assumption that the distribution function is isotropic. Three distribution functions are built in: a relativistic thermal (Maxwell-Juettner) distribution, a nonthermal power-law distribution, and a kappa distribution.
 
-*symphony* is described in [Pandya et al., 2016 ApJ 822 34](http://dx.doi.org/10.3847/0004-637X/822/1/34). If you use this code in an academic context, cite that paper.
+*symphony* was first described in [Pandya et al., 2016 ApJ 822 34](http://dx.doi.org/10.3847/0004-637X/822/1/34), and extended to compute Faraday rotation coefficients in [Pandya et al., 2018 (accepted by ApJ)](https://arxiv.org/abs/1810.05530). If you use this code in an academic context, cite these papers.
 
 ## Features
 
@@ -19,10 +19,13 @@ TODO: add __init__.py to build/ folder and build/susceptibility_tensor/ folder
 ## How to use *symphony*
 
 ### To download and build *symphony*:
- 1. Clone *symphony* from github.  Navigate into the *symphony* folder, and note that it contains a folder named "src/"; create a folder named "build" and navigate into it.
- 2. Type "cmake" followed by the location of the "src/" folder.  Altogether, this line should look something like: "cmake /location/to/symphony/src". You can add the argument `-DCMAKE_INSTALL_PREFIX=/name/of/dir` to set the name of the directory to install to
- 3. Type "make"
+ 1. Clone *symphony* from github.  Navigate into the *symphony* folder, and create a folder named "build"; navigate into it.
+ 2. Type "cmake" followed by the location of the "src/" folder (in the *symphony* folder, above).  Altogether, this line should look something like: "cmake /location/to/symphony/src". You can add the argument `-DCMAKE_INSTALL_PREFIX=/name/of/dir` to set the name of the directory to install to.
+ 3. Type "make".
  4. Optionally, run `make install` to install the library and Python module onto your system.
+ 5. In the "build" folder, navigate into the newly created "susceptibility_tensor" folder. Make an empty file called "__init__.py" and save it.
+ 6. Unzip the "kernel_samples_datafiles.zip" file in place within the "symphony" folder.
+ 7. Navigate into the "src" folder, then into the "susceptibility_tensor" folder. Open the file "susceptibilityPy.pyx" and go to the line that says "main_directory = " (line 289); after the equals sign, add the absolute directory pointing to the "kernel_samples_datafiles/" folder.
 
 ### To use *symphony*'s `Python` interface:
  1. Navigate to the "build/" folder created in step 1., above.  Open `Python` in the command line or by writing a ".py" file.
