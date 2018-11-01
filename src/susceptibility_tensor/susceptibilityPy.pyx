@@ -283,9 +283,10 @@ import numpy as np
 from scipy.interpolate import interp2d
 import scipy.special as special
 from scipy.integrate import quad, fixed_quad
+import os, sys
 
 #set up spline interpolation datafiles
-main_directory = '../kernel_samples_datafiles/'
+main_directory = '/home/alex/Documents/symphony/kernel_samples_datafiles/' #TODO: put in absolute path of kernel_samples_datafiles here
 
 gamma = np.loadtxt(main_directory + 'step_array.txt')
 
@@ -1644,15 +1645,13 @@ def alpha_I_spline(nu,
            electron_density,
            observer_angle,
            distribution,
-           real_part,
            theta_e,
            power_law_p,
            gamma_min,
            gamma_max,
            gamma_cutoff,
            kappa,
-           kappa_width,
-           component):
+           kappa_width):
 
     """returns alpha_I_spline(nu, magnetic_field, electron_density, observer_angle,
                               distribution, theta_e, power_law_p, gamma_min
@@ -1694,15 +1693,13 @@ def alpha_Q_spline(nu,
            electron_density,
            observer_angle,
            distribution,
-           real_part,
            theta_e,
            power_law_p,
            gamma_min,
            gamma_max,
            gamma_cutoff,
            kappa,
-           kappa_width,
-           component):
+           kappa_width):
 
     """returns alpha_Q_spline(nu, magnetic_field, electron_density, observer_angle,
                               distribution, theta_e, power_law_p, gamma_min
@@ -1744,15 +1741,13 @@ def alpha_V_spline(nu,
            electron_density,
            observer_angle,
            distribution,
-           real_part,
            theta_e,
            power_law_p,
            gamma_min,
            gamma_max,
            gamma_cutoff,
            kappa,
-           kappa_width,
-           component):
+           kappa_width):
 
     """returns alpha_V_spline(nu, magnetic_field, electron_density, observer_angle,
                               distribution, theta_e, power_law_p, gamma_min
@@ -1782,15 +1777,13 @@ def rho_Q_spline(nu,
            electron_density,
            observer_angle,
            distribution,
-           real_part,
            theta_e,
            power_law_p,
            gamma_min,
            gamma_max,
            gamma_cutoff,
            kappa,
-           kappa_width,
-           component):
+           kappa_width):
 
     """returns rho_Q_spline(nu, magnetic_field, electron_density, observer_angle,
                               distribution, theta_e, power_law_p, gamma_min
@@ -1832,15 +1825,13 @@ def rho_V_spline(nu,
            electron_density,
            observer_angle,
            distribution,
-           real_part,
            theta_e,
            power_law_p,
            gamma_min,
            gamma_max,
            gamma_cutoff,
            kappa,
-           kappa_width,
-           component):
+           kappa_width):
 
     """returns rho_V_spline(nu, magnetic_field, electron_density, observer_angle,
                               distribution, theta_e, power_law_p, gamma_min
