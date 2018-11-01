@@ -25,12 +25,11 @@ int main(int argc, char *argv[])
   setConstParams(&paramsM);
 
 //set some the parameters
-  paramsM.magnetic_field     = 30.; //TODO: change this
+  paramsM.magnetic_field     = 30.;
   paramsM.electron_density   = 1.;
   paramsM.observer_angle     = paramsM.pi/3.;
-  paramsM.distribution       = paramsM.POWER_LAW;
+  paramsM.distribution       = paramsM.MAXWELL_JUETTNER;
   paramsM.polarization       = paramsM.STOKES_I;
-  paramsM.polarization       = paramsM.STOKES_V;
   paramsM.theta_e            = 10.;
   paramsM.power_law_p        = 3.;
   paramsM.gamma_min          = 1.;
