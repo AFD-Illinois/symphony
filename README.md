@@ -20,26 +20,27 @@
 
 ### To download and build *symphony*:
  1. Clone *symphony* from github.  Navigate into the "symphony" folder, and create a folder named "build"; navigate into it.
- 2. Type "cmake" followed by the location of the "src/" folder (in the "symphony" folder, above).  Altogether, this line should look something like: "cmake /location/to/symphony/src". You can add the argument `-DCMAKE_INSTALL_PREFIX=/name/of/dir` to set the name of the directory to install to.
- 3. Type "make".
+ 2. Type `cmake` followed by the location of the "src/" folder (in the "symphony" folder, above).  Altogether, this line should look something like: `cmake /location/to/symphony/src`. You can add the argument `-DCMAKE_INSTALL_PREFIX=/name/of/dir` to set the name of the directory to install to.
+ 3. Type `make`.
  4. Optionally, run `make install` to install the library and Python module onto your system.
- 5. In the "build" folder, navigate into the newly created "susceptibility_tensor" folder. Make an empty file called "__init__.py" and save it.
+ 5. In the "build" folder, navigate into the newly created "susceptibility_tensor" folder. Make an empty file called "\__init\__.py" and save it.
  6. Unzip the "kernel_samples_datafiles.zip" file in place within the "symphony" folder.
- 7. Navigate into the "src" folder, then into the "susceptibility_tensor" folder. Open the file "susceptibilityPy.pyx" and go to the line that says "main_directory = " (line 289); after the equals sign, add the absolute directory pointing to the "kernel_samples_datafiles/" folder.
+ 7. Navigate into the "src" folder, then into the "susceptibility_tensor" folder. Open the file "susceptibilityPy.pyx" and go to the line (line 289) that says `main_directory = `; after the equals sign, add the absolute directory pointing to the "kernel_samples_datafiles/" folder.
 
 ### To use *symphony*'s `Python` interface:
  1. Navigate to the "build/" folder created in step 1., above.  Open `Python` in the command line or by writing a ".py" file.
  2. Import *symphony* by typing `import symphonyPy`.  
-  * This allows one to call 4 functions: `j_nu_py()`, `alpha_nu_py()`, `j_nu_fit_py()`, and `alpha_nu_fit_py()`.  
-  * The first two provide calculated values of the emissivity and absorptivity for the input parameters, and the latter two provide the corresponding approximate fitting formula results.
+  * This allows one to call the functions: `j_nu_py()`, `alpha_nu_py()`, `j_nu_fit_py()`, `alpha_nu_fit_py()`, `rho_nu_py()`, and spline fit functions `alpha_{I, Q, V}_spline()`, `rho_{Q, V}_spline()`, and `chi_ij()`.  
+  * The first two provide calculated values of the emissivity and absorptivity for the input parameters, and the second two provide the corresponding approximate fitting formula results.
+  * The function `rho_nu_py()` computes Faraday rotation coefficients using the *symphony* integrator; this is slow, and should only be used as a check of the spline fits.
  3. The arguments of these functions can be found by accessing the associated docstrings.  This can be done in the `Python` command line using the following: 
 ```
 import symphonyPy
 symphonyPy.j_nu_py?
 ```
 
-### Arguments for Emissivity and Absorptivity Functions
-* Arguments for all emissivity and absorptivity functions in both `C` and `Python` take nearly the same arguments and output a double.  The only difference is that the C version has an `error_message` parameter for handling evaluation errors. The arguments are: 
+### Arguments for Emissivity, Absorptivity, and Faraday Rotation Coefficient Functions
+* Arguments for all emissivity, absorptivity, and Faraday rotation coefficient functions in both `C` and `Python` take nearly the same arguments and output a double.  The only difference is that the C version has an `error_message` parameter for handling evaluation errors, and the absorptivity coefficients include a switch to choose the integration method. The arguments are: 
 ```
 j_nu(nu, magnetic_field, electron_density, observer_angle, distribution, polarization, 
      theta_e, power_law_p, gamma_min, gamma_max, gamma_cutoff, kappa, kappa_width,
@@ -56,3 +57,4 @@ j_nu_py(): j_nu_py(230e9, 30, 1, 1.047, symphonyPy.MAXWELL_JUETTNER, symphonyPy.
 ### TODO
 1. Add an anisotropic DF
 2. Put in warnings for frequencies outside the intended frequency regime (much greater than the plasma, relativistic cyclotron frequencies)
+3. Make cmake automatically add kernel_samples_datafiles/ directory to susceptibilityPy.pyx
