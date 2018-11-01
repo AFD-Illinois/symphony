@@ -1,4 +1,5 @@
 from symphonyHeaders cimport j_nu, alpha_nu, rho_nu, j_nu_fit, alpha_nu_fit, rho_nu_fit
+from susceptibility_tensor.susceptibilityPy import *
 
 def j_nu_py(double nu,
             double magnetic_field,
