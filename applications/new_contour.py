@@ -82,7 +82,7 @@ comm.Bcast([B_z, MPI.DOUBLE])
 comm.Bcast([B_mag, MPI.DOUBLE])
 comm.Bcast([n_e, MPI.DOUBLE])
 
-print "rank = ", rank, " of ", size, "procs"
+print("rank = ", rank, " of ", size, "procs")
 
 
 B_x_avg        = np.mean(B_x)
@@ -148,7 +148,7 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
                       	               polarization, theta_e, power_law_p, gamma_min,
                                	               gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
 		except:
-			print nu/nu_c_local, obs_angle * 180./np.pi, polarization
+			print(nu/nu_c_local, obs_angle * 180./np.pi, polarization)
 			ans = 0.
 
 		if(np.isnan(ans) == True):
@@ -168,7 +168,7 @@ def j_nu_or_alpha_nu(nu, B, n_e, obs_angle, distribution_function,
                                        polarization, theta_e, power_law_p, gamma_min,
                                                gamma_max, gamma_cutoff, kappa, kappa_width) / dim_prefactor
                 except:
-                        print nu/nu_c_local, obs_angle * 180./np.pi, polarization
+                        print(nu/nu_c_local, obs_angle * 180./np.pi, polarization)
                         ans = 0.
 
                 return ans
@@ -204,7 +204,7 @@ for x in range(0, number_of_points_x):
 	nu = nu_c_avg * 10.**(1.*x / (number_of_points_x - 1) * np.log10(max_nuratio))
 	for y in range(0, number_of_points_y):
 		if (rank == 0):
-			print 100.*(number_of_points_y*x+y)/(number_of_points_x*number_of_points_y-1.), '% complete'
+			print(100.*(number_of_points_y*x+y)/(number_of_points_x*number_of_points_y-1.), '% complete')
 
 		if(IN_PLANE == True):
 			#rotates observer vector in plane

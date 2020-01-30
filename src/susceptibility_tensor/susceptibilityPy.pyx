@@ -675,7 +675,7 @@ def chi_11_real_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_11_real_spline'
+        print('ERROR ENCOUNTERED IN chi_11_real_spline')
         return 0.
     
 def chi_11_imag_spline(gamma, omratio, angle):
@@ -753,7 +753,7 @@ def chi_11_imag_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_11_imag_spline'
+        print('ERROR ENCOUNTERED IN chi_11_imag_spline')
         return 0.
 
 def chi_12_real_spline(gamma, omratio, angle):
@@ -831,7 +831,7 @@ def chi_12_real_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_12_real_spline'
+        print('ERROR ENCOUNTERED IN chi_12_real_spline')
         return 0.
     
 def chi_12_imag_spline(gamma, omratio, angle):
@@ -909,7 +909,7 @@ def chi_12_imag_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_12_imag_spline'
+        print('ERROR ENCOUNTERED IN chi_12_imag_spline')
         return 0.
 
 def chi_13_real_spline(gamma, omratio, angle):
@@ -987,7 +987,7 @@ def chi_13_real_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_13_real_spline'
+        print('ERROR ENCOUNTERED IN chi_13_real_spline')
         return 0.
     
 def chi_13_imag_spline(gamma, omratio, angle):
@@ -1065,7 +1065,7 @@ def chi_13_imag_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_13_imag_spline'
+        print('ERROR ENCOUNTERED IN chi_13_imag_spline')
         return 0.
 
 def chi_22_real_spline(gamma, omratio, angle):
@@ -1143,7 +1143,7 @@ def chi_22_real_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_22_real_spline'
+        print('ERROR ENCOUNTERED IN chi_22_real_spline')
         return 0.
     
 def chi_22_imag_spline(gamma, omratio, angle):
@@ -1221,7 +1221,7 @@ def chi_22_imag_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_22_imag_spline'
+        print('ERROR ENCOUNTERED IN chi_22_imag_spline')
         return 0.
 
 def chi_32_real_spline(gamma, omratio, angle):
@@ -1299,7 +1299,7 @@ def chi_32_real_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_32_real_spline'
+        print('ERROR ENCOUNTERED IN chi_32_real_spline')
         return 0.
     
 def chi_32_imag_spline(gamma, omratio, angle):
@@ -1377,7 +1377,7 @@ def chi_32_imag_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_32_imag_spline'
+        print('ERROR ENCOUNTERED IN chi_32_imag_spline')
         return 0.
 
 
@@ -1456,7 +1456,7 @@ def chi_33_real_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_33_real_spline'
+        print('ERROR ENCOUNTERED IN chi_33_real_spline')
         return 0.
     
 def chi_33_imag_spline(gamma, omratio, angle):
@@ -1534,7 +1534,7 @@ def chi_33_imag_spline(gamma, omratio, angle):
         y   = y0 * (1 - (x - x0) / (x1 - x0) ) + y1 * ( (x - x0) / (x1 - x0) )
         return y
     else:
-        print 'ERROR ENCOUNTERED IN chi_33_imag_spline'
+        print('ERROR ENCOUNTERED IN chi_33_imag_spline')
         return 0.
 
 #function to choose which component's spline to use.

@@ -62,351 +62,351 @@ Kappa_Q_exp_abs = -7.09134633078e-20
 Kappa_V_exp_abs = -1.66592280833e-21
 
 #----------------------------tests--------------------------------------------#
-print '-------------------------------------------------------------------'
-print '                symphony automated testing program               '
-print '-------------------------------------------------------------------'
-print ''
+print('-------------------------------------------------------------------')
+print('                symphony automated testing program               ')
+print('-------------------------------------------------------------------')
+print('')
 
-print 'Testing emissivity fitting formulae'
-print '-------------------------------------------------------------------'
-print 'Maxwell-Juettner Emissivities'
+print('Testing emissivity fitting formulae')
+print('-------------------------------------------------------------------')
+print('Maxwell-Juettner Emissivities')
 
 MJ_I_fit = sp.j_nu_fit_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                           sp.STOKES_I, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(MJ_I_fit - MJ_I_exp_fit)/MJ_I_exp_fit > 0.01):
-	print 'STOKES_I                                     FAIL'
+	print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS' 
+        print('STOKES_I                                     PASS')
 
 MJ_Q_fit = sp.j_nu_fit_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                           sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(MJ_Q_fit - MJ_Q_exp_fit)/MJ_Q_exp_fit > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 MJ_V_fit = sp.j_nu_fit_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                           sp.STOKES_V, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(MJ_V_fit - MJ_V_exp_fit)/MJ_V_exp_fit > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
 
-print ''
-print 'Power-law Emissivities'
+print('')
+print('Power-law Emissivities')
 
 PL_I_fit = sp.j_nu_fit_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                           sp.STOKES_I, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(PL_I_fit - PL_I_exp_fit)/PL_I_exp_fit > 0.01):
-        print 'STOKES_I                                     FAIL'
+        print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS'
+        print('STOKES_I                                     PASS')
 
 PL_Q_fit = sp.j_nu_fit_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                           sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(PL_Q_fit - PL_Q_exp_fit)/PL_Q_exp_fit > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 PL_V_fit = sp.j_nu_fit_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                           sp.STOKES_V, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(PL_V_fit - PL_V_exp_fit)/PL_V_exp_fit > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
 
-print ''
-print 'Kappa Emissivities'
+print('')
+print('Kappa Emissivities')
 
 Kappa_I_fit = sp.j_nu_fit_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                              sp.STOKES_I, theta_e, power_law_p, gamma_min,
                              gamma_max, gamma_cutoff, kappa, kappa_width)
 
 if(np.abs(Kappa_I_fit - Kappa_I_exp_fit)/Kappa_I_exp_fit > 0.01):
-        print 'STOKES_I                                     FAIL'
+        print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS'
+        print('STOKES_I                                     PASS')
 
 Kappa_Q_fit = sp.j_nu_fit_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                              sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                              gamma_max, gamma_cutoff, kappa, kappa_width)
 
 if(np.abs(Kappa_Q_fit - Kappa_Q_exp_fit)/Kappa_Q_exp_fit > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 Kappa_V_fit = sp.j_nu_fit_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                              sp.STOKES_V, theta_e, power_law_p, gamma_min,
                              gamma_max, gamma_cutoff, kappa, kappa_width)
 
 if(np.abs(Kappa_V_fit - Kappa_V_exp_fit)/Kappa_V_exp_fit > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
 
-print ''
-print 'Maxwell-Juettner Absorptivities'
+print('')
+print('Maxwell-Juettner Absorptivities')
 
 MJ_I_fit_abs = sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                           sp.STOKES_I, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(MJ_I_fit_abs - MJ_I_exp_fit_abs)/MJ_I_exp_fit_abs > 0.01):
-	print 'STOKES_I                                     FAIL'
+	print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS' 
+        print('STOKES_I                                     PASS')
 
 MJ_Q_fit_abs = sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                           sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(MJ_Q_fit_abs - MJ_Q_exp_fit_abs)/MJ_Q_exp_fit_abs > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 MJ_V_fit_abs = sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                           sp.STOKES_V, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(MJ_V_fit_abs - MJ_V_exp_fit_abs)/MJ_V_exp_fit_abs > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
 
-print ''
-print 'Power-law Absorptivities'
+print('')
+print('Power-law Absorptivities')
 
 PL_I_fit_abs = sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                           sp.STOKES_I, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(PL_I_fit_abs - PL_I_exp_fit_abs)/PL_I_exp_fit_abs > 0.01):
-        print 'STOKES_I                                     FAIL'
+        print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS'
+        print('STOKES_I                                     PASS')
 
 PL_Q_fit_abs = sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                           sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(PL_Q_fit_abs - PL_Q_exp_fit_abs)/PL_Q_exp_fit_abs > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 PL_V_fit_abs = sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                           sp.STOKES_V, theta_e, power_law_p, gamma_min,
                           gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(PL_V_fit_abs - PL_V_exp_fit_abs)/PL_V_exp_fit_abs > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
 
-print ''
-print 'Kappa Absorptivities'
+print('')
+print('Kappa Absorptivities')
 
 Kappa_I_fit_abs = sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                              sp.STOKES_I, theta_e, power_law_p, gamma_min,
                              gamma_max, gamma_cutoff, kappa, kappa_width)
 
 if(np.abs(Kappa_I_fit_abs - Kappa_I_exp_fit_abs)/Kappa_I_exp_fit_abs > 0.01):
-        print 'STOKES_I                                     FAIL'
+        print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS'
+        print('STOKES_I                                     PASS')
 
 Kappa_Q_fit_abs = sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                              sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                              gamma_max, gamma_cutoff, kappa, kappa_width)
 
 if(np.abs(Kappa_Q_fit_abs - Kappa_Q_exp_fit_abs)/Kappa_Q_exp_fit_abs > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 Kappa_V_fit_abs = sp.alpha_nu_fit_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                              sp.STOKES_V, theta_e, power_law_p, gamma_min,
                              gamma_max, gamma_cutoff, kappa, kappa_width)
 
 if(np.abs(Kappa_V_fit_abs - Kappa_V_exp_fit_abs)/Kappa_V_exp_fit_abs > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
 
 
-print ''
-print 'Testing integrated values'
-print '-------------------------------------------------------------------'
+print('')
+print('Testing integrated values')
+print('-------------------------------------------------------------------')
 
-print 'Maxwell-Juettner Emissivities'
+print('Maxwell-Juettner Emissivities')
 
 MJ_I = sp.j_nu_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                   sp.STOKES_I, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(MJ_I - MJ_I_exp)/MJ_I_exp > 0.01):
-	print 'STOKES_I                                     FAIL'
+	print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS'
+        print('STOKES_I                                     PASS')
 
 MJ_Q = sp.j_nu_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                   sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(MJ_Q - MJ_Q_exp)/MJ_Q_exp > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 MJ_V = sp.j_nu_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                   sp.STOKES_V, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(MJ_V - MJ_V_exp)/MJ_V_exp > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
 
-print ''
-print 'Power-law Emissivities'
+print('')
+print('Power-law Emissivities')
 
 PL_I = sp.j_nu_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                   sp.STOKES_I, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(PL_I - PL_I_exp)/PL_I_exp > 0.01):
-        print 'STOKES_I                                     FAIL'
+        print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS'
+        print('STOKES_I                                     PASS')
 
 PL_Q = sp.j_nu_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                   sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(PL_Q - PL_Q_exp)/PL_Q_exp > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 PL_V = sp.j_nu_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                   sp.STOKES_V, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(PL_V - PL_V_exp)/PL_V_exp > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
 
-print ''
-print 'Kappa Emissivities'
+print('')
+print('Kappa Emissivities')
 
 Kappa_I = sp.j_nu_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                      sp.STOKES_I, theta_e, power_law_p, gamma_min,
                      gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(Kappa_I - Kappa_I_exp)/Kappa_I_exp > 0.01):
-        print 'STOKES_I                                     FAIL'
+        print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS'
+        print('STOKES_I                                     PASS')
 
 Kappa_Q = sp.j_nu_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                      sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                      gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(Kappa_Q - Kappa_Q_exp)/Kappa_Q_exp > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 Kappa_V = sp.j_nu_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                      sp.STOKES_V, theta_e, power_law_p, gamma_min,
                      gamma_max, gamma_cutoff, kappa, kappa_width)
 if(np.abs(Kappa_V - Kappa_V_exp)/Kappa_V_exp > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
 
-print ''
-print 'Maxwell-Juettner Absorptivities'
+print('')
+print('Maxwell-Juettner Absorptivities')
 
 MJ_I_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                   sp.STOKES_I, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width, 
 		  sp.SYMPHONY_METHOD)
 if(np.abs(MJ_I_abs - MJ_I_exp_abs)/MJ_I_exp_abs > 0.01):
-	print 'STOKES_I                                     FAIL'
+	print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS'
+        print('STOKES_I                                     PASS')
 
 MJ_Q_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                   sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width,
 		  sp.SYMPHONY_METHOD)
 if(np.abs(MJ_Q_abs - MJ_Q_exp_abs)/MJ_Q_exp_abs > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 MJ_V_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.MAXWELL_JUETTNER,
                   sp.STOKES_V, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width,
 		  sp.SYMPHONY_METHOD)
 if(np.abs(MJ_V_abs - MJ_V_exp_abs)/MJ_V_exp_abs > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
 
-print ''
-print 'Power-law Absorptivities'
+print('')
+print('Power-law Absorptivities')
 
 PL_I_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                   sp.STOKES_I, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width,
 		  sp.SYMPHONY_METHOD)
 if(np.abs(PL_I_abs - PL_I_exp_abs)/PL_I_exp_abs > 0.01):
-        print 'STOKES_I                                     FAIL'
+        print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS'
+        print('STOKES_I                                     PASS')
 
 PL_Q_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                   sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width,
 		  sp.SYMPHONY_METHOD)
 if(np.abs(PL_Q_abs - PL_Q_exp_abs)/PL_Q_exp_abs > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 PL_V_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.POWER_LAW,
                   sp.STOKES_V, theta_e, power_law_p, gamma_min,
                   gamma_max, gamma_cutoff, kappa, kappa_width,
 		  sp.SYMPHONY_METHOD)
 if(np.abs(PL_V_abs - PL_V_exp_abs)/PL_V_exp_abs > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
 
-print ''
-print 'Kappa Absorptivities'
+print('')
+print('Kappa Absorptivities')
 
 Kappa_I_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                      sp.STOKES_I, theta_e, power_law_p, gamma_min,
                      gamma_max, gamma_cutoff, kappa, kappa_width,
 		     sp.SYMPHONY_METHOD)
 if(np.abs(Kappa_I_abs - Kappa_I_exp_abs)/Kappa_I_exp_abs > 0.01):
-        print 'STOKES_I                                     FAIL'
+        print('STOKES_I                                     FAIL')
 else:
-        print 'STOKES_I                                     PASS'
+        print('STOKES_I                                     PASS')
 
 Kappa_Q_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                      sp.STOKES_Q, theta_e, power_law_p, gamma_min,
                      gamma_max, gamma_cutoff, kappa, kappa_width,
 		     sp.SYMPHONY_METHOD)
 if(np.abs(Kappa_Q_abs - Kappa_Q_exp_abs)/Kappa_Q_exp_abs > 0.01):
-        print 'STOKES_Q                                     FAIL'
+        print('STOKES_Q                                     FAIL')
 else:
-        print 'STOKES_Q                                     PASS'
+        print('STOKES_Q                                     PASS')
 
 Kappa_V_abs = sp.alpha_nu_py(nu, B, n_e, obs_angle, sp.KAPPA_DIST,
                      sp.STOKES_V, theta_e, power_law_p, gamma_min,
                      gamma_max, gamma_cutoff, kappa, kappa_width,
 		     sp.SYMPHONY_METHOD)
 if(np.abs(Kappa_V_abs - Kappa_V_exp_abs)/Kappa_V_exp_abs > 0.01):
-        print 'STOKES_V                                     FAIL'
+        print('STOKES_V                                     FAIL')
 else:
-        print 'STOKES_V                                     PASS'
+        print('STOKES_V                                     PASS')
