@@ -655,7 +655,7 @@ double alpha_nu_suscept(struct parameters * params)
 {
   /*this method has only been tested for 1 <= nu/nu_c <= 1000*/
   double nu_c = get_nu_c(*params);
-  if(params->nu/nu_c >= 1000)
+  if(params->nu/nu_c >= 20000)
   {
     printf("\nFrequency out of range for this method");
     return 0.;
