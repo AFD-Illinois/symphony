@@ -59,7 +59,7 @@ find_package(NumPy REQUIRED)
 
 include(UseCython)
 
-include_directories(${GSL_INCLUDES}  ${PYTHON_NUMPY_INCLUDE_DIR} susceptibility_tensor .)
+include_directories(${GSL_INCLUDE_DIRS}  ${PYTHON_NUMPY_INCLUDE_DIR} susceptibility_tensor .)
 
 add_subdirectory(susceptibility_tensor)
 
@@ -91,15 +91,14 @@ symphony.h
 target_link_libraries(symphony
 		      susceptibility_tensor
                       ${MATH_LIBRARIES}
-                      ${GSL_LIBRARIES}
-                      ${CBLAS_LIBRARIES})
+                      ${GSL_LIBRARIES})
 
 add_executable(demo demo.c)
 target_link_libraries(demo symphony)
 
 cython_add_module(symphonyPy symphonyPy.pyx)
 target_link_libraries(symphonyPy symphony
-  ${GSL_LIBRARIES} ${CBLAS_LIBRARIES})
+  ${GSL_LIBRARIES})
 
 set_target_properties(
   symphony
@@ -131,7 +130,6 @@ message("")
 message("C Compiler          : " ${CMAKE_C_COMPILER})
 message("C_FLAGS             : " ${CMAKE_C_FLAGS})
 message("GSL Libraries       : " ${GSL_LIBRARIES})
-message("CBLAS Libraries     : " ${CBLAS_LIBRARIES})
 message("NumPy dir           : " ${PYTHON_NUMPY_INCLUDE_DIR})
 message("Cython              : " ${CYTHON_EXECUTABLE})
 message("Library install dir : " ${CMAKE_INSTALL_PREFIX})
