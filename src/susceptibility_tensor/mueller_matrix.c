@@ -650,6 +650,72 @@ double chi_31_symphony(double nu,
   return NAN;
 }
 
+double chi_rho_Q_symphony(double nu,
+	    double magnetic_field,
+	    double electron_density,
+	    double observer_angle,
+	    int distribution,
+	    int real_part,
+	    double theta_e,
+	    double power_law_p,                                                                                     
+	    double gamma_min,
+	    double gamma_max,
+	    double gamma_cutoff,
+	    double kappa,                                                                                          
+	    double kappa_width,
+	    char **error_message
+	    )
+{
+  double retval;
+
+/*fill the struct with values*/
+  struct parameters params;
+  setConstParams(&params);
+
+//  set_params(&params);
+  params.omega = 2. * params.pi * nu;
+  params.real  = real_part;
+
+  params.nu                 = nu;
+  params.magnetic_field     = magnetic_field;
+  params.observer_angle     = observer_angle;
+  params.electron_density   = electron_density;
+  params.distribution       = distribution;
+  params.mode               = params.EMISSIVITY;
+  params.theta_e            = theta_e;
+  params.power_law_p        = power_law_p;
+  params.gamma_min          = gamma_min;
+  params.gamma_max          = gamma_max;
+  params.gamma_cutoff       = gamma_cutoff;
+  params.kappa              = kappa;
+  params.kappa_width        = kappa_width;
+
+  double nu_c = get_nu_c(params);
+  double omega_p = get_omega_p(params);
+
+  params.omega_c = 2. * params.pi * nu_c;
+  params.omega_p = omega_p;
+
+  if (error_message != NULL)
+    *error_message = NULL; /* Initialize the user's error message. */
+
+  retval = chi_rho_Q(&params);
+
+  /* Success? */
+
+  if (params.error_message == NULL)
+    return retval;
+    
+  /* Something went wrong. Give the caller the error message if they
+   * provided us with a place to save it. */
+
+//  if (error_message != NULL)
+//    *error_message = params.error_message;
+
+  return NAN;
+}
+
+
 //TODO: write documentation for this function
 double alpha_nu_suscept(struct parameters * params)
 {
@@ -768,13 +834,10 @@ double rho_Q(struct parameters *p)
 {
   p->real          = 1;
   double prefactor = 2. * p->pi * p->epsilon0 * p->omega / p->speed_light;
-  double term11    =(chi_11(p) * pow(cos(p->observer_angle), 2.)
-                   +chi_33(p) * pow(sin(p->observer_angle), 2.)
-                   -2.*chi_13(p)*sin(p->observer_angle)*cos(p->observer_angle));
-  double term22    = chi_22(p);
-  double ans       = prefactor * (term22 - term11);
-  return ans;
+  double ans       = prefactor * chi_rho_Q(p);
+  return ans; 
 }
+
 
 /*alpha_V: returns the absorption coefficient alpha_V, for the circularly
  *         polarized light along the ray in question, for the given values of 
