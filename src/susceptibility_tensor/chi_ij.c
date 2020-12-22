@@ -131,3 +131,18 @@ double chi_31(struct parameters * p)
 {
   return chi_13(p);
 }
+
+/*chi_rho_Q: evaluates the combination of the four chi components of the susceptibility tensor needed to evaluate rho_Q.
+ *
+ *@params: pointer to struct of parameters *p
+ *
+ *@returns: the value of the four combined chi components, evaluated using the parameters in struct p
+ */
+double chi_rho_Q(struct parameters * p){
+
+  p->tau_integrand = &chi_rho_Q_integrand;
+  p->gamma_integrand = &tau_integrator;
+
+  return gamma_integrator(p);
+}
+
