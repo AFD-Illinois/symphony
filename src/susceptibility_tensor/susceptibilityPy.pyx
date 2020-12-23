@@ -1,4 +1,4 @@
-from susceptibilityHeaders cimport chi_11_symphony, chi_12_symphony, chi_13_symphony, chi_21_symphony, chi_22_symphony, chi_23_symphony, chi_31_symphony, chi_32_symphony, chi_33_symphony
+from susceptibilityHeaders cimport chi_11_symphony, chi_12_symphony, chi_13_symphony, chi_21_symphony, chi_22_symphony, chi_23_symphony, chi_31_symphony, chi_32_symphony, chi_33_symphony, chi_rho_Q_symphony
 
 def chi_11_symphony_py(double nu,
             double magnetic_field,
@@ -278,6 +278,38 @@ def chi_33_symphony_py(double nu,
   if error_message:
     raise RuntimeError (error_message)
   return result
+
+def chi_rho_Q_symphony_py(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int real_part,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width):
+
+  """Returns chi_rho_Q_nu(nu, magnetic_field, electron_density, observer_angle,
+                       distribution, real_part, theta_e, power_law_p, gamma_min,
+                       gamma_max, gamma_cutoff, kappa, kappa_width).
+     Keys for distribution functions: symphonyPy.MAXWELL_JUETTNER,
+                                      symphonyPy.POWER_LAW,
+                                      symphonyPy.KAPPA_DIST
+  """
+
+  cdef char* error_message = NULL
+  result = chi_rho_Q_symphony(nu, magnetic_field, electron_density,
+                     observer_angle, distribution, real_part, theta_e,
+                     power_law_p, gamma_min, gamma_max, gamma_cutoff,
+                     kappa, kappa_width, &error_message)
+  if error_message:
+    raise RuntimeError (error_message)
+  return result
+
 
 import numpy as np
 from scipy.interpolate import interp2d
