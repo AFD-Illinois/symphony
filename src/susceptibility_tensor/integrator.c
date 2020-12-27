@@ -115,6 +115,7 @@ double tau_integrator(double gamma, void * parameters)
     }
     else if (params->tau_integrand == &chi_rho_Q_integrand)
     {
+      int o             = 0;
       double ans_total  = 0.;
       int zero_evals    = 0;
       double start_osc  = 10000 + (.035 * params->omega*gamma/( params->omega_c));
