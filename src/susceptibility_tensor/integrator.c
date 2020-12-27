@@ -174,16 +174,16 @@ double tau_integrator(double gamma, void * parameters)
           }
           else if (eval > 5)
           {
-            denom = (term1) - (2 * term2) + (2 * term4) - (term5);
-            numer = (term4 * term4) - (term2 * term2) + (term3 * (term1 - term5));
+            denom  = (term1) - (2 * term2) + (2 * term4) - (term5);
+            numer  = (term4 * term4) - (term2 * term2) + (term3 * (term1 - term5));
             holder = numer / denom;
-            fpp1 = (term1 - 2 * term2 + term3) / (step * step);
-            fpp2 = (term3 - 2 * term4 + term5) / (step * step);
-            term1 = term2;
-            term2 = term3;
-            term3 = term4;
-            term4 = term5;
-            term5 = ans_tot;
+            fpp1   = (term1 - 2 * term2 + term3) / (step * step);
+            fpp2   = (term3 - 2 * term4 + term5) / (step * step);
+            term1  = term2;
+            term2  = term3;
+            term3  = term4;
+            term4  = term5;
+            term5  = ans_tot;
             if(fpp1 > 0 && fpp2 < 0)
             {
               poi++;
