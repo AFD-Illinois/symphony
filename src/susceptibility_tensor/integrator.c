@@ -26,8 +26,6 @@ double tau_trapezoidal(struct parameters *p, double start, double end, int sampl
   return osc_ans_tot;
 }
 
-
-
 /*tau_integrator: integrator for the first integral (the tau integral) for the
  *                components of the susceptibility tensor.  The chi_33 integral
  *                is faster when we use a fixed-order Gaussian quadrature
@@ -115,7 +113,96 @@ double tau_integrator(double gamma, void * parameters)
       gsl_integration_qng(&F, i*step, (i+1)*step, epsabs, epsrel, 
                           &ans_step, &error, &limit);
     }
-    //Insert chi_rho_Q integrator here
+    else if (params->tau_integrand == &chi_rho_Q_integrand)
+    {
+      double ans_total  = 0.;
+      int zero_evals    = 0;
+      double start_osc  = 10000 + (.035 * params->omega*gamma/( params->omega_c));
+      int eval          = 0;
+      int poi           = 0;
+      double holder_sum = 0.;
+      double holder     = 0.;
+      double denom      = 0.;
+      double numer      = 0.;
+      double term1      = 0.;
+      double term2      = 0.;
+      double term3      = 0.;
+      double term4      = 0.;
+      double term5      = 0.;
+      double fpp1       = 0.;
+      double fpp2       = 0.;
+
+      while(zero_evals < 10)
+      {
+        if (o == 0)
+        {
+          gsl_integration_qags(&F, 0, step, epsabs, epsrel, limit,
+                                                     w, &ans_step, &error);
+        }
+        else
+        {
+          ans_step = tau_trapezoidal(params, o*step, (o+1)*step, 12);
+        }
+        if(ans_step == 0.)
+        {
+          zero_evals++;
+        }
+        o++;
+        ans_tot += ans_step;
+        if (o > start_osc)
+        {
+          eval++;
+          if (eval == 1)
+          {
+            term1 = ans_tot;
+          }
+          else if (eval == 2)
+          {                                                                            
+            term2 = ans_tot;
+          }
+          else if (eval == 3)
+          {
+            term3 = ans_tot;
+          }
+          else if (eval == 4)
+          {
+            term4 = ans_tot;
+          }
+          else if (eval == 5)
+          {
+            term5 = ans_tot;
+          }
+          else if (eval > 5)
+          {
+            denom = (term1) - (2 * term2) + (2 * term4) - (term5);
+            numer = (term4 * term4) - (term2 * term2) + (term3 * (term1 - term5));
+            holder = numer / denom;
+            fpp1 = (term1 - 2 * term2 + term3) / (step * step);
+            fpp2 = (term3 - 2 * term4 + term5) / (step * step);
+            term1 = term2;
+            term2 = term3;
+            term3 = term4;
+            term4 = term5;
+            term5 = ans_tot;
+            if(fpp1 > 0 && fpp2 < 0)
+            {
+              poi++;
+              holder_sum += holder;  
+            }
+            if(fpp1 < 0 && fpp2 > 0)
+            {
+                poi++;
+                holder_sum += holder;
+            }
+            if (poi > 3)
+            {
+              return holder_sum / 4;
+            }
+          }
+        }
+      }
+      return ans_tot;
+    }
     else
     {
       gsl_integration_qawo(&F, i*step, epsabs, epsrel, limit, w, table, 
