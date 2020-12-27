@@ -5,6 +5,29 @@
 #include <gsl/gsl_errno.h>
 #include "susceptibility_tensor.h"
 
+double tau_trapezoidal(struct parameters *p, double start, double end, int samples)
+{
+  int k                = 1;
+  double tau           = 0;
+  double eval          = 0;
+  double tau_step      = (end - start)/samples;
+  double tau_ans_step  = 0.;
+  double osc_ans_tot   = (chi_rho_Q_integrand(start, p) + chi_rho_Q_integrand(end, p)) * tau_step / 2;
+        
+  while(start + (k * tau_step) < end)
+  {
+    eval = chi_rho_Q_integrand(start + (k * tau_step), p);
+    tau_ans_step = tau_step * eval;
+    osc_ans_tot += tau_ans_step;
+    tau = start + (k * tau_step);
+    k++;
+  }
+  
+  return osc_ans_tot;
+}
+
+
+
 /*tau_integrator: integrator for the first integral (the tau integral) for the
  *                components of the susceptibility tensor.  The chi_33 integral
  *                is faster when we use a fixed-order Gaussian quadrature
@@ -92,6 +115,7 @@ double tau_integrator(double gamma, void * parameters)
       gsl_integration_qng(&F, i*step, (i+1)*step, epsabs, epsrel, 
                           &ans_step, &error, &limit);
     }
+    //Insert chi_rho_Q integrator here
     else
     {
       gsl_integration_qawo(&F, i*step, epsabs, epsrel, limit, w, table, 
