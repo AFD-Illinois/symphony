@@ -600,6 +600,14 @@ double chi_33_integrand(double tau_prime, void * parameters)
   return ans;
 }
 
+/*chi_rho_Q_integrand: combined integrand for the four chi_ij components of the 
+ *                     susceptibility tensor used to calculate rho_Q.  
+ *
+ *@params: double tau_prime (the first integration is carried out over this
+ *         variable), void * parameters (a pointer to the struct of parameters)
+ *
+ *@returns: chi_rho_Q_integrand at tau_prime with parameters params
+ */
 double chi_rho_Q_integrand(double tau_prime, void * parameters)
 {
   struct parameters * params = (struct parameters*) parameters ;
@@ -613,30 +621,32 @@ double chi_rho_Q_integrand(double tau_prime, void * parameters)
                       * tau_prime / (2.));
 	
   double gamma_term_chi_11 = -beta*beta * params->gamma * df_dgamma(params);
-  double tauxi_term_chi_11 = 0.5*(cos((params->epsilon*params->omega_c/params->omega) * 
-  				tau_prime) * I_1_analytic(alpha, delta) - I_1_of_2(alpha, delta));
-  double chi_11_term       = prefactor * gamma_term_chi_11 * tauxi_term_chi_11 *
- 				params->gamma*params->gamma * beta;
+  double tauxi_term_chi_11 = 0.5*(cos((params->epsilon*params->omega_c/params->omega) 
+			     * tau_prime) * I_1_analytic(alpha, delta) 
+			     - I_1_of_2(alpha, delta));
+  double chi_11_term       = prefactor * gamma_term_chi_11 * tauxi_term_chi_11 
+	                     * params->gamma*params->gamma * beta;
   double gamma_term_chi_13 = -beta*beta * params->gamma * df_dgamma(params);
   double tau_term_chi_13   = cos((params->epsilon*params->omega_c/params->omega) 
-				 * tau_prime / 2.);
+			     * tau_prime / 2.);
   double xi_term_chi_13    = I_2_analytic(alpha, delta);
-  double chi_13_term       = prefactor * gamma_term_chi_13 * xi_term_chi_13 *
- 				tau_term_chi_13 * params->gamma*params->gamma * beta;
+  double chi_13_term       = prefactor * gamma_term_chi_13 * xi_term_chi_13 
+	                     * tau_term_chi_13 * params->gamma*params->gamma * beta;
  double gamma_term_chi_22  = -beta*beta * params->gamma * df_dgamma(params);
- double tauxi_term_chi_22  = 0.5*(cos((params->epsilon*params->omega_c/params->omega) *
-			     tau_prime) * I_1_analytic(alpha, delta) + I_1_of_2(alpha, delta));
- double chi_22_term        = prefactor * gamma_term_chi_22 * tauxi_term_chi_22 *
-			     params->gamma*params->gamma * beta;
+ double tauxi_term_chi_22  = 0.5*(cos((params->epsilon*params->omega_c/params->omega) 
+		             * tau_prime) * I_1_analytic(alpha, delta) 
+			     + I_1_of_2(alpha, delta));
+ double chi_22_term        = prefactor * gamma_term_chi_22 * tauxi_term_chi_22 
+	                     * params->gamma*params->gamma * beta;
  double gamma_term_chi_33  = -beta*beta * params->gamma * df_dgamma(params);
  double tau_term_chi_33    = 1.;
  double xi_term_chi_33     = I_3_analytic(alpha, delta);
- double chi_33_term        = prefactor * gamma_term_chi_33 * xi_term_chi_33 * tau_term_chi_33 *
- 				params->gamma*params->gamma * beta;
+ double chi_33_term        = prefactor * gamma_term_chi_33 * xi_term_chi_33 
+	                     * tau_term_chi_33 * params->gamma*params->gamma * beta;
  double ans                = (chi_22_term - (chi_11_term * pow(cos(params->observer_angle), 2 )) 
-	 			- (chi_33_term * pow(sin(params->observer_angle), 2 ))
-	 			+ (2 * chi_13_term * sin(params->observer_angle) 
-				* cos(params->observer_angle))) * (-sin(params->gamma * tau_prime));
+	 		     - (chi_33_term * pow(sin(params->observer_angle), 2 ))
+	 		     + (2 * chi_13_term * sin(params->observer_angle) 
+			     * cos(params->observer_angle))) * (-sin(params->gamma * tau_prime));
 	
  return ans;
 }
