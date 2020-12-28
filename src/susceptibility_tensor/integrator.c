@@ -115,45 +115,44 @@ double tau_integrator(double gamma, void * parameters)
     }
     else if (params->tau_integrand == &chi_rho_Q_integrand)
     {
-      int o             = 0;   // Index for how many oscillations of the tau integrand we've evaluated
-      double ans_total  = 0.;  // I don't think this is used anymore
-      int zero_evals    = 0;   // Number of times an oscillation of the tau integrand evaluates to 0
-      double start_osc  = 10000 + (.035 * params->omega*gamma/( params->omega_c));   // The value for the index o at which we begin searching for points of inflection
-      int eval          = 0;   // Number of evaluations after start_osc (Replaceable with some combination of o and start_osc)
-      int poi           = 0;   // Number of points of inflection where we've evaluated the integrand
-      double holder_sum = 0.;  // The sum of the asymptotic values evaluated at points of inflection.  We average of 4 evaluations to get the final answer
-      double holder     = 0.;  // The asymptotic value of the integral calculated at a point of inflection
-      double denom      = 0.;
-      double numer      = 0.;
-      double term1      = 0.;
-      double term2      = 0.;
-      double term3      = 0.;
-      double term4      = 0.;
-      double term5      = 0.;
-      double fpp1       = 0.; // Used to find inflection points 
-      double fpp2       = 0.; // Used to find inflection points
+      int o                  = 0;   // Index for how many oscillations of the tau integrand we've evaluated
+      int zero_evals         = 0;   // Number of times an oscillation of the tau integrand evaluates to 0
+      double start_osc       = 10000 + (.035 * params->omega*gamma/( params->omega_c));   // The value for the index o at which we begin searching for points of inflection
+      int eval               = 0;   // Number of evaluations after start_osc (Replaceable with some combination of o and start_osc)
+      int poi                = 0;   // Number of points of inflection where we've evaluated the integrand
+      double asym_sum_to_avg = 0.;  // The sum of the asymptotic values evaluated at points of inflection.  We average of 4 evaluations to get the final answer
+      double asym            = 0.;  // The asymptotic value of the integral calculated at a point of inflection
+      double denom           = 0.;
+      double numer           = 0.;
+      double term1           = 0.;
+      double term2           = 0.;
+      double term3           = 0.;
+      double term4           = 0.;
+      double term5           = 0.;
+      double fpp1            = 0.; // Used to find inflection points of the integrand
+      double fpp2            = 0.; // Used to find inflection points of the integrand
 
-      while(zero_evals < 10)
+      while(zero_evals < 10) // Check to make sure integral hasn't converged
       {
-        if (o == 0)
+        if (o == 0) // Due to the singularity in the integrand at tau = 0, we use qags quadrature to evaluate the first oscillation.
         {
-          gsl_integration_qags(&F, 0, step, epsabs, epsrel, limit,
+          gsl_integration_qags(&F, 0, step, epsabs, epsrel, limit,          
                                                      w, &ans_step, &error);
         }
         else
         {
-          ans_step = tau_trapezoidal(params, o*step, (o+1)*step, 12);
+          ans_step = tau_trapezoidal(params, o*step, (o+1)*step, 12); //Use trapezoidal method to evaluate the area under each oscillation in tau
         }
         if(ans_step == 0.)
         {
-          zero_evals++;
+          zero_evals++;  // Check to make sure integral hasn't converged
         }
         o++;
         ans_tot += ans_step;
         if (o > start_osc)
         {
           eval++;
-          if (eval == 1)
+          if (eval == 1)         // Set terms to adjacent evaluations of the slow to converge integral 
           {
             term1 = ans_tot;
           }
@@ -175,34 +174,29 @@ double tau_integrator(double gamma, void * parameters)
           }
           else if (eval > 5)
           {
-            denom  = (term1) - (2 * term2) + (2 * term4) - (term5);
-            numer  = (term4 * term4) - (term2 * term2) + (term3 * (term1 - term5));
-            holder = numer / denom;
-            fpp1   = (term1 - 2 * term2 + term3) / (step * step);
+            denom  = (term1) - (2 * term2) + (2 * term4) - (term5); // Numerical method of calculating asymptote for converging sinusoid 
+            numer  = (term4 * term4) - (term2 * term2) + (term3 * (term1 - term5)); 
+            asym   = numer / denom;                                  
+            fpp1   = (term1 - 2 * term2 + term3) / (step * step);  // Calculate 2 adjacent vaues of the second derivative of the integrand 
             fpp2   = (term3 - 2 * term4 + term5) / (step * step);
             term1  = term2;
             term2  = term3;
-            term3  = term4;
+            term3  = term4;                                  // Shift all terms by 1
             term4  = term5;
             term5  = ans_tot;
-            if(fpp1 > 0 && fpp2 < 0)
-            {
-              poi++;
-              holder_sum += holder;  
-            }
-            if(fpp1 < 0 && fpp2 > 0)
-            {
-                poi++;
-                holder_sum += holder;
+            if(fpp1 > 0 && fpp2 < 0 || fpp1 < 0 && fpp2 > 0) // Check if the second derivative of the integrand changes signs.
+            {                                                // We want to evaluate at these points to avoid dividing by small numbers
+              poi++;                                         // when calculating the asymptote.
+              asym_sum_to_avg += asym;  
             }
             if (poi > 3)
             {
-              return holder_sum / 4;
+              return asym_sum_to_avg / 4; //Average The Answer over 4 points of infelction
             }
           }
         }
       }
-      return ans_tot;
+      return ans_tot; // Only happens if zero_evals surpasses 10 (The integral has converged).
     }
     else
     {
