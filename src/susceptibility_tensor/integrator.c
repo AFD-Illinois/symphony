@@ -115,10 +115,8 @@ double tau_integrator(double gamma, void * parameters)
     }
     else if (params->tau_integrand == &chi_rho_Q_integrand)
     {
-      int o                  = 0;   // Index for how many oscillations of the tau integrand we've evaluated
       int zero_evals         = 0;   // Number of times an oscillation of the tau integrand evaluates to 0
-      double start_osc       = 10000 + (.035 * params->omega*gamma/( params->omega_c));   // The value for the index o at which we begin searching for points of inflection
-      int eval               = 0;   // Number of evaluations after start_osc (Replaceable with some combination of o and start_osc)
+      int start_osc       = 10000 + (.035 * params->omega*gamma/( params->omega_c));   // The value for the index o at which we begin searching for points of inflection
       int poi                = 0;   // Number of points of inflection where we've evaluated the integrand
       double asym_sum_to_avg = 0.;  // The sum of the asymptotic values evaluated at points of inflection.  We average of 4 evaluations to get the final answer
       double asym            = 0.;  // The asymptotic value of the integral calculated at a point of inflection
@@ -129,50 +127,49 @@ double tau_integrator(double gamma, void * parameters)
       double term3           = 0.;
       double term4           = 0.;
       double term5           = 0.;
-      double fpp1            = 0.; // Used to find inflection points of the integrand
-      double fpp2            = 0.; // Used to find inflection points of the integrand
+      double fpp1            = 0.; // Two adjacent values of the second derivative of the integrand
+      double fpp2            = 0.; // Used to find inflection points of the integrand where we evaluate the asymptote
 
       while(zero_evals < 10) // Check to make sure integral hasn't converged
       {
-        if (o == 0) // Due to the singularity in the integrand at tau = 0, we use qags quadrature to evaluate the first oscillation.
+        if (i == 0) // Due to the singularity in the integrand at tau = 0, we use qags quadrature to evaluate the first oscillation.
         {
           gsl_integration_qags(&F, 0, step, epsabs, epsrel, limit,          
                                                      w, &ans_step, &error);
         }
         else
         {
-          ans_step = tau_trapezoidal(params, o*step, (o+1)*step, 12); //Use trapezoidal method to evaluate the area under each oscillation in tau
+          ans_step = tau_trapezoidal(params, i*step, (i+1)*step, 12); //Use trapezoidal method to evaluate the area under each oscillation in tau
         }
         if(ans_step == 0.)
         {
           zero_evals++;  // Check to make sure integral hasn't converged
         }
-        o++;
+        i++;
         ans_tot += ans_step;
-        if (o > start_osc)
+        if (i > start_osc)
         {
-          eval++;
-          if (eval == 1)         // Set terms to adjacent evaluations of the slow to converge integral 
+          if (i - start_osc == 1)         // Set terms to adjacent evaluations of the slow to converge integral 
           {
             term1 = ans_tot;
           }
-          else if (eval == 2)
+          else if (i - start_osc == 2)
           {                                                                            
             term2 = ans_tot;
           }
-          else if (eval == 3)
+          else if (i - start_osc == 3)
           {
             term3 = ans_tot;
           }
-          else if (eval == 4)
+          else if (i - start_osc == 4)
           {
             term4 = ans_tot;
           }
-          else if (eval == 5)
+          else if (i - start_osc == 5)
           {
             term5 = ans_tot;
           }
-          else if (eval > 5)
+          else if (i - start_osc > 5)
           {
             denom  = (term1) - (2 * term2) + (2 * term4) - (term5); // Numerical method of calculating asymptote for converging sinusoid 
             numer  = (term4 * term4) - (term2 * term2) + (term3 * (term1 - term5)); 
