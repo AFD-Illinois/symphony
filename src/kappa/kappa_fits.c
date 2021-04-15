@@ -322,3 +322,111 @@ double kappa_V_abs(struct parameters * params)
     the sign has been corrected here.*/
   return -ans * sign_bug_patch;
 }
+
+double kappa35_rho_Q(struct parameters * params)
+{
+  double nu_c = get_nu_c(*params);
+
+  double nu_w = pow(params->kappa_width*params->kappa, 2.) * nu_c 
+                * sin(params->observer_angle);
+
+  double X_k = params->nu/nu_w;
+
+  double prefactor = -(params->electron_density 
+                      * pow(params->electron_charge, 2.) 
+		      * pow(nu_c, 2.)
+		      * pow(sin(params->observer_angle), 2.))
+	             /(params->mass_electron * params->speed_light * pow(params->nu, 3.));
+	
+  double w_term = (17 * params->kappa_width) 
+	  - (3 * pow(params->kappa_width, .5)) 
+	  + (7 * pow(params->kappa_width, .5) * exp(-5 * kappa_width));
+	  
+  double f_X = 1 - exp(-pow(X_k, .84) / 30) 
+	  - (sin(X_k / 10) * exp(-3* pow(X_k, .471) / 2));
+
+  double ans = prefactor * f_X * w_term;
+
+  return ans;
+}
+
+double kappa4_rho_Q(struct parameters * params)
+{
+  double nu_c = get_nu_c(*params);
+
+  double nu_w = pow(params->kappa_width*params->kappa, 2.) * nu_c 
+                * sin(params->observer_angle);
+
+  double X_k = params->nu/nu_w;
+
+  double prefactor = -(params->electron_density 
+                      * pow(params->electron_charge, 2.) 
+		      * pow(nu_c, 2.)
+		      * pow(sin(params->observer_angle), 2.))
+	             /(params->mass_electron * params->speed_light * pow(params->nu, 3.));
+	
+  double w_term = ((46/3) * params->kappa_width) 
+	  - ((5/3) * pow(params->kappa_width, .5)) 
+	  + ((17/3) * pow(params->kappa_width, .5) * exp(-5 * kappa_width));
+	  
+  double f_X = 1 - exp(-pow(X_k, .84) / 18) 
+	  - (sin(X_k / 6) * exp(-7* pow(X_k, .5) / 4));
+
+  double ans = prefactor * f_X * w_term;
+
+  return ans;
+}
+
+double kappa45_rho_Q(struct parameters * params)
+{
+  double nu_c = get_nu_c(*params);
+
+  double nu_w = pow(params->kappa_width*params->kappa, 2.) * nu_c 
+                * sin(params->observer_angle);
+
+  double X_k = params->nu/nu_w;
+
+  double prefactor = -(params->electron_density 
+                      * pow(params->electron_charge, 2.) 
+		      * pow(nu_c, 2.)
+		      * pow(sin(params->observer_angle), 2.))
+	             /(params->mass_electron * params->speed_light * pow(params->nu, 3.));
+	
+  double w_term = (14 * params->kappa_width) 
+	  - ((13/8) * pow(params->kappa_width, .5)) 
+	  + ((9/2) * pow(params->kappa_width, .5) * exp(-5 * kappa_width));
+	  
+  double f_X = 1 - exp(-pow(X_k, .84) / 12) 
+	  - (sin(X_k / 4) * exp(-2* pow(X_k, .525)));
+
+  double ans = prefactor * f_X * w_term;
+
+  return ans;
+}
+
+double kappa5_rho_Q(struct parameters * params)
+{
+  double nu_c = get_nu_c(*params);
+
+  double nu_w = pow(params->kappa_width*params->kappa, 2.) * nu_c 
+                * sin(params->observer_angle);
+
+  double X_k = params->nu/nu_w;
+
+  double prefactor = -(params->electron_density 
+                      * pow(params->electron_charge, 2.) 
+		      * pow(nu_c, 2.)
+		      * pow(sin(params->observer_angle), 2.))
+	             /(params->mass_electron * params->speed_light * pow(params->nu, 3.));
+	
+  double w_term = ((25/2) * params->kappa_width) 
+	  - (pow(params->kappa_width, .5)) 
+	  + (5 * pow(params->kappa_width, .5) * exp(-5 * kappa_width));
+	  
+  double f_X = 1 - exp(-pow(X_k, .84) / 8) 
+	  - (sin(3 * X_k / 8) * exp(-9* pow(X_k, .541) / 4));
+
+  double ans = prefactor * f_X * w_term;
+
+  return ans;
+}
