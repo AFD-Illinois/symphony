@@ -212,6 +212,25 @@ double rho_nu_fit(double nu,
     else if(params.polarization == params.STOKES_U) return 0.;
     else if(params.polarization == params.STOKES_V) return maxwell_juettner_rho_V(&params);
   }
+  
+  if(params.distribution == params.KAPPA_DIST && params.kappa != 3.5 && params.kappa != 4. && params.kappa != 4.5 && params.kappa != 5.)
+  {
+    printf("Fits not available for this kappa value.  Try kappa = 3.5, 4, 4.5, or 5");
+    return 0.;
+  }
+  
+  if(params.distribution == params.KAPPA_DIST)
+  {
+    if     (params.polarization == params.STOKES_Q && params.kappa == 3.5) return kappa35_rho_Q(&params);
+    else if(params.polarization == params.STOKES_Q && params.kappa == 4.) return kappa4_rho_Q(&params);
+    else if(params.polarization == params.STOKES_Q && params.kappa == 4.5) return kappa45_rho_Q(&params);
+    else if(params.polarization == params.STOKES_Q && params.kappa == 5.) return kappa5_rho_Q(&params);
+    else if(params.polarization == params.STOKES_U) return 0.;
+    else if(params.polarization == params.STOKES_V && params.kappa == 3.5) return kappa35_rho_V(&params);
+    else if(params.polarization == params.STOKES_V && params.kappa == 4.) return kappa4_rho_V(&params);
+    else if(params.polarization == params.STOKES_V && params.kappa == 4.5) return kappa45_rho_V(&params);
+    else if(params.polarization == params.STOKES_V && params.kappa == 5.) return kappa5_rho_V(&params);
+  }
 
 /*Faraday rotation coefficients for Power-law and Kappa distributions will be added later*/
 //  else if(params.distribution == params.POWER_LAW)
