@@ -445,7 +445,7 @@ double kappa35_rho_V(struct parameters * params)
 		      * nu_c * cos(params->observer_angle))
 	             /(params->mass_electron * params->speed_light * pow(params->nu, 2.));
 	
-  double bessel_term = (gsl_sf_bessel_Kn(0, 1./params->kappa_width) / (gsl_sf_bessel_Kn(2, 1./params->kappa_width);
+  double bessel_term = (gsl_sf_bessel_Kn(0, 1./params->kappa_width)) / (gsl_sf_bessel_Kn(2, 1./params->kappa_width));
 	
   double w_term = (pow(params->kappa_width, 2.) + (2. * params->kappa_width) + 1.) 
 		 / (((25./8.) * pow(params->kappa_width, 2.)) + (4. * params->kappa_width) + 1.);
@@ -468,10 +468,10 @@ double kappa4_rho_V(struct parameters * params)
 
   double prefactor = 2. * (params->electron_density 
                       * pow(params->electron_charge, 2.) 
-		      * nu_c * cos(params->observer_angle)
+		      * nu_c * cos(params->observer_angle))
 	             /(params->mass_electron * params->speed_light * pow(params->nu, 2.));
 	
-  double bessel_term = (gsl_sf_bessel_Kn(0, 1./params->kappa_width) / (gsl_sf_bessel_Kn(2, 1./params->kappa_width);
+  double bessel_term = (gsl_sf_bessel_Kn(0, 1./params->kappa_width)) / (gsl_sf_bessel_Kn(2, 1./params->kappa_width));
 	
   double w_term = (pow(params->kappa_width, 2.) + (54. * params->kappa_width) + 50.) 
 		 / (((30./11.) * pow(params->kappa_width, 2.)) + (134. * params->kappa_width) + 50.);
@@ -494,10 +494,10 @@ double kappa45_rho_V(struct parameters * params)
 
   double prefactor = 2. * (params->electron_density 
                       * pow(params->electron_charge, 2.) 
-		      * nu_c * cos(params->observer_angle)
+		      * nu_c * cos(params->observer_angle))
 	             /(params->mass_electron * params->speed_light * pow(params->nu, 2.));
 	
-  double bessel_term = (gsl_sf_bessel_Kn(0, 1./params->kappa_width) / (gsl_sf_bessel_Kn(2, 1./params->kappa_width);
+  double bessel_term = (gsl_sf_bessel_Kn(0, 1./params->kappa_width)) / (gsl_sf_bessel_Kn(2, 1./params->kappa_width));
 	
   double w_term = (pow(params->kappa_width, 2.) + (43. * params->kappa_width) + 38.) 
 		 / (((7./3.) * pow(params->kappa_width, 2.)) + ((185./2.) * params->kappa_width) + 38.);
@@ -520,10 +520,10 @@ double kappa5_rho_V(struct parameters * params)
 
   double prefactor = 2. * (params->electron_density 
                       * pow(params->electron_charge, 2.) 
-		      * nu_c * cos(params->observer_angle)
+		      * nu_c * cos(params->observer_angle))
 	             /(params->mass_electron * params->speed_light * pow(params->nu, 2.));
 	
-  double bessel_term = (gsl_sf_bessel_Kn(0, 1./params->kappa_width) / (gsl_sf_bessel_Kn(2, 1./params->kappa_width)
+  double bessel_term = (gsl_sf_bessel_Kn(0, 1./params->kappa_width)) / (gsl_sf_bessel_Kn(2, 1./params->kappa_width));
 	
   double w_term = ((params->kappa_width) + (13./14.)) 
 		 / ((2. * params->kappa_width) + (13./14.));
