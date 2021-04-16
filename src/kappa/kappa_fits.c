@@ -340,7 +340,7 @@ double kappa35_rho_Q(struct parameters * params)
 	
   double w_term = (17. * params->kappa_width) 
 	  - (3. * pow(params->kappa_width, .5)) 
-	  + (7. * pow(params->kappa_width, .5) * exp(-5. * kappa_width));
+	  + (7. * pow(params->kappa_width, .5) * exp(-5. * params->kappa_width));
 	  
   double f_X = 1. - exp(-pow(X_k, .84) / 30.) 
 	  - (sin(X_k / 10.) * exp(-3. * pow(X_k, .471) / 2.));
@@ -367,7 +367,7 @@ double kappa4_rho_Q(struct parameters * params)
 	
   double w_term = ((46./3.) * params->kappa_width) 
 	  - ((5./3.) * pow(params->kappa_width, .5)) 
-	  + ((17./3.) * pow(params->kappa_width, .5) * exp(-5. * kappa_width));
+	  + ((17./3.) * pow(params->kappa_width, .5) * exp(-5. * params->kappa_width));
 	  
   double f_X = 1. - exp(-pow(X_k, .84) / 18.) 
 	  - (sin(X_k / 6.) * exp(-7. * pow(X_k, .5) / 4.));
@@ -394,7 +394,7 @@ double kappa45_rho_Q(struct parameters * params)
 	
   double w_term = (14. * params->kappa_width) 
 	  - ((13./8.) * pow(params->kappa_width, .5)) 
-	  + ((9./2.) * pow(params->kappa_width, .5) * exp(-5. * kappa_width));
+	  + ((9./2.) * pow(params->kappa_width, .5) * exp(-5. * params->kappa_width));
 	  
   double f_X = 1. - exp(-pow(X_k, .84) / 12.) 
 	  - (sin(X_k / 4.) * exp(-2. * pow(X_k, .525)));
@@ -421,7 +421,7 @@ double kappa5_rho_Q(struct parameters * params)
 	
   double w_term = ((25./2.) * params->kappa_width) 
 	  - (pow(params->kappa_width, .5)) 
-	  + (5. * pow(params->kappa_width, .5) * exp(-5. * kappa_width));
+	  + (5. * pow(params->kappa_width, .5) * exp(-5. * params->kappa_width));
 	  
   double f_X = 1. - exp(-pow(X_k, .84) / 8.) 
 	  - (sin(3. * X_k / 8.) * exp(-9. * pow(X_k, .541) / 4.));
@@ -442,7 +442,7 @@ double kappa35_rho_V(struct parameters * params)
 
   double prefactor = 2. * (params->electron_density 
                       * pow(params->electron_charge, 2.) 
-		      * nu_c * cos(params->observer_angle)
+		      * nu_c * cos(params->observer_angle))
 	             /(params->mass_electron * params->speed_light * pow(params->nu, 2.));
 	
   double bessel_term = (gsl_sf_bessel_Kn(0, 1./params->kappa_width) / (gsl_sf_bessel_Kn(2, 1./params->kappa_width);
