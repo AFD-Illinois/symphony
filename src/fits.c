@@ -221,6 +221,10 @@ double rho_nu_fit(double nu,
   
   if(params.distribution == params.KAPPA_DIST)
   {
+    if(params->nu/nu_c < 100 || params->nu/(pow(params->kappa_width * params->kappa, 2.) *nu_c * sin(params->observer_angle)) < 0.1)
+    {
+      printf("\n WARNING: nu and/or X_kappa low; rho kappa Fits may be inaccurate \n");
+    }
     if     (params.polarization == params.STOKES_Q && params.kappa == 3.5) return kappa35_rho_Q(&params);
     else if(params.polarization == params.STOKES_Q && params.kappa == 4.) return kappa4_rho_Q(&params);
     else if(params.polarization == params.STOKES_Q && params.kappa == 4.5) return kappa45_rho_Q(&params);
@@ -317,6 +321,5 @@ double check_for_errors(struct parameters * params)
   {
     printf("\n WARNING: theta out of range; fitting formula may be inaccurate \n");
   }
-
   return 0.;
 }
