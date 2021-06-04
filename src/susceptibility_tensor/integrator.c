@@ -116,7 +116,8 @@ double tau_integrator(double gamma, void * parameters)
     else if (params->tau_integrand == &chi_rho_Q_integrand)
     {
       int zero_evals         = 0;   // Number of times an oscillation of the tau integrand evaluates to 0
-      int start_osc       = 10000 + (.035 * params->omega*gamma/( params->omega_c));   // The value for the index o at which we begin searching for points of inflection
+      int start_min          = 5000; // We set this minimum since tau must be >> 1 before beginning evauluation (this condition would otherwise be violated for small gamma)
+      int start_osc          = start_min + (.25 * params->omega*gamma/( params->omega_c));   // The value for the index o at which we begin searching for points of inflection
       int poi                = 0;   // Number of points of inflection where we've evaluated the integrand
       double asym_sum_to_avg = 0.;  // The sum of the asymptotic values evaluated at points of inflection.  We average of 4 evaluations to get the final answer
       double asym            = 0.;  // The asymptotic value of the integral calculated at a point of inflection
@@ -449,10 +450,12 @@ double gamma_integrator(struct parameters *p)
     to use the (much slower) GSL integrator QAGS in these cases. */
   if(p->distribution == p->POWER_LAW && p->omega/p->omega_c < 5.)
   {
+    start   = p->gamma_min;
     ans_tot = gsl_integrator(p, start, end);
   }
   else if(p->distribution == p->POWER_LAW && p->omega/p->omega_c > 5.)
   {
+    start   = p->gamma_min;
     ans_tot = gauss_legendre(p, start, end);
   }
   else
