@@ -221,9 +221,10 @@ double rho_nu_fit(double nu,
   
   if(params.distribution == params.KAPPA_DIST)
   {
-    if(params->nu/nu_c < 100 || params->nu/(pow(params->kappa_width * params->kappa, 2.) *nu_c * sin(params->observer_angle)) < 0.1)
+    if(params.nu/(2.8e6 * params.magnetic_field) < 100 || 
+       params.nu/(pow(params.kappa_width * params.kappa, 2.) * (2.8e6 * params.magnetic_field) * sin(params.observer_angle)) < 0.1)
     {
-      printf("\n WARNING: nu and/or X_kappa low; rho kappa Fits may be inaccurate \n");
+      printf("\n WARNING: nu and/or X_kappa low; rho kappa fits may be inaccurate \n");
     }
     if     (params.polarization == params.STOKES_Q && params.kappa == 3.5) return kappa35_rho_Q(&params);
     else if(params.polarization == params.STOKES_Q && params.kappa == 4.) return kappa4_rho_Q(&params);
