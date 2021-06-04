@@ -42,8 +42,8 @@ double dPL_dgamma(struct parameters * params)
                * (-1 + 2. * params->gamma * params->gamma 
   		  + params->power_law_p * (params->gamma*params->gamma - 1.))
   	       / (4. * params->pi * 
-                  (pow(params->gamma_min, -1. - params->power_law_p) 
-                   - pow(params->gamma_max, -1. - params->power_law_p))
+                  (pow(params->gamma_min, 1. - params->power_law_p) 
+                   - pow(params->gamma_max, 1. - params->power_law_p))
   		  * beta * (params->gamma*params->gamma - 1.)) 
                * pow(params->gamma, -3. - params->power_law_p);
   return ans;	
