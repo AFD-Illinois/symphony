@@ -88,8 +88,8 @@ double maxwell_juettner_V(struct parameters * params)
 	
   double term1 = params->nu / (pow(params->theta_e, 3)*tan(params->observer_angle));
 	
-  double term2 = ((1.8138 * pow(X, -1.)) +( 3.423 * pow(X, -(2./3.))) +
-                 (0.02955 * pow(X, -(1./2.))) +( 2.0377 * pow(X, -(1./3.))))
+  double term2 = ((1.81384 * pow(X, -1.)) +( 3.42319 * pow(X, -(2./3.))) +
+                 (0.0292545 * pow(X, -(1./2.))) +( 2.03773 * pow(X, -(1./3.))))
                  *exp(-1.8899 * pow(X, 1./3.));
 	
   double ans = prefactor*term1*term2;
