@@ -5,6 +5,27 @@
 #include <gsl/gsl_errno.h>
 #include "susceptibility_tensor.h"
 
+double tau_trapezoidal(struct parameters *p, double start, double end, int samples)
+{
+  int k                = 1;
+  double tau           = 0;
+  double eval          = 0;
+  double tau_step      = (end - start)/samples;
+  double tau_ans_step  = 0.;
+  double osc_ans_tot   = (chi_rho_Q_integrand(start, p) + chi_rho_Q_integrand(end, p)) * tau_step / 2;
+        
+  while(start + (k * tau_step) < end)
+  {
+    eval = chi_rho_Q_integrand(start + (k * tau_step), p);
+    tau_ans_step = tau_step * eval;
+    osc_ans_tot += tau_ans_step;
+    tau = start + (k * tau_step);
+    k++;
+  }
+  
+  return osc_ans_tot;
+}
+
 /*tau_integrator: integrator for the first integral (the tau integral) for the
  *                components of the susceptibility tensor.  The chi_33 integral
  *                is faster when we use a fixed-order Gaussian quadrature
@@ -91,6 +112,89 @@ double tau_integrator(double gamma, void * parameters)
     {
       gsl_integration_qng(&F, i*step, (i+1)*step, epsabs, epsrel, 
                           &ans_step, &error, &limit);
+    }
+    else if (params->tau_integrand == &chi_rho_Q_integrand)
+    {
+      int zero_evals         = 0;   // Number of times an oscillation of the tau integrand evaluates to 0
+      int start_min          = 5000; // We set this minimum since tau must be >> 1 before beginning evauluation (this condition would otherwise be violated for small gamma)
+      int start_osc          = start_min + (.25 * params->omega*gamma/( params->omega_c));   // The value for the index o at which we begin searching for points of inflection
+      int poi                = 0;   // Number of points of inflection where we've evaluated the integrand
+      double asym_sum_to_avg = 0.;  // The sum of the asymptotic values evaluated at points of inflection.  We average of 4 evaluations to get the final answer
+      double asym            = 0.;  // The asymptotic value of the integral calculated at a point of inflection
+      double denom           = 0.;
+      double numer           = 0.;
+      double term1           = 0.;
+      double term2           = 0.;
+      double term3           = 0.;
+      double term4           = 0.;
+      double term5           = 0.;
+      double fpp1            = 0.; // Two adjacent values of the second derivative of the integrand
+      double fpp2            = 0.; // Used to find inflection points of the integrand where we evaluate the asymptote
+
+      while(zero_evals < 10) // Check to make sure integral hasn't converged
+      {
+        if (i == 0) // Due to the singularity in the integrand at tau = 0, we use qags quadrature to evaluate the first oscillation.
+        {
+          gsl_integration_qags(&F, 0, step, epsabs, epsrel, limit,          
+                                                     w, &ans_step, &error);
+        }
+        else
+        {
+          ans_step = tau_trapezoidal(params, i*step, (i+1)*step, 12); //Use trapezoidal method to evaluate the area under each oscillation in tau
+        }
+        if(ans_step == 0.)
+        {
+          zero_evals++;  // Check to make sure integral hasn't converged
+        }
+        i++;
+        ans_tot += ans_step;
+        if (i > start_osc)
+        {
+          if (i - start_osc == 1)         // Set terms to adjacent evaluations of the slow to converge integral 
+          {
+            term1 = ans_tot;
+          }
+          else if (i - start_osc == 2)
+          {                                                                            
+            term2 = ans_tot;
+          }
+          else if (i - start_osc == 3)
+          {
+            term3 = ans_tot;
+          }
+          else if (i - start_osc == 4)
+          {
+            term4 = ans_tot;
+          }
+          else if (i - start_osc == 5)
+          {
+            term5 = ans_tot;
+          }
+          else if (i - start_osc > 5)
+          {
+            denom  = (term1) - (2 * term2) + (2 * term4) - (term5); // Numerical method of calculating asymptote for converging sinusoid 
+            numer  = (term4 * term4) - (term2 * term2) + (term3 * (term1 - term5)); 
+            asym   = numer / denom;                                  
+            fpp1   = (term1 - 2 * term2 + term3) / (step * step);  // Calculate 2 adjacent vaues of the second derivative of the integrand 
+            fpp2   = (term3 - 2 * term4 + term5) / (step * step);
+            term1  = term2;
+            term2  = term3;
+            term3  = term4;                                  // Shift all terms by 1
+            term4  = term5;
+            term5  = ans_tot;
+            if(fpp1 > 0 && fpp2 < 0 || fpp1 < 0 && fpp2 > 0) // Check if the second derivative of the integrand changes signs.
+            {                                                // We want to evaluate at these points to avoid dividing by small numbers
+              poi++;                                         // when calculating the asymptote.
+              asym_sum_to_avg += asym;  
+            }
+            if (poi > 3)
+            {
+              return asym_sum_to_avg / 4; //Average The Answer over 4 points of infelction
+            }
+          }
+        }
+      }
+      return ans_tot; // Only happens if zero_evals surpasses 10 (The integral has converged).
     }
     else
     {
@@ -346,10 +450,12 @@ double gamma_integrator(struct parameters *p)
     to use the (much slower) GSL integrator QAGS in these cases. */
   if(p->distribution == p->POWER_LAW && p->omega/p->omega_c < 5.)
   {
+    start   = p->gamma_min;
     ans_tot = gsl_integrator(p, start, end);
   }
   else if(p->distribution == p->POWER_LAW && p->omega/p->omega_c > 5.)
   {
+    start   = p->gamma_min;
     ans_tot = gauss_legendre(p, start, end);
   }
   else

@@ -212,6 +212,48 @@ double rho_nu_fit(double nu,
     else if(params.polarization == params.STOKES_U) return 0.;
     else if(params.polarization == params.STOKES_V) return maxwell_juettner_rho_V(&params);
   }
+  
+  if(params.distribution == params.KAPPA_DIST && params.kappa < 3.5 || params.kappa > 5.0)
+  {
+    printf("Fits not available for this kappa value.  Try kappa between = 3.5 and 5");
+    return 0.;
+  }
+  
+  if(params.distribution == params.KAPPA_DIST)
+  {
+    if(params.nu/(2.8e6 * params.magnetic_field) < 100 || 
+       params.nu/(pow(params.kappa_width * params.kappa, 2.) * (2.8e6 * params.magnetic_field) * sin(params.observer_angle)) < 0.1)
+    {
+      printf("\n WARNING: nu and/or X_kappa low; rho kappa fits may be inaccurate \n");
+    }
+    if     (params.polarization == params.STOKES_Q && params.kappa == 3.5) return kappa35_rho_Q(&params);
+    else if(params.polarization == params.STOKES_Q && params.kappa == 4.) return kappa4_rho_Q(&params);
+    else if(params.polarization == params.STOKES_Q && params.kappa == 4.5) return kappa45_rho_Q(&params);
+    else if(params.polarization == params.STOKES_Q && params.kappa == 5.) return kappa5_rho_Q(&params);
+    else if(params.polarization == params.STOKES_Q && params.kappa > 3.5 && params.kappa < 4.0){
+      return kappa35_rho_Q(&params) + (params.kappa - 3.5) * (kappa4_rho_Q(&params) - kappa35_rho_Q(&params)) / 0.5;
+    }
+    else if(params.polarization == params.STOKES_Q && params.kappa > 4.0 && params.kappa < 4.5){
+      return kappa4_rho_Q(&params) + (params.kappa - 4.0) * (kappa45_rho_Q(&params) - kappa4_rho_Q(&params)) / 0.5;
+    }
+    else if(params.polarization == params.STOKES_Q && params.kappa > 4.5 && params.kappa < 5.0){
+      return kappa45_rho_Q(&params) + (params.kappa - 4.5) * (kappa5_rho_Q(&params) - kappa45_rho_Q(&params)) / 0.5;
+    }
+    else if(params.polarization == params.STOKES_U) return 0.;
+    else if(params.polarization == params.STOKES_V && params.kappa == 3.5) return kappa35_rho_V(&params);
+    else if(params.polarization == params.STOKES_V && params.kappa == 4.) return kappa4_rho_V(&params);
+    else if(params.polarization == params.STOKES_V && params.kappa == 4.5) return kappa45_rho_V(&params);
+    else if(params.polarization == params.STOKES_V && params.kappa == 5.) return kappa5_rho_V(&params);
+    else if(params.polarization == params.STOKES_V && params.kappa > 3.5 && params.kappa < 4.0){
+      return kappa35_rho_V(&params) + (params.kappa - 3.5) * (kappa4_rho_V(&params) - kappa35_rho_V(&params)) / 0.5;
+    }
+    else if(params.polarization == params.STOKES_V && params.kappa > 4.0 && params.kappa < 4.5){
+      return kappa4_rho_V(&params) + (params.kappa - 4.0) * (kappa45_rho_V(&params) - kappa4_rho_V(&params)) / 0.5;
+    }
+    else if(params.polarization == params.STOKES_V && params.kappa > 4.5 && params.kappa < 5.0){
+      return kappa45_rho_V(&params) + (params.kappa - 4.5) * (kappa5_rho_V(&params) - kappa45_rho_V(&params)) / 0.5;
+    }
+  }
 
 /*Faraday rotation coefficients for Power-law and Kappa distributions will be added later*/
 //  else if(params.distribution == params.POWER_LAW)
@@ -280,6 +322,5 @@ double check_for_errors(struct parameters * params)
   {
     printf("\n WARNING: theta out of range; fitting formula may be inaccurate \n");
   }
-
   return 0.;
 }

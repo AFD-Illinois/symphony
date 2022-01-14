@@ -143,3 +143,20 @@ cdef extern from "susceptibility_tensor.h":
             double kappa_width,
             char **error_message
            )
+
+    double chi_rho_Q_symphony(double nu,
+            double magnetic_field,
+            double electron_density,
+            double observer_angle,
+            int distribution,
+            int real_part,
+            double theta_e,
+            double power_law_p,
+            double gamma_min,
+            double gamma_max,
+            double gamma_cutoff,
+            double kappa,
+            double kappa_width,
+            char **error_message
+            )
+

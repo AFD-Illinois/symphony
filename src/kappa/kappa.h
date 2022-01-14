@@ -16,4 +16,14 @@ double kappa_I_abs(struct parameters * params);
 double kappa_Q_abs(struct parameters * params);
 double kappa_V_abs(struct parameters * params);
 
+/* Kappa Faraday Rotation fits */
+double kappa35_rho_Q(struct parameters * params);
+double kappa4_rho_Q(struct parameters * params);
+double kappa45_rho_Q(struct parameters * params);
+double kappa5_rho_Q(struct parameters * params);
+double kappa35_rho_V(struct parameters * params);
+double kappa4_rho_V(struct parameters * params);
+double kappa45_rho_V(struct parameters * params);
+double kappa5_rho_V(struct parameters * params);
+
 #endif /* SYMPHONY_KAPPA_H_ */
