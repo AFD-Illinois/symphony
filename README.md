@@ -19,13 +19,14 @@
 ## How to use *symphony*
 
 ### To download and build *symphony*:
- 1. Clone *symphony* from github.  Navigate into the "symphony" folder, and create a folder named "build"; navigate into it.
- 2. Type `cmake` followed by the location of the "src/" folder (in the "symphony" folder, above).  Altogether, this line should look something like: `cmake /location/to/symphony/src`. You can add the argument `-DCMAKE_INSTALL_PREFIX=/name/of/dir` to set the name of the directory to install to.
- 3. Type `make`.
- 4. Optionally, run `make install` to install the library and Python module onto your system.
- 5. In the "build" folder, navigate into the newly created "susceptibility_tensor" folder. Make an empty file called "\__init\__.py" and save it.
- 6. Unzip the "kernel_samples_datafiles.zip" file in place within the "symphony" folder.
- 7. Navigate into the "src" folder, then into the "susceptibility_tensor" folder. Open the file "susceptibilityPy.pyx" and go to the line (line 289) that says `main_directory = `; after the equals sign, add the absolute directory pointing to the "kernel_samples_datafiles/" folder.
+ 1. Clone *symphony* from github.
+ 2. Unzip the "kernel_samples_datafiles.zip" file in place within the root "symphony" folder.
+ 3. Edit the "susceptibilityPy.pyx" file within `src/susceptibility_tensor/` so that the `main_directory` variable (on line 288) points to the absolute path of the "kernel_samples_datafiles/" folder that was produced in step 2.
+ 4. Create a new folder named "build" within the root directory and navigate into it.
+ 5. Type `cmake` followed by the location of the "src/" folder in the root directory. Altogether, this line should look something like: `cmake /location/to/symphony/src`. You can add the argument `-DCMAKE_INSTALL_PREFIX=/name/of/dir` to set the name of the directory to install to. You can use the relative paths here if you like.
+ 6. Type `make`.
+ 7. Optionally, run `make install` to install the library and Python module onto your system.
+ 8. In the "build" folder, navigate into the newly created "susceptibility_tensor" folder. Make an empty file called "\__init\__.py" and save it.
 
 ### To use *symphony*'s `Python` interface:
  1. Navigate to the "build/" folder created in step 1., above.  Open `Python` in the command line or by writing a ".py" file.
