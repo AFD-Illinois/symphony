@@ -318,6 +318,7 @@ from scipy.integrate import quad, fixed_quad
 
 #set up spline interpolation datafiles
 main_directory = '/ADD/ABS_PATH_TO/kernel_samples_datafiles/' #NOTE: put in absolute path of kernel_samples_datafiles here
+if not main_directory.endswith('/'): main_directory += '/'
 
 gamma = np.loadtxt(main_directory + 'step_array.txt')
 
