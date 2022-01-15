@@ -21,7 +21,7 @@
 ### To download and build *symphony*:
  1. Clone *symphony* from github.
  2. Unzip the "kernel_samples_datafiles.zip" file in place within the root "symphony" folder.
- 3. Edit the "susceptibilityPy.pyx" file within `src/susceptibility_tensor/` so that the `main_directory` variable (on line 288) points to the absolute path of the "kernel_samples_datafiles/" folder that was produced in step 2.
+ 3. Edit the "susceptibilityPy.pyx" file within `src/susceptibility_tensor/` so that the `main_directory` variable (on line 320) points to the absolute path of the "kernel_samples_datafiles/" folder that was produced in step 2.
  4. Create a new folder named "build" within the root directory and navigate into it.
  5. Type `cmake` followed by the location of the "src/" folder in the root directory. Altogether, this line should look something like: `cmake /location/to/symphony/src`. You can add the argument `-DCMAKE_INSTALL_PREFIX=/name/of/dir` to set the name of the directory to install to. You can use the relative paths here if you like.
  6. Type `make`.
